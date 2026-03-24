@@ -40,6 +40,11 @@ input {
   font: inherit;
 }
 
+textarea,
+select {
+  font: inherit;
+}
+
 .hidden {
   display: none !important;
 }
@@ -1036,6 +1041,112 @@ input {
   margin-top: 8px;
 }
 
+.card-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-search-input {
+  width: 100%;
+  max-width: 220px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(16, 34, 47, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.panel-search-block {
+  max-width: none;
+  margin-bottom: 14px;
+}
+
+.mini-add-button {
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(16, 34, 47, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 34, 47, 0.45);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.dashboard-modal {
+  width: min(100%, 720px);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 30px;
+  padding: 24px;
+  background: rgba(255, 250, 242, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 30px 80px rgba(16, 34, 47, 0.22);
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.modal-head h2 {
+  margin: 14px 0 0;
+  font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
+}
+
+.modal-close {
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(16, 34, 47, 0.1);
+  background: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-form {
+  display: grid;
+  gap: 14px;
+}
+
+.modal-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.modal-form input,
+.modal-form textarea,
+.modal-form select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 34, 47, 0.1);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.modal-feedback {
+  margin-top: 16px;
+}
+
 @media (max-width: 1100px) {
   .hero,
   .workspace-layout,
@@ -1069,6 +1180,12 @@ input {
 
   .workspace-mini-grid {
     grid-template-columns: 1fr;
+  }
+
+  .card-head-row,
+  .row-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

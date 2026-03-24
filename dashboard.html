@@ -36,7 +36,7 @@
 
       <div class="sidebar-note">
         <span class="sidebar-note-label">სამუშაო სივრცე</span>
-        <p>ეს პანელი უნდა გახდეს ადვოკატის მთავარი კომპიუტერი: საქმეები, დოკუმენტები, ვადები, ჩანაწერები და კლიენტები ერთ ადგილზე.</p>
+        <p>აქედან უნდა იმუშაოს ყველაფერმა: ძებნამ, დამატებამ, კონტროლმა და ყოველდღიურმა იურიდიულმა ოპერაციებმა.</p>
       </div>
     </aside>
 
@@ -50,8 +50,8 @@
 
         <div class="dashboard-top-actions">
           <label class="dashboard-search">
-            <span>სწრაფი ძებნა</span>
-            <input type="text" placeholder="საქმე, კლიენტი, დოკუმენტი...">
+            <span>გლობალური ძებნა</span>
+            <input type="text" data-global-search placeholder="საქმე, კლიენტი, დოკუმენტი, ტრანსკრიფცია...">
           </label>
           <a class="nav-login" href="index.html">მთავარი გვერდი</a>
           <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
@@ -60,11 +60,8 @@
 
       <section class="dashboard-workspace-hero">
         <div class="workspace-hero-copy">
-          <h2>აქ უნდა იყოს ყველაფერი, რაც ადვოკატს კომპიუტერში აქვს და უფრო ჭკვიანად მუშაობს</h2>
-          <p>
-            დღეის პრიორიტეტები, აქტიური საქმეები, სასამართლო სხდომები, Word დოკუმენტები, კლიენტები, AI ტრანსკრიფცია და
-            პროცედურული ვადები ერთ სამუშაო სისტემაში.
-          </p>
+          <h2>ეს არის ადვოკატის ყოველდღიური სამუშაო კომპიუტერი, არა უბრალოდ პროფილის გვერდი</h2>
+          <p>ძებნა, დამატება, რედაქტირება, ვადები, დოკუმენტები, კლიენტები, საქმეები და AI ინსტრუმენტები ერთიან სამუშაო სივრცეში.</p>
         </div>
 
         <div class="workspace-hero-status">
@@ -72,40 +69,40 @@
           <div class="workspace-mini-grid">
             <article class="mini-status-card">
               <span>ღია დოკუმენტები</span>
-              <strong>12</strong>
+              <strong data-open-docs-count>0</strong>
             </article>
             <article class="mini-status-card">
-              <span>ახალი შეტყობინებები</span>
-              <strong>4</strong>
+              <span>კლიენტების ბაზა</span>
+              <strong data-clients-count>0</strong>
             </article>
           </div>
           <div class="workspace-day-card">
             <span>დღევანდელი ფოკუსი</span>
-            <strong data-today-focus>3 გადაუდებელი ვადა • 2 სხდომა • 4 აქტიური საქმე</strong>
+            <strong data-today-focus>მონაცემები იტვირთება...</strong>
           </div>
         </div>
       </section>
 
       <section class="quick-actions-grid">
-        <button class="quick-action-card" type="button">
+        <button class="quick-action-card" type="button" data-open-modal="case">
           <span>საქმეები</span>
           <strong>ახალი საქმე</strong>
           <small>საქმის ბარათი, სასამართლო, მხარეები</small>
         </button>
-        <button class="quick-action-card" type="button">
+        <button class="quick-action-card" type="button" data-open-modal="client">
           <span>კლიენტები</span>
           <strong>ახალი კლიენტი</strong>
-          <small>პირადი მონაცემები და ისტორია</small>
+          <small>პირადი მონაცემები და საკონტაქტო ისტორია</small>
         </button>
-        <button class="quick-action-card" type="button">
+        <button class="quick-action-card" type="button" data-open-modal="transcription">
           <span>AI</span>
-          <strong>აუდიოს ატვირთვა</strong>
-          <small>ტრანსკრიფცია და Word ექსპორტი</small>
+          <strong>ახალი ტრანსკრიფცია</strong>
+          <small>სათაური, საქმე, სტატუსი და ჩანაწერი</small>
         </button>
-        <button class="quick-action-card" type="button">
+        <button class="quick-action-card" type="button" data-open-modal="document">
           <span>დოკუმენტები</span>
-          <strong>დოკუმენტის შექმნა</strong>
-          <small>შაბლონიდან ან ცარიელი ფაილით</small>
+          <strong>ახალი დოკუმენტი</strong>
+          <small>საქმეზე მიბმა და სტატუსით შექმნა</small>
         </button>
       </section>
 
@@ -140,19 +137,31 @@
           </div>
           <div class="operations-grid">
             <div class="operations-card">
-              <h3>სხდომები და მოვლენები</h3>
+              <div class="card-head-row">
+                <h3>სხდომები და მოვლენები</h3>
+                <input class="panel-search-input" type="search" data-search="events" placeholder="ძებნა მოვლენებში">
+              </div>
               <ul class="dashboard-list" data-events-list>
                 <li>დღის მოვლენები ჩაიტვირთება აქ.</li>
               </ul>
             </div>
             <div class="operations-card">
-              <h3>პროცესუალური ვადები</h3>
+              <div class="card-head-row">
+                <h3>პროცესუალური ვადები</h3>
+                <div class="row-actions">
+                  <input class="panel-search-input" type="search" data-search="deadlines" placeholder="ძებნა ვადებში">
+                  <button class="mini-add-button" type="button" data-open-modal="deadline">დამატება</button>
+                </div>
+              </div>
               <ul class="dashboard-list" data-deadlines-list>
                 <li>ვადები ჩაიტვირთება აქ.</li>
               </ul>
             </div>
             <div class="operations-card">
-              <h3>ფინანსური აქტივობა</h3>
+              <div class="card-head-row">
+                <h3>ფინანსური აქტივობა</h3>
+                <input class="panel-search-input" type="search" data-search="transactions" placeholder="ძებნა ოპერაციებში">
+              </div>
               <ul class="dashboard-list" data-transactions-list>
                 <li>ბოლო ოპერაციები ჩაიტვირთება აქ.</li>
               </ul>
@@ -170,6 +179,7 @@
             <span class="panel-chip">ვადები</span>
             <span class="panel-chip">მტკიცებულება</span>
           </div>
+          <input class="panel-search-input panel-search-block" type="search" data-search="cases" placeholder="ძებნა საქმეებში">
           <ul class="dashboard-list" data-cases-list>
             <li>საქმეები ჩაიტვირთება აქ.</li>
           </ul>
@@ -185,6 +195,7 @@
             <span class="panel-chip">კონტაქტი</span>
             <span class="panel-chip">საქმეები</span>
           </div>
+          <input class="panel-search-input panel-search-block" type="search" data-search="clients" placeholder="ძებნა კლიენტებში">
           <ul class="dashboard-list" data-clients-list>
             <li>კლიენტების სია ჩაიტვირთება აქ.</li>
           </ul>
@@ -200,6 +211,7 @@
             <span class="panel-chip">ვერსიები</span>
             <span class="panel-chip">ექსპორტი</span>
           </div>
+          <input class="panel-search-input panel-search-block" type="search" data-search="documents" placeholder="ძებნა დოკუმენტებში">
           <ul class="dashboard-list" data-documents-list>
             <li>დოკუმენტები ჩაიტვირთება აქ.</li>
           </ul>
@@ -215,6 +227,7 @@
             <span class="panel-chip">ცოცხალი ტექსტი</span>
             <span class="panel-chip">.docx</span>
           </div>
+          <input class="panel-search-input panel-search-block" type="search" data-search="transcriptions" placeholder="ძებნა ტრანსკრიფციებში">
           <ul class="dashboard-list" data-transcriptions-list>
             <li>ტრანსკრიფციები ჩაიტვირთება აქ.</li>
           </ul>
@@ -228,23 +241,37 @@
           <div class="replacement-grid">
             <div class="replacement-card">
               <strong>Desktop ფოლდერები</strong>
-              <p>სისტემური საქმეები და კლიენტების პაპკები.</p>
+              <p>საქმეების და კლიენტების ცალკე საქაღალდეები ერთ ციფრულ არქივში გადადის.</p>
             </div>
             <div class="replacement-card">
               <strong>Word ფაილების ქაოსი</strong>
-              <p>შაბლონები, ვერსიები და სწრაფი ექსპორტი.</p>
+              <p>დოკუმენტები, შაბლონები, სტატუსები და ვერსიები მართვად სივრცეშია.</p>
             </div>
             <div class="replacement-card">
               <strong>Excel სიები</strong>
-              <p>კლიენტები, საქმეები, გადახდები და სტატუსები.</p>
+              <p>კლიენტები, საქმეები, გადახდები და პროგრესი ახლა ბაზაშია და საძიებოა.</p>
             </div>
             <div class="replacement-card">
               <strong>ფურცელზე მიწერილი ვადები</strong>
-              <p>ავტომატური კალენდარი, შეხსენებები და კონტროლი.</p>
+              <p>ვადები, სხდომები და შეხსენებები უკვე სამუშაო სისტემის ნაწილია.</p>
             </div>
           </div>
         </article>
       </section>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" data-modal-backdrop>
+    <div class="dashboard-modal">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow modal-eyebrow">ახალი ჩანაწერი</span>
+          <h2 data-modal-title>ფორმა</h2>
+        </div>
+        <button class="modal-close" type="button" data-close-modal>დახურვა</button>
+      </div>
+      <form class="modal-form" data-modal-form></form>
+      <p class="auth-feedback modal-feedback" data-modal-feedback></p>
     </div>
   </div>
 
