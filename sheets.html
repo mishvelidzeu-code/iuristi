@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexFlow | Sheets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page sheets-page">
+  <div class="dashboard-shell">
+    <aside class="dashboard-sidebar">
+      <a class="brand dashboard-brand" href="index.html">
+        <span class="brand-mark">L</span>
+        <span><strong>LexFlow</strong><small>Legal Operating System</small></span>
+      </a>
+      <nav class="dashboard-nav">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="cases.html">საქმეები</a>
+        <a href="clients.html">კლიენტები</a>
+        <a href="documents.html">დოკუმენტები</a>
+        <a href="transcriptions.html">AI ტრანსკრიფცია</a>
+        <a href="deadlines.html">ვადები</a>
+        <a href="events.html">სხდომები და მოვლენები</a>
+        <a class="active" href="sheets.html">ცხრილები / Excel</a>
+      </nav>
+    </aside>
+
+    <div class="dashboard-content">
+      <header class="dashboard-topbar">
+        <div class="dashboard-topbar-copy">
+          <div class="eyebrow">Embedded Workspace</div>
+          <h1 data-user-name>იტვირთება...</h1>
+          <p class="dashboard-subtext" data-user-meta>Google Sheets ან Excel workflow კაბინეტშივე.</p>
+        </div>
+        <div class="dashboard-top-actions compact-actions">
+          <a class="nav-login" href="dashboard.html">Dashboard</a>
+          <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
+        </div>
+      </header>
+
+      <section class="module-hero">
+        <div>
+          <h2>ჩაშენებული Google Sheet / Excel</h2>
+          <p>აქ შეგიძლია ჩასვა published ან shareable Google Sheets embed ლინკი და იმუშაო პირდაპირ LexFlow-დან.</p>
+        </div>
+        <div class="dashboard-status" data-sheets-status>ჩასვი Sheets embed ბმული და შეინახე.</div>
+      </section>
+
+      <section class="sheets-toolbar-card">
+        <form class="sheets-toolbar" data-sheets-form>
+          <label class="module-search sheets-url-field">
+            <span>Google Sheets embed ლინკი</span>
+            <input type="url" name="sheet_url" data-sheets-input placeholder="https://docs.google.com/spreadsheets/d/.../edit ან .../pubhtml?widget=true">
+          </label>
+          <div class="sheets-actions">
+            <button class="nav-cta" type="submit">შენახვა</button>
+            <button class="nav-login" type="button" data-open-sheet>ახალ ტაბში გახსნა</button>
+            <button class="nav-login" type="button" data-clear-sheet>გასუფთავება</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="sheets-frame-card">
+        <div class="panel-head panel-head-link">
+          <div>
+            <h2>ცხრილი სამუშაო სივრცეში</h2>
+            <span>თუ Google Sheet public/embed ფორმატშია, აქ პირდაპირ გამოჩნდება.</span>
+          </div>
+        </div>
+        <div class="sheets-empty" data-sheets-empty>
+          <strong>ჯერ embed ბმული არაა ჩასმული</strong>
+          <p>Google Sheet-ის link ჩასვი ზემოთ და გვერდი პირდაპირ შიგნით ჩატვირთავს ცხრილს.</p>
+        </div>
+        <iframe class="sheets-frame hidden" data-sheets-frame title="Embedded Google Sheet"></iframe>
+      </section>
+    </div>
+  </div>
+
+  <script type="module" src="sheets.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+import { supabase } from "./supabase.js";
+
+const STORAGE_KEY = "lexflow_sheet_embed_url";
+const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1hMopI0YHEJWzvOKMPflmUeEamZ6RM__OJv-ZUNONhOE/preview";
+
+const userName = document.querySelector("[data-user-name]");
+const userMeta = document.querySelector("[data-user-meta]");
+const logoutButton = document.querySelector("[data-logout]");
+const statusEl = document.querySelector("[data-sheets-status]");
+const form = document.querySelector("[data-sheets-form]");
+const input = document.querySelector("[data-sheets-input]");
+const frame = document.querySelector("[data-sheets-frame]");
+const empty = document.querySelector("[data-sheets-empty]");
+const openButton = document.querySelector("[data-open-sheet]");
+const clearButton = document.querySelector("[data-clear-sheet]");
+
+const normalizeSheetUrl = (value) => {
+  const url = String(value || "").trim();
+  if (!url) return "";
+
+  if (url.includes("/pubhtml")) return url;
+  if (url.includes("/preview")) return url;
+  if (url.includes("/edit")) return url.replace("/edit", "/preview");
+  return url;
+};
+
+const setStatus = (message) => {
+  if (statusEl) statusEl.textContent = message;
+};
+
+const renderSheet = (url) => {
+  const normalized = normalizeSheetUrl(url);
+
+  if (!normalized) {
+    frame.classList.add("hidden");
+    frame.removeAttribute("src");
+    empty.classList.remove("hidden");
+    setStatus("ჩასვი Sheets embed ბმული და შეინახე.");
+    return;
+  }
+
+  frame.src = normalized;
+  frame.classList.remove("hidden");
+  empty.classList.add("hidden");
+  setStatus("ცხრილი ჩაშენებულია. შეგიძლია იმუშაო პირდაპირ ამ გვერდიდან.");
+};
+
+async function initPage() {
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    window.location.href = "./login.html";
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", session.user.id)
+    .single();
+
+  if (profile) {
+    userName.textContent = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || "კაბინეტი";
+    userMeta.textContent = profile.bureau_name || "ცხრილების სამუშაო სივრცე";
+  }
+
+  const savedUrl = localStorage.getItem(STORAGE_KEY) || DEFAULT_SHEET_URL;
+  input.value = savedUrl;
+  renderSheet(savedUrl);
+}
+
+form?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = normalizeSheetUrl(input.value);
+  localStorage.setItem(STORAGE_KEY, value);
+  input.value = value;
+  renderSheet(value);
+});
+
+openButton?.addEventListener("click", () => {
+  const url = normalizeSheetUrl(input.value || localStorage.getItem(STORAGE_KEY));
+  if (!url) {
+    setStatus("ჯერ ბმული ჩასვი, მერე გახსენი ახალ ტაბში.");
+    return;
+  }
+
+  window.open(url, "_blank", "noopener,noreferrer");
+});
+
+clearButton?.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  input.value = "";
+  renderSheet("");
+});
+
+logoutButton?.addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  window.location.href = "./index.html";
+});
+
+initPage();
