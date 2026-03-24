@@ -1,15 +1,15 @@
 :root {
-  --bg: #f4efe6;
-  --bg-deep: #10222f;
-  --surface: rgba(255, 255, 255, 0.72);
-  --surface-strong: #fffaf2;
+  --bg: #f5f1ea;
+  --bg-deep: #132532;
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-strong: #fffaf4;
   --text: #18222c;
-  --muted: #5f6c78;
-  --line: rgba(24, 34, 44, 0.1);
-  --accent: #b98a3d;
-  --accent-dark: #93671f;
-  --ink-soft: #d8cfc0;
-  --shadow: 0 20px 60px rgba(16, 34, 47, 0.12);
+  --muted: #65717c;
+  --line: rgba(24, 34, 44, 0.08);
+  --accent: #b48a4b;
+  --accent-dark: #8c6630;
+  --ink-soft: #d8d0c4;
+  --shadow: 0 16px 38px rgba(16, 34, 47, 0.09);
 }
 
 * {
@@ -75,8 +75,8 @@ select {
 .overview-link-card {
   display: grid;
   gap: 8px;
-  padding: 22px;
-  border-radius: 24px;
+  padding: 20px;
+  border-radius: 20px;
   background: rgba(255, 250, 242, 0.78);
   border: 1px solid rgba(16, 34, 47, 0.08);
   box-shadow: var(--shadow);
@@ -90,7 +90,7 @@ select {
 }
 
 .overview-link-card strong {
-  font-size: 1.08rem;
+  font-size: 1rem;
 }
 
 .dashboard-board-overview {
@@ -132,9 +132,9 @@ select {
   justify-content: space-between;
   gap: 24px;
   align-items: flex-start;
-  padding: 28px;
+  padding: 24px;
   margin-top: 12px;
-  border-radius: 28px;
+  border-radius: 24px;
   background: rgba(255, 250, 242, 0.7);
   border: 1px solid rgba(16, 34, 47, 0.08);
   box-shadow: var(--shadow);
@@ -143,14 +143,15 @@ select {
 .module-hero h2 {
   margin: 0 0 10px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
 }
 
 .module-hero p {
   margin: 0;
   color: var(--muted);
   max-width: 60ch;
-  line-height: 1.7;
+  font-size: 0.94rem;
+  line-height: 1.65;
 }
 
 .module-stats {
@@ -177,8 +178,8 @@ select {
 
 .module-search input {
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
   border: 1px solid rgba(16, 34, 47, 0.12);
   background: rgba(255, 255, 255, 0.72);
 }
@@ -196,11 +197,11 @@ select {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px 22px;
-  border-radius: 22px;
+  padding: 18px 20px;
+  border-radius: 18px;
   background: rgba(255, 250, 242, 0.82);
   border: 1px solid rgba(16, 34, 47, 0.08);
-  box-shadow: 0 14px 30px rgba(16, 34, 47, 0.08);
+  box-shadow: 0 10px 24px rgba(16, 34, 47, 0.07);
 }
 
 .record-card-main {
@@ -215,10 +216,24 @@ select {
   gap: 12px;
 }
 
+.record-card-top strong,
+.panel-head h2,
+.panel-head-link h2 {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.panel-head span,
+.panel-head-link span,
+.panel-link {
+  font-size: 0.84rem;
+}
+
 .record-card p {
   margin: 10px 0;
   color: var(--muted);
-  line-height: 1.7;
+  font-size: 0.93rem;
+  line-height: 1.6;
 }
 
 .record-meta-row {
@@ -226,17 +241,17 @@ select {
   flex-wrap: wrap;
   gap: 10px 18px;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.86rem;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 7px 10px;
   border-radius: 999px;
   background: rgba(16, 34, 47, 0.08);
-  font-size: 0.84rem;
+  font-size: 0.74rem;
   font-weight: 700;
 }
 
@@ -347,21 +362,21 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  padding: 14px 22px;
+  border-radius: 16px;
+  padding: 12px 18px;
   background: linear-gradient(135deg, var(--accent), #d5ae61);
   color: #1e1a14;
-  font-weight: 800;
+  font-weight: 700;
   border: none;
-  box-shadow: 0 12px 24px rgba(185, 138, 61, 0.28);
+  box-shadow: 0 10px 22px rgba(185, 138, 61, 0.18);
 }
 
 .nav-login {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  padding: 14px 18px;
+  border-radius: 16px;
+  padding: 12px 16px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.42);
   font-weight: 700;
@@ -387,9 +402,9 @@ select {
   border-radius: 999px;
   background: rgba(16, 34, 47, 0.08);
   color: var(--bg-deep);
-  font-size: 0.88rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -398,8 +413,8 @@ select {
 .contact-card h2 {
   margin: 18px 0 16px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2.6rem, 5vw, 5.3rem);
-  line-height: 1.02;
+  font-size: clamp(2.2rem, 4vw, 4.2rem);
+  line-height: 1.06;
   letter-spacing: -0.02em;
 }
 
@@ -416,8 +431,8 @@ select {
 
 .hero-text {
   max-width: 62ch;
-  font-size: 1.08rem;
-  line-height: 1.8;
+  font-size: 0.98rem;
+  line-height: 1.72;
 }
 
 .hero-text,
@@ -431,8 +446,8 @@ select {
 .pricing-card li,
 .editor-box,
 .transcript-card p {
-  font-size: 1rem;
-  line-height: 1.85;
+  font-size: 0.95rem;
+  line-height: 1.75;
 }
 
 .hero-actions {
@@ -922,14 +937,14 @@ select {
 }
 
 .dashboard-sidebar {
-  border-radius: 28px;
-  padding: 22px;
+  border-radius: 24px;
+  padding: 18px;
   position: sticky;
   top: 18px;
   height: calc(100vh - 36px);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .dashboard-brand {
@@ -943,10 +958,11 @@ select {
 }
 
 .dashboard-nav a {
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
   color: var(--muted);
   font-weight: 700;
+  font-size: 0.94rem;
 }
 
 .dashboard-nav a.active {
@@ -956,8 +972,8 @@ select {
 
 .sidebar-note {
   margin-top: auto;
-  border-radius: 22px;
-  padding: 18px;
+  border-radius: 18px;
+  padding: 16px;
 }
 
 .sidebar-note-label {
@@ -973,7 +989,8 @@ select {
 .replacement-card p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.8;
+  font-size: 0.93rem;
+  line-height: 1.68;
 }
 
 .dashboard-content {
@@ -982,8 +999,8 @@ select {
 }
 
 .dashboard-topbar {
-  border-radius: 28px;
-  padding: 24px 28px;
+  border-radius: 24px;
+  padding: 22px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -997,8 +1014,8 @@ select {
 .workspace-hero-copy h2 {
   margin: 16px 0 10px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2rem, 4vw, 3.6rem);
-  line-height: 1.08;
+  font-size: clamp(1.7rem, 3vw, 2.75rem);
+  line-height: 1.12;
   letter-spacing: -0.02em;
 }
 
@@ -1017,21 +1034,21 @@ select {
   display: grid;
   gap: 8px;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 .dashboard-search input {
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
   border: 1px solid rgba(16, 34, 47, 0.1);
   background: rgba(255, 255, 255, 0.82);
 }
 
 .dashboard-workspace-hero {
-  border-radius: 28px;
-  padding: 28px;
+  border-radius: 24px;
+  padding: 24px;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 18px;
@@ -1049,6 +1066,8 @@ select {
 
 .workspace-hero-copy p {
   color: rgba(255, 255, 255, 0.78);
+  font-size: 0.95rem;
+  line-height: 1.68;
 }
 
 .workspace-mini-grid {
@@ -1058,8 +1077,8 @@ select {
 }
 
 .mini-status-card {
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 14px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -1072,12 +1091,12 @@ select {
 
 .mini-status-card strong {
   display: block;
-  font-size: 1.3rem;
+  font-size: 1.08rem;
 }
 
 .workspace-day-card {
-  border-radius: 22px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 18px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -1090,8 +1109,8 @@ select {
 }
 
 .workspace-day-card strong {
-  font-size: 1.15rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .quick-actions-grid {
@@ -1101,11 +1120,11 @@ select {
 }
 
 .quick-action-card {
-  border-radius: 22px;
-  padding: 18px;
+  border-radius: 18px;
+  padding: 16px;
   border: none;
   text-align: left;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--bg-deep);
   cursor: pointer;
   display: grid;
@@ -1127,13 +1146,13 @@ select {
 }
 
 .quick-action-card strong {
-  font-size: 1.08rem;
+  font-size: 0.98rem;
 }
 
 .quick-action-card small {
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
+  font-size: 0.86rem;
+  line-height: 1.55;
 }
 
 .metrics-strip {
@@ -1143,8 +1162,8 @@ select {
 }
 
 .metric-tile {
-  border-radius: 24px;
-  padding: 22px;
+  border-radius: 20px;
+  padding: 18px;
   position: relative;
   overflow: hidden;
 }
@@ -1161,8 +1180,8 @@ select {
 
 .metric-tile strong {
   display: block;
-  font-size: 2rem;
-  margin: 10px 0 8px;
+  font-size: 1.45rem;
+  margin: 8px 0 6px;
 }
 
 .metric-tile::after {
@@ -1192,8 +1211,8 @@ select {
 }
 
 .dashboard-panel {
-  border-radius: 26px;
-  padding: 24px;
+  border-radius: 22px;
+  padding: 20px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 250, 242, 0.66));
 }
