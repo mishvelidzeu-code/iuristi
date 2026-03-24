@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ka">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LexFlow | Dashboard</title>
-  <meta name="description" content="LexFlow-ის მთავარი სამუშაო სივრცე ადვოკატებისთვის, პროკურორებისთვის და მოსამართლეებისთვის.">
+  <meta name="description" content="LexFlow-ის მთავარი overview იურისტებისთვის, სადაც ჩანს მხოლოდ უახლოესი სხდომები, ვადები და მთავარი სამუშაო მაჩვენებლები.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
@@ -22,256 +22,195 @@
       </a>
 
       <nav class="dashboard-nav">
-        <a class="active" href="#">Dashboard</a>
-        <a href="#">საქმეები</a>
-        <a href="#">კლიენტები</a>
-        <a href="#">დოკუმენტები</a>
-        <a href="#">AI ტრანსკრიფცია</a>
-        <a href="#">კალენდარი და ვადები</a>
-        <a href="#">არქივი</a>
-        <a href="#">ფინანსები</a>
-        <a href="#">იურიდიული ხელსაწყოები</a>
-        <a href="#">პარამეტრები</a>
+        <a class="active" href="dashboard.html">Dashboard</a>
+        <a href="cases.html">საქმეები</a>
+        <a href="clients.html">კლიენტები</a>
+        <a href="documents.html">დოკუმენტები</a>
+        <a href="transcriptions.html">AI ტრანსკრიფცია</a>
+        <a href="deadlines.html">ვადები</a>
+        <a href="events.html">სხდომები და მოვლენები</a>
       </nav>
 
       <div class="sidebar-note">
-        <span class="sidebar-note-label">სამუშაო სივრცე</span>
-        <p>აქედან უნდა იმუშაოს ყველაფერმა: ძებნამ, დამატებამ, კონტროლმა და ყოველდღიურმა იურიდიულმა ოპერაციებმა.</p>
+        <span class="sidebar-note-label">მთავარი სამუშაო სივრცე</span>
+        <p>დეშბორდზე ჩანს მხოლოდ ყველაზე მნიშვნელოვანი. სრული ისტორია, ძებნა, დამატება და მართვა გადანაწილებულია ცალკე სამუშაო გვერდებზე.</p>
       </div>
     </aside>
 
     <div class="dashboard-content">
       <header class="dashboard-topbar">
         <div class="dashboard-topbar-copy">
-          <div class="eyebrow">მთავარი სამუშაო სივრცე</div>
+          <div class="eyebrow">დღის overview</div>
           <h1 data-user-name>იტვირთება...</h1>
-          <p class="dashboard-subtext" data-user-meta>მომხმარებლის სამუშაო მონაცემები იტვირთება.</p>
+          <p class="dashboard-subtext" data-user-meta>სამუშაო პროფილი იტვირთება.</p>
         </div>
 
-        <div class="dashboard-top-actions">
-          <label class="dashboard-search">
-            <span>გლობალური ძებნა</span>
-            <input type="text" data-global-search placeholder="საქმე, კლიენტი, დოკუმენტი, ტრანსკრიფცია...">
-          </label>
+        <div class="dashboard-top-actions compact-actions">
           <a class="nav-login" href="index.html">მთავარი გვერდი</a>
           <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
         </div>
       </header>
 
-      <section class="dashboard-workspace-hero">
+      <section class="dashboard-workspace-hero dashboard-overview-hero">
         <div class="workspace-hero-copy">
-          <h2>ეს არის ადვოკატის ყოველდღიური სამუშაო კომპიუტერი, არა უბრალოდ პროფილის გვერდი</h2>
-          <p>ძებნა, დამატება, რედაქტირება, ვადები, დოკუმენტები, კლიენტები, საქმეები და AI ინსტრუმენტები ერთიან სამუშაო სივრცეში.</p>
+          <h2>აქ უნდა ჩანდეს მხოლოდ ის, რაც ახლა ყველაზე მნიშვნელოვანია</h2>
+          <p>უახლოესი სხდომა, უახლოესი ვადა, ყველაზე აქტუალური საქმეები და ბოლო სამუშაო მოძრაობა. დანარჩენი ყველაფერი იხსნება შესაბამის გვერდებზე, სადაც უკვე სრული ძებნა და მართვაა.</p>
         </div>
 
         <div class="workspace-hero-status">
           <div class="dashboard-status" data-dashboard-status>მონაცემები იტვირთება...</div>
-          <div class="workspace-mini-grid">
+          <div class="workspace-mini-grid overview-mini-grid">
             <article class="mini-status-card">
-              <span>ღია დოკუმენტები</span>
-              <strong data-open-docs-count>0</strong>
+              <span>უახლოესი სხდომა</span>
+              <strong data-next-hearing>ჯერ არ არის</strong>
             </article>
             <article class="mini-status-card">
-              <span>კლიენტების ბაზა</span>
-              <strong data-clients-count>0</strong>
+              <span>უახლოესი ვადა</span>
+              <strong data-next-deadline>ჯერ არ არის</strong>
             </article>
           </div>
           <div class="workspace-day-card">
-            <span>დღევანდელი ფოკუსი</span>
+            <span>დღის მთავარი ფოკუსი</span>
             <strong data-today-focus>მონაცემები იტვირთება...</strong>
           </div>
         </div>
       </section>
 
-      <section class="quick-actions-grid">
-        <button class="quick-action-card" type="button" data-open-modal="case">
-          <span>საქმეები</span>
-          <strong>ახალი საქმე</strong>
-          <small>საქმის ბარათი, სასამართლო, მხარეები</small>
-        </button>
-        <button class="quick-action-card" type="button" data-open-modal="client">
-          <span>კლიენტები</span>
-          <strong>ახალი კლიენტი</strong>
-          <small>პირადი მონაცემები და საკონტაქტო ისტორია</small>
-        </button>
-        <button class="quick-action-card" type="button" data-open-modal="transcription">
-          <span>AI</span>
-          <strong>ახალი ტრანსკრიფცია</strong>
-          <small>სათაური, საქმე, სტატუსი და ჩანაწერი</small>
-        </button>
-        <button class="quick-action-card" type="button" data-open-modal="document">
-          <span>დოკუმენტები</span>
-          <strong>ახალი დოკუმენტი</strong>
-          <small>საქმეზე მიბმა და სტატუსით შექმნა</small>
-        </button>
-      </section>
-
-      <section class="metrics-strip">
+      <section class="metrics-strip overview-metrics">
         <article class="metric-tile">
           <span>ბალანსი</span>
           <strong data-balance>₾ 0.00</strong>
-          <small>გამოყენება და შევსება ერთ ხედში</small>
+          <small>სრული ისტორია იხსნება ფინანსების მოდულში</small>
         </article>
         <article class="metric-tile">
           <span>აქტიური საქმეები</span>
           <strong data-cases-count>0</strong>
-          <small>დღეს სამუშაოში არსებული საქმეები</small>
+          <small>გახსენი საქმეთა გვერდი სრული სიისთვის</small>
         </article>
         <article class="metric-tile">
-          <span>დღევანდელი სხდომები</span>
-          <strong data-events-count>0</strong>
-          <small>კალენდარში მონიშნული პროცესები</small>
+          <span>კლიენტები</span>
+          <strong data-clients-count>0</strong>
+          <small>ბაზა და ძებნა იხსნება კლიენტების გვერდზე</small>
         </article>
         <article class="metric-tile accent">
           <span>AI ტრანსკრიფცია</span>
           <strong data-transcriptions-count>0</strong>
-          <small>ბოლო დამუშავებული ჩანაწერები</small>
+          <small>მხოლოდ ბოლო აქტივობა ჩანს აქ</small>
         </article>
       </section>
 
-      <section class="dashboard-board">
-        <article class="dashboard-panel dashboard-panel-large">
-          <div class="panel-head">
-            <h2>დღევანდელი სამუშაო ცენტრი</h2>
-            <span>დღის პრიორიტეტები და უახლოესი ნაბიჯები</span>
-          </div>
-          <div class="operations-grid">
-            <div class="operations-card">
-              <div class="card-head-row">
-                <h3>სხდომები და მოვლენები</h3>
-                <input class="panel-search-input" type="search" data-search="events" placeholder="ძებნა მოვლენებში">
-              </div>
-              <ul class="dashboard-list" data-events-list>
-                <li>დღის მოვლენები ჩაიტვირთება აქ.</li>
-              </ul>
-            </div>
-            <div class="operations-card">
-              <div class="card-head-row">
-                <h3>პროცესუალური ვადები</h3>
-                <div class="row-actions">
-                  <input class="panel-search-input" type="search" data-search="deadlines" placeholder="ძებნა ვადებში">
-                  <button class="mini-add-button" type="button" data-open-modal="deadline">დამატება</button>
-                </div>
-              </div>
-              <ul class="dashboard-list" data-deadlines-list>
-                <li>ვადები ჩაიტვირთება აქ.</li>
-              </ul>
-            </div>
-            <div class="operations-card">
-              <div class="card-head-row">
-                <h3>ფინანსური აქტივობა</h3>
-                <input class="panel-search-input" type="search" data-search="transactions" placeholder="ძებნა ოპერაციებში">
-              </div>
-              <ul class="dashboard-list" data-transactions-list>
-                <li>ბოლო ოპერაციები ჩაიტვირთება აქ.</li>
-              </ul>
-            </div>
-          </div>
-        </article>
+      <section class="overview-links-grid">
+        <a class="overview-link-card" href="cases.html">
+          <span>საქმეები</span>
+          <strong data-cases-preview-count>0 აქტიური საქმე</strong>
+          <small>სრული სია, ფილტრი, ძებნა, დამატება და რედაქტირება</small>
+        </a>
+        <a class="overview-link-card" href="clients.html">
+          <span>კლიენტები</span>
+          <strong data-clients-preview-count>0 კლიენტი</strong>
+          <small>კლიენტის ბარათები, კონტაქტები და შენიშვნები</small>
+        </a>
+        <a class="overview-link-card" href="documents.html">
+          <span>დოკუმენტები</span>
+          <strong data-documents-preview-count>0 დოკუმენტი</strong>
+          <small>შაბლონები, drafts, generated ფაილები და მართვა</small>
+        </a>
+        <a class="overview-link-card" href="transcriptions.html">
+          <span>AI ტრანსკრიფცია</span>
+          <strong data-transcriptions-preview-count>0 ჩანაწერი</strong>
+          <small>ძებნა, სტატუსები, ტექსტი და რედაქტირება</small>
+        </a>
+        <a class="overview-link-card" href="deadlines.html">
+          <span>ვადები</span>
+          <strong data-deadlines-preview-count>0 ვადა</strong>
+          <small>მხოლოდ უახლოესი ჩანს აქ, სრული სია შიგნით</small>
+        </a>
+        <a class="overview-link-card" href="events.html">
+          <span>სხდომები და მოვლენები</span>
+          <strong data-events-preview-count>0 მოვლენა</strong>
+          <small>დეშბორდზე მხოლოდ უახლოესი, სრულად გვერდზე</small>
+        </a>
+      </section>
 
-        <article class="dashboard-panel">
-          <div class="panel-head">
-            <h2>აქტიური საქმეები</h2>
-            <span>რაც ახლა იხსნება და მუშავდება</span>
+      <section class="dashboard-board dashboard-board-overview">
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>უახლოესი სხდომები და მოვლენები</h2>
+              <span>აქ ჩანს მხოლოდ მომავალი ან უახლესი ჩანაწერები</span>
+            </div>
+            <a class="panel-link" href="events.html">ყველას ნახვა</a>
           </div>
-          <div class="panel-toolbar">
-            <span class="panel-chip">სასამართლო</span>
-            <span class="panel-chip">ვადები</span>
-            <span class="panel-chip">მტკიცებულება</span>
-          </div>
-          <input class="panel-search-input panel-search-block" type="search" data-search="cases" placeholder="ძებნა საქმეებში">
-          <ul class="dashboard-list" data-cases-list>
-            <li>საქმეები ჩაიტვირთება აქ.</li>
+          <ul class="dashboard-list preview-list" data-preview-list="events">
+            <li>მონაცემები იტვირთება...</li>
           </ul>
         </article>
 
-        <article class="dashboard-panel">
-          <div class="panel-head">
-            <h2>კლიენტების ბაზა</h2>
-            <span>ბოლო ან ყველაზე აქტიური კონტაქტები</span>
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>უახლოესი ვადები</h2>
+              <span>ყველაზე მალე მოსული საპროცესო ან სამუშაო ვადები</span>
+            </div>
+            <a class="panel-link" href="deadlines.html">ყველას ნახვა</a>
           </div>
-          <div class="panel-toolbar">
-            <span class="panel-chip">პირადი ნომერი</span>
-            <span class="panel-chip">კონტაქტი</span>
-            <span class="panel-chip">საქმეები</span>
-          </div>
-          <input class="panel-search-input panel-search-block" type="search" data-search="clients" placeholder="ძებნა კლიენტებში">
-          <ul class="dashboard-list" data-clients-list>
-            <li>კლიენტების სია ჩაიტვირთება აქ.</li>
+          <ul class="dashboard-list preview-list" data-preview-list="deadlines">
+            <li>მონაცემები იტვირთება...</li>
           </ul>
         </article>
 
-        <article class="dashboard-panel">
-          <div class="panel-head">
-            <h2>დოკუმენტების ცენტრი</h2>
-            <span>ბოლო Word/PDF ფაილები</span>
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>აქტიური საქმეების მოკლე სურათი</h2>
+              <span>მხოლოდ ყველაზე აქტუალური საქმეები</span>
+            </div>
+            <a class="panel-link" href="cases.html">ყველას ნახვა</a>
           </div>
-          <div class="panel-toolbar">
-            <span class="panel-chip">შაბლონები</span>
-            <span class="panel-chip">ვერსიები</span>
-            <span class="panel-chip">ექსპორტი</span>
-          </div>
-          <input class="panel-search-input panel-search-block" type="search" data-search="documents" placeholder="ძებნა დოკუმენტებში">
-          <ul class="dashboard-list" data-documents-list>
-            <li>დოკუმენტები ჩაიტვირთება აქ.</li>
+          <ul class="dashboard-list preview-list" data-preview-list="cases">
+            <li>მონაცემები იტვირთება...</li>
           </ul>
         </article>
 
-        <article class="dashboard-panel">
-          <div class="panel-head">
-            <h2>AI ტრანსკრიფციის ცენტრი</h2>
-            <span>აუდიო, სტატუსი, რედაქტირება</span>
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>ბოლო დოკუმენტები</h2>
+              <span>უახლესი სამუშაო ფაილები</span>
+            </div>
+            <a class="panel-link" href="documents.html">ყველას ნახვა</a>
           </div>
-          <div class="panel-toolbar">
-            <span class="panel-chip">ქართული</span>
-            <span class="panel-chip">ცოცხალი ტექსტი</span>
-            <span class="panel-chip">.docx</span>
-          </div>
-          <input class="panel-search-input panel-search-block" type="search" data-search="transcriptions" placeholder="ძებნა ტრანსკრიფციებში">
-          <ul class="dashboard-list" data-transcriptions-list>
-            <li>ტრანსკრიფციები ჩაიტვირთება აქ.</li>
+          <ul class="dashboard-list preview-list" data-preview-list="documents">
+            <li>მონაცემები იტვირთება...</li>
           </ul>
         </article>
 
-        <article class="dashboard-panel dashboard-panel-wide">
-          <div class="panel-head">
-            <h2>რა უნდა ჩაანაცვლოს ამ სისტემამ</h2>
-            <span>ძველი კომპიუტერული ჩვევები ერთიან პლატფორმაში</span>
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>AI ტრანსკრიფციის ბოლო აქტივობა</h2>
+              <span>მხოლოდ უახლესი ჩანაწერები და სტატუსები</span>
+            </div>
+            <a class="panel-link" href="transcriptions.html">ყველას ნახვა</a>
           </div>
-          <div class="replacement-grid">
-            <div class="replacement-card">
-              <strong>Desktop ფოლდერები</strong>
-              <p>საქმეების და კლიენტების ცალკე საქაღალდეები ერთ ციფრულ არქივში გადადის.</p>
+          <ul class="dashboard-list preview-list" data-preview-list="transcriptions">
+            <li>მონაცემები იტვირთება...</li>
+          </ul>
+        </article>
+
+        <article class="dashboard-panel overview-panel">
+          <div class="panel-head panel-head-link">
+            <div>
+              <h2>ახალი და აქტიური კლიენტები</h2>
+              <span>მოკლე preview, სრული ბაზა ცალკე გვერდზე</span>
             </div>
-            <div class="replacement-card">
-              <strong>Word ფაილების ქაოსი</strong>
-              <p>დოკუმენტები, შაბლონები, სტატუსები და ვერსიები მართვად სივრცეშია.</p>
-            </div>
-            <div class="replacement-card">
-              <strong>Excel სიები</strong>
-              <p>კლიენტები, საქმეები, გადახდები და პროგრესი ახლა ბაზაშია და საძიებოა.</p>
-            </div>
-            <div class="replacement-card">
-              <strong>ფურცელზე მიწერილი ვადები</strong>
-              <p>ვადები, სხდომები და შეხსენებები უკვე სამუშაო სისტემის ნაწილია.</p>
-            </div>
+            <a class="panel-link" href="clients.html">ყველას ნახვა</a>
           </div>
+          <ul class="dashboard-list preview-list" data-preview-list="clients">
+            <li>მონაცემები იტვირთება...</li>
+          </ul>
         </article>
       </section>
-    </div>
-  </div>
-
-  <div class="modal-backdrop hidden" data-modal-backdrop>
-    <div class="dashboard-modal">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow modal-eyebrow">ახალი ჩანაწერი</span>
-          <h2 data-modal-title>ფორმა</h2>
-        </div>
-        <button class="modal-close" type="button" data-close-modal>დახურვა</button>
-      </div>
-      <form class="modal-form" data-modal-form></form>
-      <p class="auth-feedback modal-feedback" data-modal-feedback></p>
     </div>
   </div>
 
