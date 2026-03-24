@@ -4,55 +4,136 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LexFlow | Dashboard</title>
-  <meta name="description" content="LexFlow-ის პირადი კაბინეტი იურისტებისთვის, პროკურორებისთვის და მოსამართლეებისთვის.">
+  <meta name="description" content="LexFlow-ის მთავარი სამუშაო სივრცე ადვოკატებისთვის, პროკურორებისთვის და მოსამართლეებისთვის.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="dashboard-page">
-  <div class="page-shell">
-    <header class="site-header dashboard-header">
-      <a class="brand" href="index.html">
+  <div class="dashboard-shell">
+    <aside class="dashboard-sidebar">
+      <a class="brand dashboard-brand" href="index.html">
         <span class="brand-mark">L</span>
         <span>
           <strong>LexFlow</strong>
-          <small>Personal Dashboard</small>
+          <small>Legal Operating System</small>
         </span>
       </a>
 
-      <div class="header-actions">
-        <a class="nav-login" href="index.html">მთავარი</a>
-        <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
-      </div>
-    </header>
+      <nav class="dashboard-nav">
+        <a class="active" href="#">Dashboard</a>
+        <a href="#">საქმეები</a>
+        <a href="#">კლიენტები</a>
+        <a href="#">დოკუმენტები</a>
+        <a href="#">AI ტრანსკრიფცია</a>
+        <a href="#">კალენდარი და ვადები</a>
+        <a href="#">არქივი</a>
+        <a href="#">ფინანსები</a>
+        <a href="#">იურიდიული ხელსაწყოები</a>
+        <a href="#">პარამეტრები</a>
+      </nav>
 
-    <main class="dashboard-main">
-      <section class="dashboard-hero">
+      <div class="sidebar-note">
+        <span class="sidebar-note-label">სამუშაო სივრცე</span>
+        <p>ეს პანელი უნდა გახდეს ადვოკატის მთავარი კომპიუტერი: საქმეები, დოკუმენტები, ვადები, ჩანაწერები და კლიენტები ერთ ადგილზე.</p>
+      </div>
+    </aside>
+
+    <div class="dashboard-content">
+      <header class="dashboard-topbar">
         <div>
-          <div class="eyebrow">პერსონალური კაბინეტი</div>
+          <div class="eyebrow">მთავარი სამუშაო სივრცე</div>
           <h1 data-user-name>იტვირთება...</h1>
-          <p class="hero-text" data-user-meta>ვცდილობ პროფილის და სამუშაო მონაცემების წამოღებას.</p>
+          <p class="dashboard-subtext" data-user-meta>მომხმარებლის სამუშაო მონაცემები იტვირთება.</p>
         </div>
-        <div class="dashboard-status" data-dashboard-status>მონაცემები იტვირთება...</div>
+
+        <div class="dashboard-top-actions">
+          <a class="nav-login" href="index.html">მთავარი გვერდი</a>
+          <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
+        </div>
+      </header>
+
+      <section class="dashboard-workspace-hero">
+        <div class="workspace-hero-copy">
+          <h2>აქ უნდა იყოს ყველაფერი, რაც ადვოკატს კომპიუტერში აქვს და უფრო ჭკვიანად მუშაობს</h2>
+          <p>
+            დღეის პრიორიტეტები, აქტიური საქმეები, სასამართლო სხდომები, Word დოკუმენტები, კლიენტები, AI ტრანსკრიფცია და
+            პროცედურული ვადები ერთ სამუშაო სისტემაში.
+          </p>
+        </div>
+
+        <div class="workspace-hero-status">
+          <div class="dashboard-status" data-dashboard-status>მონაცემები იტვირთება...</div>
+          <div class="workspace-day-card">
+            <span>დღევანდელი ფოკუსი</span>
+            <strong data-today-focus>3 გადაუდებელი ვადა • 2 სხდომა • 4 აქტიური საქმე</strong>
+          </div>
+        </div>
       </section>
 
-      <section class="dashboard-grid">
-        <article class="dashboard-panel">
+      <section class="quick-actions-grid">
+        <button class="quick-action-card" type="button">ახალი საქმე</button>
+        <button class="quick-action-card" type="button">ახალი კლიენტი</button>
+        <button class="quick-action-card" type="button">აუდიოს ატვირთვა</button>
+        <button class="quick-action-card" type="button">დოკუმენტის შექმნა</button>
+      </section>
+
+      <section class="metrics-strip">
+        <article class="metric-tile">
+          <span>ბალანსი</span>
+          <strong data-balance>₾ 0.00</strong>
+          <small>გამოყენება და შევსება ერთ ხედში</small>
+        </article>
+        <article class="metric-tile">
+          <span>აქტიური საქმეები</span>
+          <strong data-cases-count>0</strong>
+          <small>დღეს სამუშაოში არსებული საქმეები</small>
+        </article>
+        <article class="metric-tile">
+          <span>დღევანდელი სხდომები</span>
+          <strong data-events-count>0</strong>
+          <small>კალენდარში მონიშნული პროცესები</small>
+        </article>
+        <article class="metric-tile accent">
+          <span>AI ტრანსკრიფცია</span>
+          <strong data-transcriptions-count>0</strong>
+          <small>ბოლო დამუშავებული ჩანაწერები</small>
+        </article>
+      </section>
+
+      <section class="dashboard-board">
+        <article class="dashboard-panel dashboard-panel-large">
           <div class="panel-head">
-            <h2>ბალანსი</h2>
-            <span data-balance-label>ბოლო 10 ოპერაცია</span>
+            <h2>დღევანდელი სამუშაო ცენტრი</h2>
+            <span>დღის პრიორიტეტები და უახლოესი ნაბიჯები</span>
           </div>
-          <strong class="dashboard-amount" data-balance>₾ 0.00</strong>
-          <ul class="dashboard-list" data-transactions-list>
-            <li>ტრანზაქციები ჩაიტვირთება აქ.</li>
-          </ul>
+          <div class="operations-grid">
+            <div class="operations-card">
+              <h3>სხდომები და მოვლენები</h3>
+              <ul class="dashboard-list" data-events-list>
+                <li>დღის მოვლენები ჩაიტვირთება აქ.</li>
+              </ul>
+            </div>
+            <div class="operations-card">
+              <h3>პროცესუალური ვადები</h3>
+              <ul class="dashboard-list" data-deadlines-list>
+                <li>ვადები ჩაიტვირთება აქ.</li>
+              </ul>
+            </div>
+            <div class="operations-card">
+              <h3>ფინანსური აქტივობა</h3>
+              <ul class="dashboard-list" data-transactions-list>
+                <li>ბოლო ოპერაციები ჩაიტვირთება აქ.</li>
+              </ul>
+            </div>
+          </div>
         </article>
 
         <article class="dashboard-panel">
           <div class="panel-head">
             <h2>აქტიური საქმეები</h2>
-            <span data-cases-count>0 ჩანაწერი</span>
+            <span>რაც ახლა იხსნება და მუშავდება</span>
           </div>
           <ul class="dashboard-list" data-cases-list>
             <li>საქმეები ჩაიტვირთება აქ.</li>
@@ -61,35 +142,60 @@
 
         <article class="dashboard-panel">
           <div class="panel-head">
-            <h2>ვადები</h2>
-            <span>მომავალი შეხსენებები</span>
+            <h2>კლიენტების ბაზა</h2>
+            <span>ბოლო ან ყველაზე აქტიური კონტაქტები</span>
           </div>
-          <ul class="dashboard-list" data-deadlines-list>
-            <li>ვადები ჩაიტვირთება აქ.</li>
+          <ul class="dashboard-list" data-clients-list>
+            <li>კლიენტების სია ჩაიტვირთება აქ.</li>
           </ul>
         </article>
 
         <article class="dashboard-panel">
           <div class="panel-head">
-            <h2>დოკუმენტები</h2>
-            <span>ბოლო ფაილები</span>
+            <h2>დოკუმენტების ცენტრი</h2>
+            <span>ბოლო Word/PDF ფაილები</span>
           </div>
           <ul class="dashboard-list" data-documents-list>
             <li>დოკუმენტები ჩაიტვირთება აქ.</li>
           </ul>
         </article>
 
-        <article class="dashboard-panel dashboard-panel-wide">
+        <article class="dashboard-panel">
           <div class="panel-head">
-            <h2>AI ტრანსკრიფცია</h2>
-            <span>ბოლო დამუშავებული ჩანაწერები</span>
+            <h2>AI ტრანსკრიფციის ცენტრი</h2>
+            <span>აუდიო, სტატუსი, რედაქტირება</span>
           </div>
           <ul class="dashboard-list" data-transcriptions-list>
             <li>ტრანსკრიფციები ჩაიტვირთება აქ.</li>
           </ul>
         </article>
+
+        <article class="dashboard-panel dashboard-panel-wide">
+          <div class="panel-head">
+            <h2>რა უნდა ჩაანაცვლოს ამ სისტემამ</h2>
+            <span>ძველი კომპიუტერული ჩვევები ერთიან პლატფორმაში</span>
+          </div>
+          <div class="replacement-grid">
+            <div class="replacement-card">
+              <strong>Desktop ფოლდერები</strong>
+              <p>სისტემური საქმეები და კლიენტების პაპკები.</p>
+            </div>
+            <div class="replacement-card">
+              <strong>Word ფაილების ქაოსი</strong>
+              <p>შაბლონები, ვერსიები და სწრაფი ექსპორტი.</p>
+            </div>
+            <div class="replacement-card">
+              <strong>Excel სიები</strong>
+              <p>კლიენტები, საქმეები, გადახდები და სტატუსები.</p>
+            </div>
+            <div class="replacement-card">
+              <strong>ფურცელზე მიწერილი ვადები</strong>
+              <p>ავტომატური კალენდარი, შეხსენებები და კონტროლი.</p>
+            </div>
+          </div>
+        </article>
       </section>
-    </main>
+    </div>
   </div>
 
   <script type="module" src="dashboard.js"></script>
