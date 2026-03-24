@@ -11,25 +11,43 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="auth-page">
-  <div class="page-shell auth-shell">
+  <div class="page-shell auth-shell auth-shell-modern">
     <a class="back-link" href="index.html">მთავარ გვერდზე დაბრუნება</a>
 
-    <section class="auth-layout">
-      <div class="auth-copy">
+    <section class="auth-layout auth-layout-modern">
+      <div class="auth-copy auth-copy-modern">
         <div class="eyebrow">LexFlow Access</div>
         <h1>შესვლა სამუშაო სივრცეში</h1>
         <p>
-          ერთ ეკრანზე აკონტროლე ტრანსკრიფცია, აქტიური საქმეები, ვადები, დოკუმენტები და ბალანსი.
+          შედი შენს იურიდიულ სამუშაო სისტემაში, სადაც საქმეები, კლიენტები, დოკუმენტები,
+          ვადები და AI ტრანსკრიფცია ერთ სივრცეში მუშაობს.
         </p>
-        <div class="auth-points">
+
+        <div class="auth-stat-grid">
+          <article>
+            <strong>დღის overview</strong>
+            <span>უახლოესი სხდომა, ვადა და აქტიური საქმეები ერთ ეკრანზე</span>
+          </article>
+          <article>
+            <strong>AI workflow</strong>
+            <span>აუდიოდან ტექსტამდე და შემდეგ .docx ექსპორტამდე</span>
+          </article>
+        </div>
+
+        <div class="auth-points auth-points-modern">
+          <span>საქმეები</span>
+          <span>ვადები</span>
+          <span>დოკუმენტები</span>
           <span>AI ტრანსკრიფცია</span>
-          <span>Doc Builder</span>
-          <span>Cloud Archive</span>
         </div>
       </div>
 
-      <div class="auth-card">
-        <h2>შესვლა</h2>
+      <div class="auth-card auth-card-modern">
+        <div class="auth-card-head">
+          <h2>შესვლა</h2>
+          <p>შეიყვანე ანგარიში და გააგრძელე მუშაობა კაბინეტში.</p>
+        </div>
+
         <form class="auth-form" data-auth-form="login">
           <label>
             ელფოსტა
@@ -41,9 +59,12 @@
           </label>
           <button type="submit">შესვლა</button>
         </form>
+
         <p class="auth-feedback" data-auth-feedback></p>
-        <p class="auth-switch"><a href="reset-password.html">დაგავიწყდა პაროლი?</a></p>
-        <p class="auth-switch">ანგარიში არ გაქვს? <a href="register.html">რეგისტრაცია</a></p>
+        <div class="auth-links-row">
+          <a href="reset-password.html">დაგავიწყდა პაროლი?</a>
+          <a href="register.html">რეგისტრაცია</a>
+        </div>
       </div>
     </section>
   </div>
