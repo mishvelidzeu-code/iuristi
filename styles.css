@@ -621,22 +621,23 @@ select {
   box-shadow: var(--shadow);
 }
 
-.auth-copy-modern {
+.auth-layout-modern .auth-copy.auth-copy-modern {
   padding: 30px;
   border-radius: 28px;
   background:
     linear-gradient(135deg, rgba(16, 34, 47, 0.97), rgba(28, 53, 72, 0.93)),
     radial-gradient(circle at top left, rgba(180, 138, 75, 0.18), transparent 24%);
   color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.auth-copy.auth-copy-modern,
-.auth-copy.auth-copy-modern h1,
-.auth-copy.auth-copy-modern strong {
+.auth-layout-modern .auth-copy.auth-copy-modern,
+.auth-layout-modern .auth-copy.auth-copy-modern h1,
+.auth-layout-modern .auth-copy.auth-copy-modern strong {
   color: #fff;
 }
 
-.auth-copy.auth-copy-modern .eyebrow {
+.auth-layout-modern .auth-copy.auth-copy-modern .eyebrow {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
@@ -648,7 +649,7 @@ select {
   line-height: 1.08;
 }
 
-.auth-copy.auth-copy-modern p {
+.auth-layout-modern .auth-copy.auth-copy-modern p {
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.96rem;
   line-height: 1.72;
@@ -673,7 +674,7 @@ select {
   margin-bottom: 6px;
 }
 
-.auth-copy.auth-copy-modern .auth-stat-grid span {
+.auth-layout-modern .auth-copy.auth-copy-modern .auth-stat-grid span {
   color: rgba(255, 255, 255, 0.74);
   font-size: 0.9rem;
   line-height: 1.58;
@@ -683,7 +684,7 @@ select {
   gap: 10px;
 }
 
-.auth-copy.auth-copy-modern .auth-points-modern span {
+.auth-layout-modern .auth-copy.auth-copy-modern .auth-points-modern span {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
