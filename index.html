@@ -31,9 +31,11 @@
         <a href="#contact">კონტაქტი</a>
       </nav>
 
-      <div class="header-actions">
-        <a class="nav-login" href="login.html">შესვლა</a>
-        <a class="nav-cta" href="register.html">რეგისტრაცია</a>
+      <div class="header-actions" data-home-auth>
+        <a class="nav-login" href="login.html" data-auth-login>შესვლა</a>
+        <a class="nav-cta" href="register.html" data-auth-register>რეგისტრაცია</a>
+        <a class="nav-login hidden" href="dashboard.html" data-auth-dashboard>კაბინეტი</a>
+        <button class="nav-cta hidden nav-logout" type="button" data-auth-logout>გასვლა</button>
       </div>
     </header>
 
@@ -301,5 +303,6 @@
   </div>
 
   <script src="script.js"></script>
+  <script type="module" src="home-auth.js"></script>
 </body>
 </html>

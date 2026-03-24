@@ -40,6 +40,10 @@ input {
   font: inherit;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .page-shell {
   width: min(1240px, calc(100% - 40px));
   margin: 0 auto;
@@ -127,6 +131,10 @@ input {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.42);
   font-weight: 700;
+}
+
+.nav-logout {
+  cursor: pointer;
 }
 
 .hero {

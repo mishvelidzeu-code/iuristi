@@ -1,8 +1,10 @@
 import { supabase } from "./supabase.js";
 
-const form = document.querySelector("[data-auth-form]");
+const forms = document.querySelectorAll("[data-auth-form]");
 const feedback = document.querySelector("[data-auth-feedback]");
-const formMode = form?.dataset.authForm;
+const resetTitle = document.querySelector("[data-reset-title]");
+const resetRequestForm = document.querySelector("[data-reset-request-form]");
+const resetUpdateForm = document.querySelector("[data-reset-update-form]");
 
 function setFeedback(message, type = "info") {
   if (!feedback) return;
@@ -11,11 +13,41 @@ function setFeedback(message, type = "info") {
 }
 
 async function redirectIfLoggedIn() {
-  if (formMode === "reset") return;
+  if (resetRequestForm || resetUpdateForm) return;
   const { data } = await supabase.auth.getSession();
   if (data.session) {
     window.location.href = "./dashboard.html";
   }
+}
+
+function toggleResetMode(isUpdateMode) {
+  if (!resetRequestForm || !resetUpdateForm || !resetTitle) return;
+  resetRequestForm.classList.toggle("hidden", isUpdateMode);
+  resetUpdateForm.classList.toggle("hidden", !isUpdateMode);
+  resetTitle.textContent = isUpdateMode ? "ახალი პაროლის დაყენება" : "აღდგენის ბმული";
+}
+
+async function initResetScreen() {
+  if (!resetRequestForm || !resetUpdateForm) return;
+
+  const hash = window.location.hash || "";
+  const search = new URLSearchParams(window.location.search);
+  const isRecovery = hash.includes("type=recovery") || search.get("type") === "recovery";
+
+  if (!isRecovery) {
+    toggleResetMode(false);
+    return;
+  }
+
+  const { error } = await supabase.auth.getSession();
+  if (error) {
+    setFeedback("აღდგენის ბმული ვერ დამუშავდა. სცადე თავიდან.", "error");
+    toggleResetMode(false);
+    return;
+  }
+
+  toggleResetMode(true);
+  setFeedback("შეიყვანე ახალი პაროლი.", "info");
 }
 
 async function handleRegister(submitForm) {
@@ -82,14 +114,14 @@ async function handleRegister(submitForm) {
   submitForm.reset();
 }
 
-async function handleReset(submitForm) {
+async function handleResetRequest(submitForm) {
   const formData = new FormData(submitForm);
   const email = String(formData.get("email") || "").trim();
 
   setFeedback("აღდგენის წერილი იგზავნება...", "info");
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}${window.location.pathname.replace("reset-password.html", "login.html")}`
+    redirectTo: `${window.location.origin}${window.location.pathname.replace("reset-password.html", "reset-password.html")}`
   });
 
   if (error) {
@@ -99,6 +131,31 @@ async function handleReset(submitForm) {
 
   setFeedback("აღდგენის ბმული გამოგზავნილია ელფოსტაზე.", "success");
   submitForm.reset();
+}
+
+async function handleResetUpdate(submitForm) {
+  const formData = new FormData(submitForm);
+  const password = String(formData.get("password") || "");
+  const confirmPassword = String(formData.get("confirm_password") || "");
+
+  if (password !== confirmPassword) {
+    setFeedback("პაროლები არ ემთხვევა.", "error");
+    return;
+  }
+
+  setFeedback("პაროლი იცვლება...", "info");
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    setFeedback(error.message, "error");
+    return;
+  }
+
+  setFeedback("პაროლი წარმატებით შეიცვალა. ახლა შეგიძლია შეხვიდე.", "success");
+  window.setTimeout(() => {
+    window.location.href = "./login.html";
+  }, 900);
 }
 
 async function handleLogin(submitForm) {
@@ -124,22 +181,29 @@ async function handleLogin(submitForm) {
   }, 500);
 }
 
-if (form) {
+if (forms.length) {
   redirectIfLoggedIn();
+  initResetScreen();
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  forms.forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-    try {
-      if (formMode === "register") {
-        await handleRegister(form);
-      } else if (formMode === "login") {
-        await handleLogin(form);
-      } else if (formMode === "reset") {
-        await handleReset(form);
+      try {
+        const formMode = form.dataset.authForm;
+
+        if (formMode === "register") {
+          await handleRegister(form);
+        } else if (formMode === "login") {
+          await handleLogin(form);
+        } else if (formMode === "reset-request") {
+          await handleResetRequest(form);
+        } else if (formMode === "reset-update") {
+          await handleResetUpdate(form);
+        }
+      } catch (error) {
+        setFeedback(error?.message || "დაფიქსირდა შეცდომა. სცადე თავიდან.", "error");
       }
-    } catch (error) {
-      setFeedback(error?.message || "დაფიქსირდა შეცდომა. სცადე თავიდან.", "error");
-    }
+    });
   });
 }
