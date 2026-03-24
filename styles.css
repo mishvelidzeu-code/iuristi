@@ -740,6 +740,9 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  background:
+    linear-gradient(135deg, rgba(255, 250, 242, 0.88), rgba(255, 255, 255, 0.6)),
+    radial-gradient(circle at top right, rgba(185, 138, 61, 0.16), transparent 30%);
 }
 
 .dashboard-topbar h1,
@@ -757,12 +760,37 @@ input {
   gap: 12px;
 }
 
+.dashboard-topbar-copy {
+  max-width: 620px;
+}
+
+.dashboard-search {
+  min-width: 260px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.dashboard-search input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 34, 47, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+}
+
 .dashboard-workspace-hero {
   border-radius: 28px;
   padding: 28px;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   gap: 18px;
+  background:
+    linear-gradient(135deg, rgba(16, 34, 47, 0.96), rgba(31, 57, 76, 0.92)),
+    radial-gradient(circle at top left, rgba(185, 138, 61, 0.22), transparent 28%);
+  color: #fff;
 }
 
 .workspace-hero-status {
@@ -771,15 +799,45 @@ input {
   align-content: start;
 }
 
+.workspace-hero-copy p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.workspace-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.mini-status-card {
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mini-status-card span {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+  margin-bottom: 8px;
+}
+
+.mini-status-card strong {
+  display: block;
+  font-size: 1.3rem;
+}
+
 .workspace-day-card {
   border-radius: 22px;
   padding: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .workspace-day-card span {
   display: block;
   margin-bottom: 8px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
   font-weight: 700;
 }
 
@@ -802,6 +860,32 @@ input {
   font-weight: 800;
   color: var(--bg-deep);
   cursor: pointer;
+  display: grid;
+  gap: 8px;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 40px rgba(16, 34, 47, 0.14);
+  background: rgba(255, 251, 245, 0.92);
+}
+
+.quick-action-card span {
+  color: var(--accent-dark);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.quick-action-card strong {
+  font-size: 1.08rem;
+}
+
+.quick-action-card small {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 .metrics-strip {
@@ -813,6 +897,8 @@ input {
 .metric-tile {
   border-radius: 24px;
   padding: 22px;
+  position: relative;
+  overflow: hidden;
 }
 
 .metric-tile span,
@@ -829,6 +915,16 @@ input {
   display: block;
   font-size: 2rem;
   margin: 10px 0 8px;
+}
+
+.metric-tile::after {
+  content: "";
+  position: absolute;
+  inset: auto -24px -24px auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(185, 138, 61, 0.12);
 }
 
 .metric-tile.accent {
@@ -850,6 +946,8 @@ input {
 .dashboard-panel {
   border-radius: 26px;
   padding: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 250, 242, 0.66));
 }
 
 .dashboard-panel-large,
@@ -873,6 +971,24 @@ input {
   color: var(--muted);
 }
 
+.panel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+
+.panel-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(16, 34, 47, 0.06);
+  color: var(--bg-deep);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .operations-grid,
 .replacement-grid {
   display: grid;
@@ -885,6 +1001,7 @@ input {
 .replacement-card {
   border-radius: 20px;
   padding: 18px;
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .operations-card h3,
@@ -899,6 +1016,10 @@ input {
   padding-left: 18px;
   color: var(--muted);
   line-height: 1.8;
+}
+
+.dashboard-list li + li {
+  margin-top: 8px;
 }
 
 @media (max-width: 1100px) {
@@ -931,6 +1052,10 @@ input {
     position: static;
     height: auto;
   }
+
+  .workspace-mini-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
@@ -955,6 +1080,10 @@ input {
     align-items: stretch;
   }
 
+  .dashboard-search {
+    min-width: 0;
+  }
+
   .hero-actions,
   .mini-actions {
     flex-direction: column;
@@ -973,5 +1102,6 @@ input {
 
   .dashboard-top-actions {
     width: 100%;
+    flex-direction: column;
   }
 }

@@ -42,13 +42,17 @@
 
     <div class="dashboard-content">
       <header class="dashboard-topbar">
-        <div>
+        <div class="dashboard-topbar-copy">
           <div class="eyebrow">მთავარი სამუშაო სივრცე</div>
           <h1 data-user-name>იტვირთება...</h1>
           <p class="dashboard-subtext" data-user-meta>მომხმარებლის სამუშაო მონაცემები იტვირთება.</p>
         </div>
 
         <div class="dashboard-top-actions">
+          <label class="dashboard-search">
+            <span>სწრაფი ძებნა</span>
+            <input type="text" placeholder="საქმე, კლიენტი, დოკუმენტი...">
+          </label>
           <a class="nav-login" href="index.html">მთავარი გვერდი</a>
           <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
         </div>
@@ -65,6 +69,16 @@
 
         <div class="workspace-hero-status">
           <div class="dashboard-status" data-dashboard-status>მონაცემები იტვირთება...</div>
+          <div class="workspace-mini-grid">
+            <article class="mini-status-card">
+              <span>ღია დოკუმენტები</span>
+              <strong>12</strong>
+            </article>
+            <article class="mini-status-card">
+              <span>ახალი შეტყობინებები</span>
+              <strong>4</strong>
+            </article>
+          </div>
           <div class="workspace-day-card">
             <span>დღევანდელი ფოკუსი</span>
             <strong data-today-focus>3 გადაუდებელი ვადა • 2 სხდომა • 4 აქტიური საქმე</strong>
@@ -73,10 +87,26 @@
       </section>
 
       <section class="quick-actions-grid">
-        <button class="quick-action-card" type="button">ახალი საქმე</button>
-        <button class="quick-action-card" type="button">ახალი კლიენტი</button>
-        <button class="quick-action-card" type="button">აუდიოს ატვირთვა</button>
-        <button class="quick-action-card" type="button">დოკუმენტის შექმნა</button>
+        <button class="quick-action-card" type="button">
+          <span>საქმეები</span>
+          <strong>ახალი საქმე</strong>
+          <small>საქმის ბარათი, სასამართლო, მხარეები</small>
+        </button>
+        <button class="quick-action-card" type="button">
+          <span>კლიენტები</span>
+          <strong>ახალი კლიენტი</strong>
+          <small>პირადი მონაცემები და ისტორია</small>
+        </button>
+        <button class="quick-action-card" type="button">
+          <span>AI</span>
+          <strong>აუდიოს ატვირთვა</strong>
+          <small>ტრანსკრიფცია და Word ექსპორტი</small>
+        </button>
+        <button class="quick-action-card" type="button">
+          <span>დოკუმენტები</span>
+          <strong>დოკუმენტის შექმნა</strong>
+          <small>შაბლონიდან ან ცარიელი ფაილით</small>
+        </button>
       </section>
 
       <section class="metrics-strip">
@@ -135,6 +165,11 @@
             <h2>აქტიური საქმეები</h2>
             <span>რაც ახლა იხსნება და მუშავდება</span>
           </div>
+          <div class="panel-toolbar">
+            <span class="panel-chip">სასამართლო</span>
+            <span class="panel-chip">ვადები</span>
+            <span class="panel-chip">მტკიცებულება</span>
+          </div>
           <ul class="dashboard-list" data-cases-list>
             <li>საქმეები ჩაიტვირთება აქ.</li>
           </ul>
@@ -144,6 +179,11 @@
           <div class="panel-head">
             <h2>კლიენტების ბაზა</h2>
             <span>ბოლო ან ყველაზე აქტიური კონტაქტები</span>
+          </div>
+          <div class="panel-toolbar">
+            <span class="panel-chip">პირადი ნომერი</span>
+            <span class="panel-chip">კონტაქტი</span>
+            <span class="panel-chip">საქმეები</span>
           </div>
           <ul class="dashboard-list" data-clients-list>
             <li>კლიენტების სია ჩაიტვირთება აქ.</li>
@@ -155,6 +195,11 @@
             <h2>დოკუმენტების ცენტრი</h2>
             <span>ბოლო Word/PDF ფაილები</span>
           </div>
+          <div class="panel-toolbar">
+            <span class="panel-chip">შაბლონები</span>
+            <span class="panel-chip">ვერსიები</span>
+            <span class="panel-chip">ექსპორტი</span>
+          </div>
           <ul class="dashboard-list" data-documents-list>
             <li>დოკუმენტები ჩაიტვირთება აქ.</li>
           </ul>
@@ -164,6 +209,11 @@
           <div class="panel-head">
             <h2>AI ტრანსკრიფციის ცენტრი</h2>
             <span>აუდიო, სტატუსი, რედაქტირება</span>
+          </div>
+          <div class="panel-toolbar">
+            <span class="panel-chip">ქართული</span>
+            <span class="panel-chip">ცოცხალი ტექსტი</span>
+            <span class="panel-chip">.docx</span>
           </div>
           <ul class="dashboard-list" data-transcriptions-list>
             <li>ტრანსკრიფციები ჩაიტვირთება აქ.</li>
