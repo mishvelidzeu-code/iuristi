@@ -11,6 +11,7 @@ const transcriptionsCount = document.querySelector("[data-transcriptions-count]"
 const nextHearing = document.querySelector("[data-next-hearing]");
 const nextDeadline = document.querySelector("[data-next-deadline]");
 const logoutButton = document.querySelector("[data-logout]");
+const clickablePanels = document.querySelectorAll("[data-href]");
 
 const previewLists = {
   cases: document.querySelector('[data-preview-list="cases"]'),
@@ -195,6 +196,25 @@ async function loadDashboard() {
 logoutButton?.addEventListener("click", async () => {
   await supabase.auth.signOut();
   window.location.href = "./index.html";
+});
+
+clickablePanels.forEach((panel) => {
+  const goToLink = () => {
+    const target = panel.dataset.href;
+    if (target) window.location.href = target;
+  };
+
+  panel.addEventListener("click", (event) => {
+    if (event.target.closest("a, button")) return;
+    goToLink();
+  });
+
+  panel.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      goToLink();
+    }
+  });
 });
 
 loadDashboard();

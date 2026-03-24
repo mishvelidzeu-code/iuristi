@@ -35,6 +35,27 @@ a {
   text-decoration: none;
 }
 
+a,
+button,
+.overview-link-card,
+.overview-panel-clickable,
+.record-card,
+.dashboard-nav a,
+.nav-login,
+.nav-cta,
+.quick-action-card,
+.pricing-card,
+.landing-feature,
+.landing-proof article,
+.landing-workspace-panels article {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
 button,
 input {
   font: inherit;
@@ -82,6 +103,13 @@ select {
   box-shadow: var(--shadow);
 }
 
+.overview-link-card:hover,
+.overview-link-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgba(16, 34, 47, 0.12);
+  border-color: rgba(180, 138, 75, 0.34);
+}
+
 .overview-link-card span,
 .panel-link,
 .preview-item-label,
@@ -101,6 +129,39 @@ select {
   min-height: 100%;
 }
 
+.overview-panel-clickable {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-panel-clickable::after {
+  content: "";
+  position: absolute;
+  inset: auto -12% -28% auto;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(180, 138, 75, 0.18), transparent 65%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  transform: scale(0.8);
+}
+
+.overview-panel-clickable:hover,
+.overview-panel-clickable:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 38px rgba(16, 34, 47, 0.12);
+  border-color: rgba(180, 138, 75, 0.34);
+}
+
+.overview-panel-clickable:hover::after,
+.overview-panel-clickable:focus-visible::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
 .panel-head-link {
   display: flex;
   justify-content: space-between;
@@ -110,6 +171,11 @@ select {
 
 .panel-link {
   font-weight: 700;
+}
+
+.panel-link:hover,
+.panel-link:focus-visible {
+  color: var(--accent-dark);
 }
 
 .preview-list {
@@ -204,6 +270,12 @@ select {
   box-shadow: 0 10px 24px rgba(16, 34, 47, 0.07);
 }
 
+.record-card:hover,
+.record-card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px rgba(16, 34, 47, 0.1);
+}
+
 .record-card-main {
   min-width: 0;
   flex: 1;
@@ -253,6 +325,35 @@ select {
   background: rgba(16, 34, 47, 0.08);
   font-size: 0.74rem;
   font-weight: 700;
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav a:focus-visible,
+.nav-login:hover,
+.nav-login:focus-visible,
+.nav-cta:hover,
+.nav-cta:focus-visible,
+.item-action:hover,
+.item-action:focus-visible,
+.pricing-card:hover,
+.pricing-card:focus-within,
+.landing-feature:hover,
+.landing-feature:focus-within,
+.landing-proof article:hover,
+.landing-workspace-panels article:hover {
+  transform: translateY(-2px);
+}
+
+.nav-login:hover,
+.nav-login:focus-visible {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(180, 138, 75, 0.28);
+}
+
+.nav-cta:hover,
+.nav-cta:focus-visible {
+  box-shadow: 0 14px 28px rgba(180, 138, 75, 0.24);
+  filter: saturate(1.05);
 }
 
 .empty-state {
