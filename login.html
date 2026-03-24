@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexFlow | შესვლა</title>
+  <meta name="description" content="LexFlow-ის ავტორიზაციის გვერდი იურისტებისთვის, პროკურორებისთვის და მოსამართლეებისთვის.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+  <div class="page-shell auth-shell">
+    <a class="back-link" href="index.html">მთავარ გვერდზე დაბრუნება</a>
+
+    <section class="auth-layout">
+      <div class="auth-copy">
+        <div class="eyebrow">LexFlow Access</div>
+        <h1>შესვლა სამუშაო სივრცეში</h1>
+        <p>
+          ერთ ეკრანზე აკონტროლე ტრანსკრიფცია, აქტიური საქმეები, ვადები, დოკუმენტები და ბალანსი.
+        </p>
+        <div class="auth-points">
+          <span>AI ტრანსკრიფცია</span>
+          <span>Doc Builder</span>
+          <span>Cloud Archive</span>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <h2>შესვლა</h2>
+        <form class="auth-form" data-auth-form="login">
+          <label>
+            ელფოსტა
+            <input name="email" type="email" placeholder="name@example.com" required>
+          </label>
+          <label>
+            პაროლი
+            <input name="password" type="password" placeholder="შეიყვანე პაროლი" required minlength="6">
+          </label>
+          <button type="submit">შესვლა</button>
+        </form>
+        <p class="auth-feedback" data-auth-feedback></p>
+        <p class="auth-switch">ანგარიში არ გაქვს? <a href="register.html">რეგისტრაცია</a></p>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+</html>

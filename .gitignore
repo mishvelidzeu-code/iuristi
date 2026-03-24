@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.env
+.env.local
+.env.production
+
+node_modules/
+dist/
+build/
+
+.vercel/
+.netlify/

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexFlow | Dashboard</title>
+  <meta name="description" content="LexFlow-ის პირადი კაბინეტი იურისტებისთვის, პროკურორებისთვის და მოსამართლეებისთვის.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+  <div class="page-shell">
+    <header class="site-header dashboard-header">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">L</span>
+        <span>
+          <strong>LexFlow</strong>
+          <small>Personal Dashboard</small>
+        </span>
+      </a>
+
+      <div class="header-actions">
+        <a class="nav-login" href="index.html">მთავარი</a>
+        <button class="nav-cta dashboard-logout" type="button" data-logout>გასვლა</button>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="dashboard-hero">
+        <div>
+          <div class="eyebrow">პერსონალური კაბინეტი</div>
+          <h1 data-user-name>იტვირთება...</h1>
+          <p class="hero-text" data-user-meta>ვცდილობ პროფილის და სამუშაო მონაცემების წამოღებას.</p>
+        </div>
+        <div class="dashboard-status" data-dashboard-status>მონაცემები იტვირთება...</div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="dashboard-panel">
+          <div class="panel-head">
+            <h2>ბალანსი</h2>
+            <span data-balance-label>ბოლო 10 ოპერაცია</span>
+          </div>
+          <strong class="dashboard-amount" data-balance>₾ 0.00</strong>
+          <ul class="dashboard-list" data-transactions-list>
+            <li>ტრანზაქციები ჩაიტვირთება აქ.</li>
+          </ul>
+        </article>
+
+        <article class="dashboard-panel">
+          <div class="panel-head">
+            <h2>აქტიური საქმეები</h2>
+            <span data-cases-count>0 ჩანაწერი</span>
+          </div>
+          <ul class="dashboard-list" data-cases-list>
+            <li>საქმეები ჩაიტვირთება აქ.</li>
+          </ul>
+        </article>
+
+        <article class="dashboard-panel">
+          <div class="panel-head">
+            <h2>ვადები</h2>
+            <span>მომავალი შეხსენებები</span>
+          </div>
+          <ul class="dashboard-list" data-deadlines-list>
+            <li>ვადები ჩაიტვირთება აქ.</li>
+          </ul>
+        </article>
+
+        <article class="dashboard-panel">
+          <div class="panel-head">
+            <h2>დოკუმენტები</h2>
+            <span>ბოლო ფაილები</span>
+          </div>
+          <ul class="dashboard-list" data-documents-list>
+            <li>დოკუმენტები ჩაიტვირთება აქ.</li>
+          </ul>
+        </article>
+
+        <article class="dashboard-panel dashboard-panel-wide">
+          <div class="panel-head">
+            <h2>AI ტრანსკრიფცია</h2>
+            <span>ბოლო დამუშავებული ჩანაწერები</span>
+          </div>
+          <ul class="dashboard-list" data-transcriptions-list>
+            <li>ტრანსკრიფციები ჩაიტვირთება აქ.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>
