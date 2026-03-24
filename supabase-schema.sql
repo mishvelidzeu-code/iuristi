@@ -25,6 +25,7 @@ create table if not exists public.profiles (
   last_name text not null default '',
   bureau_name text,
   phone text,
+  sheet_url text,
   avatar_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

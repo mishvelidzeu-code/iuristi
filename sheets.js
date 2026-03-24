@@ -1,6 +1,5 @@
 import { supabase } from "./supabase.js";
 
-const STORAGE_KEY = "lexflow_sheet_embed_url";
 const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1hMopI0YHEJWzvOKMPflmUeEamZ6RM__OJv-ZUNONhOE/preview";
 
 const userName = document.querySelector("[data-user-name]");
@@ -13,6 +12,9 @@ const frame = document.querySelector("[data-sheets-frame]");
 const empty = document.querySelector("[data-sheets-empty]");
 const openButton = document.querySelector("[data-open-sheet]");
 const clearButton = document.querySelector("[data-clear-sheet]");
+
+let currentUserId = null;
+let currentSheetUrl = "";
 
 const normalizeSheetUrl = (value) => {
   const url = String(value || "").trim();
@@ -30,6 +32,7 @@ const setStatus = (message) => {
 
 const renderSheet = (url) => {
   const normalized = normalizeSheetUrl(url);
+  currentSheetUrl = normalized;
 
   if (!normalized) {
     frame.classList.add("hidden");
@@ -55,10 +58,12 @@ async function initPage() {
     return;
   }
 
+  currentUserId = session.user.id;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", session.user.id)
+    .eq("id", currentUserId)
     .single();
 
   if (profile) {
@@ -66,21 +71,35 @@ async function initPage() {
     userMeta.textContent = profile.bureau_name || "ცხრილების სამუშაო სივრცე";
   }
 
-  const savedUrl = localStorage.getItem(STORAGE_KEY) || DEFAULT_SHEET_URL;
+  const savedUrl = profile?.sheet_url || DEFAULT_SHEET_URL;
   input.value = savedUrl;
   renderSheet(savedUrl);
 }
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (!currentUserId) return;
+
   const value = normalizeSheetUrl(input.value);
-  localStorage.setItem(STORAGE_KEY, value);
+  setStatus("ცხრილის ბმული ინახება...");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ sheet_url: value || null })
+    .eq("id", currentUserId);
+
+  if (error) {
+    setStatus(`შენახვა ვერ მოხერხდა: ${error.message}`);
+    return;
+  }
+
   input.value = value;
   renderSheet(value);
 });
 
 openButton?.addEventListener("click", () => {
-  const url = normalizeSheetUrl(input.value || localStorage.getItem(STORAGE_KEY));
+  const url = normalizeSheetUrl(input.value || currentSheetUrl);
   if (!url) {
     setStatus("ჯერ ბმული ჩასვი, მერე გახსენი ახალ ტაბში.");
     return;
@@ -89,8 +108,19 @@ openButton?.addEventListener("click", () => {
   window.open(url, "_blank", "noopener,noreferrer");
 });
 
-clearButton?.addEventListener("click", () => {
-  localStorage.removeItem(STORAGE_KEY);
+clearButton?.addEventListener("click", async () => {
+  if (!currentUserId) return;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ sheet_url: null })
+    .eq("id", currentUserId);
+
+  if (error) {
+    setStatus(`გასუფთავება ვერ მოხერხდა: ${error.message}`);
+    return;
+  }
+
   input.value = "";
   renderSheet("");
 });
