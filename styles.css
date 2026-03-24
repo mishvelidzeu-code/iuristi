@@ -630,6 +630,17 @@ select {
   color: #fff;
 }
 
+.auth-copy.auth-copy-modern,
+.auth-copy.auth-copy-modern h1,
+.auth-copy.auth-copy-modern strong {
+  color: #fff;
+}
+
+.auth-copy.auth-copy-modern .eyebrow {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
 .auth-copy-modern h1 {
   margin: 16px 0 14px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
@@ -637,7 +648,7 @@ select {
   line-height: 1.08;
 }
 
-.auth-copy-modern p {
+.auth-copy.auth-copy-modern p {
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.96rem;
   line-height: 1.72;
@@ -662,7 +673,7 @@ select {
   margin-bottom: 6px;
 }
 
-.auth-stat-grid span {
+.auth-copy.auth-copy-modern .auth-stat-grid span {
   color: rgba(255, 255, 255, 0.74);
   font-size: 0.9rem;
   line-height: 1.58;
@@ -672,7 +683,7 @@ select {
   gap: 10px;
 }
 
-.auth-points-modern span {
+.auth-copy.auth-copy-modern .auth-points-modern span {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
