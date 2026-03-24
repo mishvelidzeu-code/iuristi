@@ -299,6 +299,10 @@ select {
   padding: 24px 0 64px;
 }
 
+.landing-shell {
+  width: min(1320px, calc(100% - 32px));
+}
+
 .site-header {
   display: flex;
   align-items: center;
@@ -313,6 +317,11 @@ select {
   top: 18px;
   z-index: 20;
   box-shadow: var(--shadow);
+}
+
+.landing-header {
+  border-radius: 20px;
+  padding: 14px 18px;
 }
 
 .brand {
@@ -352,6 +361,247 @@ select {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 22px;
+  align-items: stretch;
+  padding: 42px 0 28px;
+}
+
+.landing-copy,
+.landing-stage,
+.landing-ribbon p,
+.landing-feature,
+.landing-workspace,
+.landing-workspace-panels article,
+.landing-contact-card {
+  background: rgba(255, 250, 242, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: var(--shadow);
+}
+
+.landing-copy {
+  padding: 34px;
+  border-radius: 28px;
+}
+
+.landing-copy h1 {
+  margin: 16px 0 14px;
+  font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
+  font-size: clamp(2.3rem, 4vw, 4.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.landing-lead {
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.landing-actions {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 20px;
+}
+
+.landing-tags,
+.landing-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.landing-tags span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(16, 34, 47, 0.07);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.landing-proof {
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.landing-proof article {
+  min-width: 180px;
+  flex: 1;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(16, 34, 47, 0.06);
+}
+
+.landing-proof strong,
+.landing-workspace-panels strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.landing-proof span,
+.landing-workspace-panels p,
+.landing-feature p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.landing-stage {
+  padding: 18px;
+  border-radius: 28px;
+}
+
+.stage-window {
+  border-radius: 24px;
+  padding: 18px;
+  background:
+    linear-gradient(135deg, rgba(16, 34, 47, 0.97), rgba(28, 53, 72, 0.94)),
+    radial-gradient(circle at top left, rgba(180, 138, 75, 0.2), transparent 26%);
+  color: #fff;
+}
+
+.stage-top,
+.stage-transcript-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.stage-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stage-card span,
+.stage-card small {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.stage-card strong {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 1.08rem;
+}
+
+.stage-card-accent {
+  background: linear-gradient(135deg, rgba(180, 138, 75, 0.22), rgba(255, 255, 255, 0.08));
+}
+
+.stage-transcript {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stage-transcript p {
+  min-height: 86px;
+  margin: 16px 0;
+  color: rgba(255, 255, 255, 0.84);
+  line-height: 1.68;
+}
+
+.stage-transcript-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.stage-transcript-actions button {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.landing-ribbon {
+  padding: 0 0 20px;
+}
+
+.landing-ribbon p {
+  margin: 0;
+  padding: 18px 22px;
+  border-radius: 20px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.landing-section {
+  padding: 30px 0 8px;
+}
+
+.landing-heading {
+  max-width: 760px;
+}
+
+.landing-feature-grid,
+.landing-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.landing-feature {
+  padding: 22px;
+  border-radius: 22px;
+}
+
+.landing-feature h3 {
+  margin: 12px 0 8px;
+}
+
+.landing-workspace {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 28px;
+}
+
+.landing-workspace-copy h2 {
+  margin: 14px 0 12px;
+  font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.1;
+}
+
+.landing-workspace-copy p {
+  color: var(--muted);
+  line-height: 1.72;
+}
+
+.landing-workspace-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.landing-workspace-panels article {
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.landing-contact-card {
+  border-radius: 28px;
 }
 
 .nav-cta,
@@ -1462,12 +1712,17 @@ select {
   .auth-layout,
   .feature-grid,
   .benefit-list,
-  .pricing-grid {
+  .pricing-grid,
+  .landing-hero,
+  .landing-workspace {
     grid-template-columns: 1fr;
   }
 
   .dashboard-preview,
-  .workspace-cards {
+  .workspace-cards,
+  .landing-feature-grid,
+  .landing-plan-grid,
+  .landing-workspace-panels {
     grid-template-columns: 1fr;
   }
 
@@ -1521,6 +1776,34 @@ select {
 @media (max-width: 760px) {
   .hero {
     padding-top: 36px;
+  }
+
+  .landing-hero {
+    padding-top: 26px;
+    gap: 16px;
+  }
+
+  .landing-copy,
+  .landing-stage,
+  .landing-workspace,
+  .landing-feature,
+  .landing-contact-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .landing-copy h1 {
+    font-size: clamp(1.9rem, 9vw, 3rem);
+  }
+
+  .landing-actions,
+  .stage-transcript-actions {
+    flex-direction: column;
+  }
+
+  .stage-grid,
+  .landing-workspace-panels {
+    grid-template-columns: 1fr;
   }
 
   .hero h1,
@@ -1662,10 +1945,18 @@ select {
     width: min(100% - 16px, 1440px);
   }
 
+  .landing-shell {
+    width: min(100% - 16px, 1320px);
+  }
+
   .site-header,
   .dashboard-topbar {
     padding: 16px;
     border-radius: 18px;
+  }
+
+  .landing-header {
+    gap: 14px;
   }
 
   .brand {
@@ -1690,7 +1981,9 @@ select {
   .overview-links-grid,
   .records-list,
   .module-stats,
-  .metrics-strip {
+  .metrics-strip,
+  .landing-feature-grid,
+  .landing-plan-grid {
     gap: 12px;
   }
 
