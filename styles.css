@@ -1041,6 +1041,58 @@ select {
   margin-top: 8px;
 }
 
+.dashboard-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(16, 34, 47, 0.08);
+  list-style: none;
+}
+
+.dashboard-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.item-main {
+  display: grid;
+  gap: 4px;
+}
+
+.item-main strong {
+  color: var(--bg-deep);
+}
+
+.item-main span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.item-action {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 34, 47, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--bg-deep);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.item-action.danger {
+  color: #8f1d1d;
+  background: rgba(175, 47, 47, 0.08);
+}
+
 .card-head-row {
   display: flex;
   align-items: center;
@@ -1183,9 +1235,14 @@ select {
   }
 
   .card-head-row,
-  .row-actions {
+  .row-actions,
+  .dashboard-item {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .item-actions {
+    justify-content: flex-start;
   }
 }
 

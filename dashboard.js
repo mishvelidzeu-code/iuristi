@@ -28,6 +28,7 @@ const modalFeedback = document.querySelector("[data-modal-feedback]");
 const closeModalButton = document.querySelector("[data-close-modal]");
 
 let authUserId = null;
+let modalState = { type: null, mode: "create", itemId: null };
 let dashboardData = {
   transactions: [],
   cases: [],
@@ -52,23 +53,28 @@ const filters = {
 const modalDefinitions = {
   client: {
     title: "ახალი კლიენტი",
-    fields: `
+    getTitle(mode) {
+      return mode === "edit" ? "კლიენტის რედაქტირება" : mode === "view" ? "კლიენტის დეტალები" : "ახალი კლიენტი";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
       <div class="auth-form-grid">
-        <label>სახელი<input name="first_name" type="text" required></label>
-        <label>გვარი<input name="last_name" type="text" required></label>
+        <label>სახელი<input name="first_name" type="text" value="${item.first_name || ""}" required ${disabled}></label>
+        <label>გვარი<input name="last_name" type="text" value="${item.last_name || ""}" required ${disabled}></label>
       </div>
       <div class="auth-form-grid">
-        <label>ტელეფონი<input name="phone" type="tel"></label>
-        <label>ელფოსტა<input name="email" type="email"></label>
+        <label>ტელეფონი<input name="phone" type="tel" value="${item.phone || ""}" ${disabled}></label>
+        <label>ელფოსტა<input name="email" type="email" value="${item.email || ""}" ${disabled}></label>
       </div>
-      <label>პირადი ნომერი<input name="personal_id" type="text"></label>
-      <label>მისამართი<input name="address" type="text"></label>
-      <label>შენიშვნა<textarea name="notes" rows="3"></textarea></label>
-      <button type="submit">კლიენტის დამატება</button>
-    `,
+      <label>პირადი ნომერი<input name="personal_id" type="text" value="${item.personal_id || ""}" ${disabled}></label>
+      <label>მისამართი<input name="address" type="text" value="${item.address || ""}" ${disabled}></label>
+      <label>შენიშვნა<textarea name="notes" rows="3" ${disabled}>${item.notes || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "კლიენტის დამატება"}</button>`}
+    `;
+    },
     async submit(formData) {
-      return supabase.from("clients").insert({
-        owner_id: authUserId,
+      const payload = {
         first_name: String(formData.get("first_name") || "").trim(),
         last_name: String(formData.get("last_name") || "").trim(),
         phone: String(formData.get("phone") || "").trim() || null,
@@ -76,117 +82,197 @@ const modalDefinitions = {
         personal_id: String(formData.get("personal_id") || "").trim() || null,
         address: String(formData.get("address") || "").trim() || null,
         notes: String(formData.get("notes") || "").trim() || null
-      });
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("clients").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("clients").insert({ owner_id: authUserId, ...payload });
     }
   },
   case: {
     title: "ახალი საქმე",
-    fields: `
-      <label>საქმის სათაური<input name="title" type="text" required></label>
+    getTitle(mode) {
+      return mode === "edit" ? "საქმის რედაქტირება" : mode === "view" ? "საქმის დეტალები" : "ახალი საქმე";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
       <div class="auth-form-grid">
-        <label>საქმის ნომერი<input name="case_number" type="text"></label>
-        <label>სასამართლო<input name="court_name" type="text"></label>
+        <label>საქმის სათაური<input name="title" type="text" value="${item.title || ""}" required ${disabled}></label>
+        <label>საქმის ნომერი<input name="case_number" type="text" value="${item.case_number || ""}" ${disabled}></label>
       </div>
-      <label>სხდომის თარიღი<input name="hearing_date" type="datetime-local"></label>
-      <label>აღწერა<textarea name="description" rows="3"></textarea></label>
-      <button type="submit">საქმის დამატება</button>
-    `,
+      <div class="auth-form-grid">
+        <label>სასამართლო<input name="court_name" type="text" value="${item.court_name || ""}" ${disabled}></label>
+        <label>სხდომის თარიღი<input name="hearing_date" type="datetime-local" value="${item.hearing_date ? new Date(item.hearing_date).toISOString().slice(0,16) : ""}" ${disabled}></label>
+      </div>
+      <label>აღწერა<textarea name="description" rows="3" ${disabled}>${item.description || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "საქმის დამატება"}</button>`}
+    `;
+    },
     async submit(formData) {
       const hearingDate = String(formData.get("hearing_date") || "").trim();
-      return supabase.from("cases").insert({
-        owner_id: authUserId,
+      const payload = {
         title: String(formData.get("title") || "").trim(),
         case_number: String(formData.get("case_number") || "").trim() || null,
         court_name: String(formData.get("court_name") || "").trim() || null,
         description: String(formData.get("description") || "").trim() || null,
         hearing_date: hearingDate || null,
         status: "active"
-      });
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("cases").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("cases").insert({ owner_id: authUserId, ...payload });
     }
   },
   document: {
     title: "ახალი დოკუმენტი",
-    fields: `
+    getTitle(mode) {
+      return mode === "edit" ? "დოკუმენტის რედაქტირება" : mode === "view" ? "დოკუმენტის დეტალები" : "ახალი დოკუმენტი";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
       <label>დოკუმენტის სათაური<input name="title" type="text" required></label>
       <div class="auth-form-grid">
         <label>სტატუსი
-          <select name="status">
-            <option value="draft">draft</option>
-            <option value="generated">generated</option>
-            <option value="signed">signed</option>
-            <option value="archived">archived</option>
+          <select name="status" ${disabled}>
+            <option value="draft" ${item.status === "draft" ? "selected" : ""}>draft</option>
+            <option value="generated" ${item.status === "generated" ? "selected" : ""}>generated</option>
+            <option value="signed" ${item.status === "signed" ? "selected" : ""}>signed</option>
+            <option value="archived" ${item.status === "archived" ? "selected" : ""}>archived</option>
           </select>
         </label>
-        <label>ფაილის ბმული / path<input name="file_path" type="text"></label>
+        <label>ფაილის ბმული / path<input name="file_path" type="text" value="${item.file_path || ""}" ${disabled}></label>
       </div>
-      <label>შინაარსი<textarea name="body" rows="4"></textarea></label>
-      <button type="submit">დოკუმენტის დამატება</button>
-    `,
+      <label>დოკუმენტის სათაური<input name="title" type="text" value="${item.title || ""}" required ${disabled}></label>
+      <label>შინაარსი<textarea name="body" rows="4" ${disabled}>${item.body || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "დოკუმენტის დამატება"}</button>`}
+    `;
+    },
     async submit(formData) {
-      return supabase.from("documents").insert({
-        owner_id: authUserId,
+      const payload = {
         title: String(formData.get("title") || "").trim(),
         status: String(formData.get("status") || "draft"),
         body: String(formData.get("body") || "").trim() || null,
         file_path: String(formData.get("file_path") || "").trim() || null,
         generated_data: {}
-      });
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("documents").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("documents").insert({ owner_id: authUserId, ...payload });
     }
   },
   transcription: {
     title: "ახალი ტრანსკრიფცია",
-    fields: `
+    getTitle(mode) {
+      return mode === "edit" ? "ტრანსკრიფციის რედაქტირება" : mode === "view" ? "ტრანსკრიფციის დეტალები" : "ახალი ტრანსკრიფცია";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
       <label>სათაური<input name="title" type="text" required></label>
       <div class="auth-form-grid">
         <label>ენა
-          <select name="language_code">
-            <option value="ka">ქართული</option>
-            <option value="en">English</option>
-            <option value="ru">Русский</option>
+          <select name="language_code" ${disabled}>
+            <option value="ka" ${item.language_code === "ka" ? "selected" : ""}>ქართული</option>
+            <option value="en" ${item.language_code === "en" ? "selected" : ""}>English</option>
+            <option value="ru" ${item.language_code === "ru" ? "selected" : ""}>Русский</option>
           </select>
         </label>
         <label>სტატუსი
-          <select name="status">
-            <option value="uploaded">uploaded</option>
-            <option value="processing">processing</option>
-            <option value="completed">completed</option>
-            <option value="failed">failed</option>
+          <select name="status" ${disabled}>
+            <option value="uploaded" ${item.status === "uploaded" ? "selected" : ""}>uploaded</option>
+            <option value="processing" ${item.status === "processing" ? "selected" : ""}>processing</option>
+            <option value="completed" ${item.status === "completed" ? "selected" : ""}>completed</option>
+            <option value="failed" ${item.status === "failed" ? "selected" : ""}>failed</option>
           </select>
         </label>
       </div>
-      <label>ნედლი ტექსტი<textarea name="raw_text" rows="4"></textarea></label>
-      <button type="submit">ტრანსკრიფციის დამატება</button>
-    `,
+      <label>სათაური<input name="title" type="text" value="${item.title || ""}" required ${disabled}></label>
+      <label>ნედლი ტექსტი<textarea name="raw_text" rows="4" ${disabled}>${item.raw_text || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "ტრანსკრიფციის დამატება"}</button>`}
+    `;
+    },
     async submit(formData) {
-      return supabase.from("transcriptions").insert({
-        owner_id: authUserId,
+      const payload = {
         title: String(formData.get("title") || "").trim(),
         language_code: String(formData.get("language_code") || "ka"),
         status: String(formData.get("status") || "uploaded"),
         raw_text: String(formData.get("raw_text") || "").trim() || null
-      });
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("transcriptions").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("transcriptions").insert({ owner_id: authUserId, ...payload });
     }
   },
   deadline: {
     title: "ახალი ვადა",
-    fields: `
+    getTitle(mode) {
+      return mode === "edit" ? "ვადის რედაქტირება" : mode === "view" ? "ვადის დეტალები" : "ახალი ვადა";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
       <label>ვადის სათაური<input name="title" type="text" required></label>
       <div class="auth-form-grid">
-        <label>საწყისი თარიღი<input name="base_date" type="date" required></label>
-        <label>ბოლო ვადა<input name="due_date" type="date" required></label>
+        <label>ვადის სათაური<input name="title" type="text" value="${item.title || ""}" required ${disabled}></label>
+        <label>საწყისი თარიღი<input name="base_date" type="date" value="${item.base_date || ""}" required ${disabled}></label>
       </div>
-      <label>შენიშვნა<textarea name="notes" rows="3"></textarea></label>
-      <button type="submit">ვადის დამატება</button>
-    `,
+      <div class="auth-form-grid">
+        <label>ბოლო ვადა<input name="due_date" type="date" value="${item.due_date || ""}" required ${disabled}></label>
+        <label>სტატუსი
+          <select name="status" ${disabled}>
+            <option value="upcoming" ${item.status === "upcoming" ? "selected" : ""}>upcoming</option>
+            <option value="done" ${item.status === "done" ? "selected" : ""}>done</option>
+            <option value="missed" ${item.status === "missed" ? "selected" : ""}>missed</option>
+          </select>
+        </label>
+      </div>
+      <label>შენიშვნა<textarea name="notes" rows="3" ${disabled}>${item.notes || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "ვადის დამატება"}</button>`}
+    `;
+    },
     async submit(formData) {
-      return supabase.from("deadlines").insert({
-        owner_id: authUserId,
+      const payload = {
         title: String(formData.get("title") || "").trim(),
         base_date: String(formData.get("base_date") || "").trim(),
         due_date: String(formData.get("due_date") || "").trim(),
-        status: "upcoming",
+        status: String(formData.get("status") || "upcoming"),
         notes: String(formData.get("notes") || "").trim() || null
-      });
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("deadlines").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("deadlines").insert({ owner_id: authUserId, ...payload });
+    }
+  },
+  event: {
+    title: "ახალი მოვლენა",
+    getTitle(mode) {
+      return mode === "edit" ? "მოვლენის რედაქტირება" : mode === "view" ? "მოვლენის დეტალები" : "ახალი მოვლენა";
+    },
+    getFields(mode, item = {}) {
+      const disabled = mode === "view" ? "disabled" : "";
+      return `
+      <label>მოვლენის სათაური<input name="title" type="text" value="${item.title || ""}" required ${disabled}></label>
+      <div class="auth-form-grid">
+        <label>დაწყება<input name="starts_at" type="datetime-local" value="${item.starts_at ? new Date(item.starts_at).toISOString().slice(0,16) : ""}" required ${disabled}></label>
+        <label>დასრულება<input name="ends_at" type="datetime-local" value="${item.ends_at ? new Date(item.ends_at).toISOString().slice(0,16) : ""}" ${disabled}></label>
+      </div>
+      <label>ადგილმდებარეობა<input name="location" type="text" value="${item.location || ""}" ${disabled}></label>
+      <label>შენიშვნა<textarea name="notes" rows="3" ${disabled}>${item.notes || ""}</textarea></label>
+      ${mode === "view" ? "" : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "მოვლენის დამატება"}</button>`}
+    `;
+    },
+    async submit(formData) {
+      const payload = {
+        title: String(formData.get("title") || "").trim(),
+        starts_at: String(formData.get("starts_at") || "").trim(),
+        ends_at: String(formData.get("ends_at") || "").trim() || null,
+        location: String(formData.get("location") || "").trim() || null,
+        notes: String(formData.get("notes") || "").trim() || null
+      };
+      return modalState.mode === "edit"
+        ? supabase.from("calendar_events").update(payload).eq("id", modalState.itemId).eq("owner_id", authUserId)
+        : supabase.from("calendar_events").insert({ owner_id: authUserId, ...payload });
     }
   }
 };
@@ -238,6 +324,35 @@ function renderList(container, items, emptyText) {
     : `<li>${emptyText}</li>`;
 }
 
+function buildActionButtons(type, id) {
+  return `
+    <div class="item-actions">
+      <button type="button" class="item-action" data-action="view" data-type="${type}" data-id="${id}">ნახვა</button>
+      <button type="button" class="item-action" data-action="edit" data-type="${type}" data-id="${id}">რედაქტირება</button>
+      <button type="button" class="item-action danger" data-action="delete" data-type="${type}" data-id="${id}">წაშლა</button>
+    </div>
+  `;
+}
+
+function renderRichList(container, items, emptyText) {
+  if (!container) return;
+  container.innerHTML = items.length
+    ? items.join("")
+    : `<li>${emptyText}</li>`;
+}
+
+function findItem(type, id) {
+  const map = {
+    client: dashboardData.clients,
+    case: dashboardData.cases,
+    document: dashboardData.documents,
+    transcription: dashboardData.transcriptions,
+    deadline: dashboardData.deadlines,
+    event: dashboardData.events
+  };
+  return (map[type] || []).find((item) => item.id === id) || null;
+}
+
 async function fetchSingle(queryBuilder) {
   const { data, error } = await queryBuilder;
   if (error) throw error;
@@ -285,34 +400,76 @@ function applyFiltersAndRender() {
     filteredTransactions.map((item) => `${lari(item.amount)} • ${item.description || item.transaction_type || "ოპერაცია"}`),
     "ფინანსური ოპერაციები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     casesList,
-    filteredCases.map((item) => `${item.title || "უსათაურო საქმე"}${item.court_name ? ` • ${item.court_name}` : ""}${item.hearing_date ? ` • სხდომა ${safeDate(item.hearing_date)}` : ""}`),
+    filteredCases.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${item.title || "უსათაურო საქმე"}</strong>
+          <span>${item.court_name || "სასამართლო არ არის მითითებული"}${item.hearing_date ? ` • სხდომა ${safeDate(item.hearing_date)}` : ""}</span>
+        </div>
+        ${buildActionButtons("case", item.id)}
+      </li>`),
     "საქმეები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     deadlinesList,
-    filteredDeadlines.map((item) => `${item.title || "ვადა"} • ${safeDate(item.due_date)}${item.notes ? ` • ${item.notes}` : ""}`),
+    filteredDeadlines.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${item.title || "ვადა"}</strong>
+          <span>${safeDate(item.due_date)}${item.notes ? ` • ${item.notes}` : ""}</span>
+        </div>
+        ${buildActionButtons("deadline", item.id)}
+      </li>`),
     "ვადები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     documentsList,
-    filteredDocuments.map((item) => `${item.title || "დოკუმენტი"} • ${item.status || "draft"}`),
+    filteredDocuments.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${item.title || "დოკუმენტი"}</strong>
+          <span>${item.status || "draft"}${item.file_path ? ` • ${item.file_path}` : ""}</span>
+        </div>
+        ${buildActionButtons("document", item.id)}
+      </li>`),
     "დოკუმენტები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     transcriptionsList,
-    filteredTranscriptions.map((item) => `${item.title || "ტრანსკრიფცია"} • ${item.status || "uploaded"}`),
+    filteredTranscriptions.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${item.title || "ტრანსკრიფცია"}</strong>
+          <span>${item.status || "uploaded"} • ${item.language_code || "ka"}</span>
+        </div>
+        ${buildActionButtons("transcription", item.id)}
+      </li>`),
     "ტრანსკრიფციები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     eventsList,
-    filteredEvents.map((item) => `${item.title || "მოვლენა"} • ${safeDate(item.starts_at, true)}${item.location ? ` • ${item.location}` : ""}`),
+    filteredEvents.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${item.title || "მოვლენა"}</strong>
+          <span>${safeDate(item.starts_at, true)}${item.location ? ` • ${item.location}` : ""}</span>
+        </div>
+        ${buildActionButtons("event", item.id)}
+      </li>`),
     "მოვლენები ვერ მოიძებნა."
   );
-  renderList(
+  renderRichList(
     clientsList,
-    filteredClients.map((item) => `${[item.first_name, item.last_name].filter(Boolean).join(" ") || "კლიენტი"}${item.phone ? ` • ${item.phone}` : ""}${item.email ? ` • ${item.email}` : ""}`),
+    filteredClients.map((item) => `
+      <li class="dashboard-item">
+        <div class="item-main">
+          <strong>${[item.first_name, item.last_name].filter(Boolean).join(" ") || "კლიენტი"}</strong>
+          <span>${item.phone ? `${item.phone}` : "ტელეფონი არ არის"}${item.email ? ` • ${item.email}` : ""}</span>
+        </div>
+        ${buildActionButtons("client", item.id)}
+      </li>`),
     "კლიენტები ვერ მოიძებნა."
   );
 }
@@ -341,11 +498,12 @@ async function loadDashboardData() {
   applyFiltersAndRender();
 }
 
-function openModal(type) {
+function openModal(type, mode = "create", item = null) {
   const definition = modalDefinitions[type];
   if (!definition) return;
-  modalTitle.textContent = definition.title;
-  modalForm.innerHTML = definition.fields;
+  modalState = { type, mode, itemId: item?.id || null };
+  modalTitle.textContent = definition.getTitle ? definition.getTitle(mode) : definition.title;
+  modalForm.innerHTML = definition.getFields ? definition.getFields(mode, item) : definition.fields;
   modalForm.dataset.modalType = type;
   setModalFeedback("", "info");
   modalBackdrop.classList.remove("hidden");
@@ -355,7 +513,32 @@ function closeModal() {
   modalBackdrop.classList.add("hidden");
   modalForm.innerHTML = "";
   modalForm.dataset.modalType = "";
+  modalState = { type: null, mode: "create", itemId: null };
   setModalFeedback("", "info");
+}
+
+async function deleteItem(type, id) {
+  const config = {
+    client: { table: "clients", owner: "owner_id" },
+    case: { table: "cases", owner: "owner_id" },
+    document: { table: "documents", owner: "owner_id" },
+    transcription: { table: "transcriptions", owner: "owner_id" },
+    deadline: { table: "deadlines", owner: "owner_id" },
+    event: { table: "calendar_events", owner: "owner_id" }
+  }[type];
+
+  if (!config) return;
+  const confirmed = window.confirm("ნამდვილად გინდა წაშლა?");
+  if (!confirmed) return;
+
+  setStatus("ჩანაწერი იშლება...", "info");
+  const { error } = await supabase.from(config.table).delete().eq("id", id).eq(config.owner, authUserId);
+  if (error) {
+    setStatus(error.message, "error");
+    return;
+  }
+  await loadDashboardData();
+  setStatus("ჩანაწერი წაიშალა.", "success");
 }
 
 async function initDashboard() {
@@ -399,6 +582,23 @@ globalSearchInput?.addEventListener("input", (event) => {
 
 openModalButtons.forEach((button) => {
   button.addEventListener("click", () => openModal(button.dataset.openModal));
+});
+
+document.addEventListener("click", async (event) => {
+  const actionButton = event.target.closest("[data-action]");
+  if (!actionButton) return;
+
+  const { action, type, id } = actionButton.dataset;
+  const item = findItem(type, id);
+  if (!item) return;
+
+  if (action === "view") {
+    openModal(type, "view", item);
+  } else if (action === "edit") {
+    openModal(type, "edit", item);
+  } else if (action === "delete") {
+    await deleteItem(type, id);
+  }
 });
 
 closeModalButton?.addEventListener("click", closeModal);
