@@ -470,8 +470,9 @@ const closeModal = () => {
 };
 
 const openModal = (mode, item = null) => {
+  const safeItem = item || {};
   modalMode = mode;
-  modalItemId = item?.id || null;
+  modalItemId = safeItem.id || null;
   isSubmitting = false;
   modalBackdrop.classList.remove("hidden");
   modalFeedback.textContent = "";
@@ -492,7 +493,7 @@ const openModal = (mode, item = null) => {
         </div>
       `;
 
-  modalForm.innerHTML = `${config.fields(mode, item)}${submitButton}`;
+  modalForm.innerHTML = `${config.fields(mode, safeItem)}${submitButton}`;
   modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
 };
 
