@@ -10,15 +10,8 @@ function setFeedback(message, type = "info") {
   feedback.dataset.state = type;
 }
 
-function splitName(fullName) {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean);
-  return {
-    firstName: parts[0] || "",
-    lastName: parts.slice(1).join(" ")
-  };
-}
-
 async function redirectIfLoggedIn() {
+  if (formMode === "reset") return;
   const { data } = await supabase.auth.getSession();
   if (data.session) {
     window.location.href = "./dashboard.html";
@@ -27,14 +20,26 @@ async function redirectIfLoggedIn() {
 
 async function handleRegister(submitForm) {
   const formData = new FormData(submitForm);
-  const fullName = String(formData.get("full_name") || "").trim();
+  const firstName = String(formData.get("first_name") || "").trim();
+  const lastName = String(formData.get("last_name") || "").trim();
   const email = String(formData.get("email") || "").trim();
+  const phone = String(formData.get("phone") || "").trim();
   const bureauName = String(formData.get("bureau_name") || "").trim();
   const password = String(formData.get("password") || "");
-  const { firstName, lastName } = splitName(fullName);
+  const confirmPassword = String(formData.get("confirm_password") || "");
 
-  if (!fullName) {
-    setFeedback("შეიყვანე სახელი და გვარი.", "error");
+  if (!firstName || !lastName) {
+    setFeedback("შეიყვანე სახელი და გვარი ცალ-ცალკე.", "error");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setFeedback("პაროლები არ ემთხვევა.", "error");
+    return;
+  }
+
+  if (!phone) {
+    setFeedback("შეიყვანე ტელეფონის ნომერი.", "error");
     return;
   }
 
@@ -47,7 +52,8 @@ async function handleRegister(submitForm) {
       data: {
         first_name: firstName,
         last_name: lastName,
-        bureau_name: bureauName
+        bureau_name: bureauName,
+        phone
       }
     }
   });
@@ -57,10 +63,10 @@ async function handleRegister(submitForm) {
     return;
   }
 
-  if (data.user?.id && bureauName) {
+  if (data.user?.id) {
     await supabase
       .from("profiles")
-      .update({ bureau_name: bureauName })
+      .update({ bureau_name: bureauName || null, phone: phone || null })
       .eq("id", data.user.id);
   }
 
@@ -73,6 +79,25 @@ async function handleRegister(submitForm) {
   }
 
   setFeedback("რეგისტრაცია დასრულდა. თუ ელფოსტის დადასტურება ჩართულია, შეამოწმე მეილი.", "success");
+  submitForm.reset();
+}
+
+async function handleReset(submitForm) {
+  const formData = new FormData(submitForm);
+  const email = String(formData.get("email") || "").trim();
+
+  setFeedback("აღდგენის წერილი იგზავნება...", "info");
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}${window.location.pathname.replace("reset-password.html", "login.html")}`
+  });
+
+  if (error) {
+    setFeedback(error.message, "error");
+    return;
+  }
+
+  setFeedback("აღდგენის ბმული გამოგზავნილია ელფოსტაზე.", "success");
   submitForm.reset();
 }
 
@@ -110,6 +135,8 @@ if (form) {
         await handleRegister(form);
       } else if (formMode === "login") {
         await handleLogin(form);
+      } else if (formMode === "reset") {
+        await handleReset(form);
       }
     } catch (error) {
       setFeedback(error?.message || "დაფიქსირდა შეცდომა. სცადე თავიდან.", "error");

@@ -31,22 +31,38 @@
       <div class="auth-card">
         <h2>რეგისტრაცია</h2>
         <form class="auth-form" data-auth-form="register">
-          <label>
-            სახელი და გვარი
-            <input name="full_name" type="text" placeholder="მაგ: ნინო გელაშვილი" required>
-          </label>
+          <div class="auth-form-grid">
+            <label>
+              სახელი
+              <input name="first_name" type="text" placeholder="მაგ: ნინო" required>
+            </label>
+            <label>
+              გვარი
+              <input name="last_name" type="text" placeholder="მაგ: გელაშვილი" required>
+            </label>
+          </div>
           <label>
             ელფოსტა
             <input name="email" type="email" placeholder="name@example.com" required>
           </label>
           <label>
+            ტელეფონის ნომერი
+            <input name="phone" type="tel" placeholder="მაგ: 599123456" required>
+          </label>
+          <label>
             ორგანიზაცია / ბიურო
             <input name="bureau_name" type="text" placeholder="ბიუროს ან უწყების დასახელება">
           </label>
-          <label>
-            პაროლი
-            <input name="password" type="password" placeholder="შექმენი პაროლი" required minlength="6">
-          </label>
+          <div class="auth-form-grid">
+            <label>
+              პაროლი
+              <input name="password" type="password" placeholder="შექმენი პაროლი" required minlength="6">
+            </label>
+            <label>
+              გაიმეორე პაროლი
+              <input name="confirm_password" type="password" placeholder="გაიმეორე პაროლი" required minlength="6">
+            </label>
+          </div>
           <button type="submit">ანგარიშის შექმნა</button>
         </form>
         <p class="auth-feedback" data-auth-feedback></p>
