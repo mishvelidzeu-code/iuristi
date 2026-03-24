@@ -25,6 +25,7 @@ let records = [];
 let currentSearch = "";
 let modalMode = "create";
 let modalItemId = null;
+let isSubmitting = false;
 
 const formatDate = (value) => {
   if (!value) return "თარიღი მითითებული არ არის";
@@ -51,6 +52,22 @@ const toDateTimeLocalValue = (value) => {
   const date = new Date(value);
   const offset = date.getTimezoneOffset();
   return new Date(date.getTime() - offset * 60_000).toISOString().slice(0, 16);
+};
+
+const getNowLocalValue = () => toDateTimeLocalValue(new Date().toISOString());
+
+const getOneHourLaterValue = () => {
+  const date = new Date();
+  date.setHours(date.getHours() + 1);
+  return toDateTimeLocalValue(date.toISOString());
+};
+
+const getTodayValue = () => new Date().toISOString().slice(0, 10);
+
+const getThreeDaysLaterValue = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 3);
+  return date.toISOString().slice(0, 10);
 };
 
 const configs = {
@@ -92,6 +109,7 @@ const configs = {
     },
     fields(mode, item = {}) {
       const disabled = mode === "view" ? "disabled" : "";
+      const statusValue = item.status || "active";
       return `
         <div class="auth-form-grid">
           <label>საქმის სათაური<input name="title" type="text" value="${escapeHtml(item.title || "")}" required ${disabled}></label>
@@ -99,14 +117,14 @@ const configs = {
         </div>
         <div class="auth-form-grid">
           <label>სასამართლო<input name="court_name" type="text" value="${escapeHtml(item.court_name || "")}" ${disabled}></label>
-          <label>სხდომის თარიღი<input name="hearing_date" type="datetime-local" value="${toDateTimeLocalValue(item.hearing_date)}" ${disabled}></label>
+          <label>სხდომის თარიღი<input name="hearing_date" type="datetime-local" value="${toDateTimeLocalValue(item.hearing_date) || getNowLocalValue()}" ${disabled}></label>
         </div>
         <label>სტატუსი
           <select name="status" ${disabled}>
-            <option value="active" ${item.status === "active" ? "selected" : ""}>active</option>
-            <option value="pending" ${item.status === "pending" ? "selected" : ""}>pending</option>
-            <option value="closed" ${item.status === "closed" ? "selected" : ""}>closed</option>
-            <option value="archived" ${item.status === "archived" ? "selected" : ""}>archived</option>
+            <option value="active" ${statusValue === "active" ? "selected" : ""}>active</option>
+            <option value="pending" ${statusValue === "pending" ? "selected" : ""}>pending</option>
+            <option value="closed" ${statusValue === "closed" ? "selected" : ""}>closed</option>
+            <option value="archived" ${statusValue === "archived" ? "selected" : ""}>archived</option>
           </select>
         </label>
         <label>აღწერა<textarea name="description" rows="4" ${disabled}>${escapeHtml(item.description || "")}</textarea></label>
@@ -219,15 +237,16 @@ const configs = {
     },
     fields(mode, item = {}) {
       const disabled = mode === "view" ? "disabled" : "";
+      const statusValue = item.status || "draft";
       return `
         <label>დოკუმენტის სათაური<input name="title" type="text" value="${escapeHtml(item.title || "")}" required ${disabled}></label>
         <div class="auth-form-grid">
           <label>სტატუსი
             <select name="status" ${disabled}>
-              <option value="draft" ${item.status === "draft" ? "selected" : ""}>draft</option>
-              <option value="generated" ${item.status === "generated" ? "selected" : ""}>generated</option>
-              <option value="signed" ${item.status === "signed" ? "selected" : ""}>signed</option>
-              <option value="archived" ${item.status === "archived" ? "selected" : ""}>archived</option>
+              <option value="draft" ${statusValue === "draft" ? "selected" : ""}>draft</option>
+              <option value="generated" ${statusValue === "generated" ? "selected" : ""}>generated</option>
+              <option value="signed" ${statusValue === "signed" ? "selected" : ""}>signed</option>
+              <option value="archived" ${statusValue === "archived" ? "selected" : ""}>archived</option>
             </select>
           </label>
           <label>ფაილის ბმული<input name="file_path" type="text" value="${escapeHtml(item.file_path || "")}" ${disabled}></label>
@@ -280,22 +299,24 @@ const configs = {
     },
     fields(mode, item = {}) {
       const disabled = mode === "view" ? "disabled" : "";
+      const languageValue = item.language_code || "ka";
+      const statusValue = item.status || "uploaded";
       return `
         <label>სათაური<input name="title" type="text" value="${escapeHtml(item.title || "")}" required ${disabled}></label>
         <div class="auth-form-grid">
           <label>ენა
             <select name="language_code" ${disabled}>
-              <option value="ka" ${item.language_code === "ka" ? "selected" : ""}>ქართული</option>
-              <option value="en" ${item.language_code === "en" ? "selected" : ""}>English</option>
-              <option value="ru" ${item.language_code === "ru" ? "selected" : ""}>Русский</option>
+              <option value="ka" ${languageValue === "ka" ? "selected" : ""}>ქართული</option>
+              <option value="en" ${languageValue === "en" ? "selected" : ""}>English</option>
+              <option value="ru" ${languageValue === "ru" ? "selected" : ""}>Русский</option>
             </select>
           </label>
           <label>სტატუსი
             <select name="status" ${disabled}>
-              <option value="uploaded" ${item.status === "uploaded" ? "selected" : ""}>uploaded</option>
-              <option value="processing" ${item.status === "processing" ? "selected" : ""}>processing</option>
-              <option value="completed" ${item.status === "completed" ? "selected" : ""}>completed</option>
-              <option value="failed" ${item.status === "failed" ? "selected" : ""}>failed</option>
+              <option value="uploaded" ${statusValue === "uploaded" ? "selected" : ""}>uploaded</option>
+              <option value="processing" ${statusValue === "processing" ? "selected" : ""}>processing</option>
+              <option value="completed" ${statusValue === "completed" ? "selected" : ""}>completed</option>
+              <option value="failed" ${statusValue === "failed" ? "selected" : ""}>failed</option>
             </select>
           </label>
         </div>
@@ -351,17 +372,18 @@ const configs = {
     },
     fields(mode, item = {}) {
       const disabled = mode === "view" ? "disabled" : "";
+      const statusValue = item.status || "upcoming";
       return `
         <label>ვადის სათაური<input name="title" type="text" value="${escapeHtml(item.title || "")}" required ${disabled}></label>
         <div class="auth-form-grid">
-          <label>საწყისი თარიღი<input name="base_date" type="date" value="${escapeHtml(item.base_date || "")}" required ${disabled}></label>
-          <label>ბოლო ვადა<input name="due_date" type="date" value="${escapeHtml(item.due_date || "")}" required ${disabled}></label>
+          <label>საწყისი თარიღი<input name="base_date" type="date" value="${escapeHtml(item.base_date || "") || getTodayValue()}" required ${disabled}></label>
+          <label>ბოლო ვადა<input name="due_date" type="date" value="${escapeHtml(item.due_date || "") || getThreeDaysLaterValue()}" required ${disabled}></label>
         </div>
         <label>სტატუსი
           <select name="status" ${disabled}>
-            <option value="upcoming" ${item.status === "upcoming" ? "selected" : ""}>upcoming</option>
-            <option value="done" ${item.status === "done" ? "selected" : ""}>done</option>
-            <option value="missed" ${item.status === "missed" ? "selected" : ""}>missed</option>
+            <option value="upcoming" ${statusValue === "upcoming" ? "selected" : ""}>upcoming</option>
+            <option value="done" ${statusValue === "done" ? "selected" : ""}>done</option>
+            <option value="missed" ${statusValue === "missed" ? "selected" : ""}>missed</option>
           </select>
         </label>
         <label>შენიშვნა<textarea name="notes" rows="4" ${disabled}>${escapeHtml(item.notes || "")}</textarea></label>
@@ -418,8 +440,8 @@ const configs = {
       return `
         <label>მოვლენის სათაური<input name="title" type="text" value="${escapeHtml(item.title || "")}" required ${disabled}></label>
         <div class="auth-form-grid">
-          <label>დაწყება<input name="starts_at" type="datetime-local" value="${toDateTimeLocalValue(item.starts_at)}" required ${disabled}></label>
-          <label>დასრულება<input name="ends_at" type="datetime-local" value="${toDateTimeLocalValue(item.ends_at)}" ${disabled}></label>
+          <label>დაწყება<input name="starts_at" type="datetime-local" value="${toDateTimeLocalValue(item.starts_at) || getNowLocalValue()}" required ${disabled}></label>
+          <label>დასრულება<input name="ends_at" type="datetime-local" value="${toDateTimeLocalValue(item.ends_at) || getOneHourLaterValue()}" ${disabled}></label>
         </div>
         <label>ადგილმდებარეობა<input name="location" type="text" value="${escapeHtml(item.location || "")}" ${disabled}></label>
         <label>შენიშვნა<textarea name="notes" rows="4" ${disabled}>${escapeHtml(item.notes || "")}</textarea></label>
@@ -450,6 +472,7 @@ const closeModal = () => {
 const openModal = (mode, item = null) => {
   modalMode = mode;
   modalItemId = item?.id || null;
+  isSubmitting = false;
   modalBackdrop.classList.remove("hidden");
   modalFeedback.textContent = "";
   modalTitle.textContent =
@@ -462,9 +485,15 @@ const openModal = (mode, item = null) => {
   const submitButton =
     mode === "view"
       ? ""
-      : `<button type="submit">${mode === "edit" ? "ცვლილების შენახვა" : "დამატება"}</button>`;
+      : `
+        <div class="modal-actions">
+          <button class="nav-login" type="button" data-close-inline>გაუქმება</button>
+          <button type="submit" data-submit-button>${mode === "edit" ? "ცვლილების შენახვა" : "დამატება"}</button>
+        </div>
+      `;
 
   modalForm.innerHTML = `${config.fields(mode, item)}${submitButton}`;
+  modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
 };
 
 const getItemById = (id) => records.find((item) => item.id === id);
@@ -564,26 +593,45 @@ searchInput?.addEventListener("input", (event) => {
 
 modalForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (isSubmitting) return;
 
   const formData = new FormData(modalForm);
   const payload = config.payload(formData);
+  const submitButton = modalForm.querySelector("[data-submit-button]");
 
-  const query =
-    modalMode === "edit"
-      ? supabase.from(config.table).update(payload).eq("id", modalItemId).eq(config.ownerColumn, authUserId)
-      : supabase.from(config.table).insert({ [config.ownerColumn]: authUserId, ...payload });
-
-  const { error } = await query;
-
-  if (error) {
-    modalFeedback.textContent = "შენახვა ვერ მოხერხდა. გადაამოწმე ველები.";
-    return;
+  isSubmitting = true;
+  modalFeedback.textContent = "ინახება...";
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "ინახება...";
   }
 
-  const savedMode = modalMode;
-  closeModal();
-  await fetchRecords();
-  statusEl.textContent = savedMode === "edit" ? "ჩანაწერი განახლდა." : "ახალი ჩანაწერი დაემატა.";
+  try {
+    const query =
+      modalMode === "edit"
+        ? supabase.from(config.table).update(payload).eq("id", modalItemId).eq(config.ownerColumn, authUserId)
+        : supabase.from(config.table).insert({ [config.ownerColumn]: authUserId, ...payload });
+
+    const { error } = await query;
+
+    if (error) {
+      modalFeedback.textContent = `შენახვა ვერ მოხერხდა: ${error.message}`;
+      return;
+    }
+
+    const savedMode = modalMode;
+    closeModal();
+    await fetchRecords();
+    statusEl.textContent = savedMode === "edit" ? "ჩანაწერი განახლდა." : "ახალი ჩანაწერი დაემატა.";
+  } catch (error) {
+    modalFeedback.textContent = `შეცდომა: ${error.message || "შენახვა ვერ მოხერხდა."}`;
+  } finally {
+    isSubmitting = false;
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = modalMode === "edit" ? "ცვლილების შენახვა" : "დამატება";
+    }
+  }
 });
 
 logoutButton?.addEventListener("click", async () => {
