@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 
-const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1hMopI0YHEJWzvOKMPflmUeEamZ6RM__OJv-ZUNONhOE/preview";
+const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbskafP7Y7t1bmQYW6kkMrmes5spDf-uXumTcnALajOW8j8dBG6KroONkNPQINNUZTcXxVeK-iyvaY/pubhtml?widget=true&headers=false";
 
 const userName = document.querySelector("[data-user-name]");
 const userMeta = document.querySelector("[data-user-meta]");
