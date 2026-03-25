@@ -1,6 +1,6 @@
 import { supabase } from "./supabase.js";
 
-const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbskafP7Y7t1bmQYW6kkMrmes5spDf-uXumTcnALajOW8j8dBG6KroONkNPQINNUZTcXxVeK-iyvaY/pubhtml?widget=true&headers=false";
+const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1hMopI0YHEJWzvOKMPflmUeEamZ6RM__OJv-ZUNONhOE/edit?usp=sharing";
 
 const userName = document.querySelector("[data-user-name]");
 const userMeta = document.querySelector("[data-user-meta]");
@@ -10,42 +10,40 @@ const form = document.querySelector("[data-sheets-form]");
 const input = document.querySelector("[data-sheets-input]");
 const frame = document.querySelector("[data-sheets-frame]");
 const empty = document.querySelector("[data-sheets-empty]");
+const previewCard = document.querySelector("[data-sheets-preview-card]");
 const openButton = document.querySelector("[data-open-sheet]");
 const clearButton = document.querySelector("[data-clear-sheet]");
 
 let currentUserId = null;
 let currentSheetUrl = "";
 
-const normalizeSheetUrl = (value) => {
-  const url = String(value || "").trim();
-  if (!url) return "";
-
-  if (url.includes("/pubhtml")) return url;
-  if (url.includes("/preview")) return url;
-  if (url.includes("/edit")) return url.replace("/edit", "/preview");
-  return url;
-};
+const normalizeSheetUrl = (value) => String(value || "").trim();
 
 const setStatus = (message) => {
   if (statusEl) statusEl.textContent = message;
 };
 
-const renderSheet = (url) => {
-  const normalized = normalizeSheetUrl(url);
-  currentSheetUrl = normalized;
+const renderSheetState = (url) => {
+  currentSheetUrl = normalizeSheetUrl(url);
 
-  if (!normalized) {
-    frame.classList.add("hidden");
-    frame.removeAttribute("src");
-    empty.classList.remove("hidden");
-    setStatus("ჩასვი Sheets embed ბმული და შეინახე.");
+  if (!currentSheetUrl) {
+    previewCard?.classList.remove("hidden");
+    frame?.classList.add("hidden");
+    frame?.removeAttribute("src");
+    empty?.classList.remove("hidden");
+    setStatus("ჩასვი შენი Google Sheet-ის ლინკი და შეინახე.");
     return;
   }
 
-  frame.src = normalized;
-  frame.classList.remove("hidden");
-  empty.classList.add("hidden");
-  setStatus("ცხრილი ჩაშენებულია. შეგიძლია იმუშაო პირდაპირ ამ გვერდიდან.");
+  previewCard?.classList.add("hidden");
+  setStatus("ლინკი შენახულია. მარცხენა მენიუდან `ექსელი` ყოველთვის პირდაპირ შენს ცხრილს გახსნის.");
+};
+
+const maybeRedirectToSheet = (url) => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("manage") === "1") return;
+  if (!url) return;
+  window.location.href = url;
 };
 
 async function initPage() {
@@ -68,21 +66,21 @@ async function initPage() {
 
   if (profile) {
     userName.textContent = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || "კაბინეტი";
-    userMeta.textContent = profile.bureau_name || "ცხრილების სამუშაო სივრცე";
+    userMeta.textContent = profile.bureau_name || "პირდაპირი Google Sheets კავშირი";
   }
 
   const savedUrl = profile?.sheet_url || DEFAULT_SHEET_URL;
   input.value = savedUrl;
-  renderSheet(savedUrl);
+  renderSheetState(savedUrl);
+  maybeRedirectToSheet(savedUrl);
 }
 
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-
   if (!currentUserId) return;
 
   const value = normalizeSheetUrl(input.value);
-  setStatus("ცხრილის ბმული ინახება...");
+  setStatus("Excel ბმული ინახება...");
 
   const { error } = await supabase
     .from("profiles")
@@ -95,17 +93,18 @@ form?.addEventListener("submit", async (event) => {
   }
 
   input.value = value;
-  renderSheet(value);
+  renderSheetState(value);
+  setStatus("ბმული წარმატებით შეინახა. შემდეგში მენიუდან პირდაპირ შენს Excel-ს გახსნის.");
 });
 
 openButton?.addEventListener("click", () => {
   const url = normalizeSheetUrl(input.value || currentSheetUrl);
   if (!url) {
-    setStatus("ჯერ ბმული ჩასვი, მერე გახსენი ახალ ტაბში.");
+    setStatus("ჯერ ჩასვი შენი Google Sheet-ის ლინკი.");
     return;
   }
 
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.location.href = url;
 });
 
 clearButton?.addEventListener("click", async () => {
@@ -122,7 +121,7 @@ clearButton?.addEventListener("click", async () => {
   }
 
   input.value = "";
-  renderSheet("");
+  renderSheetState("");
 });
 
 logoutButton?.addEventListener("click", async () => {
