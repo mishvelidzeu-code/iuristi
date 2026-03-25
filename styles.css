@@ -1654,6 +1654,22 @@ select {
   align-content: start;
 }
 
+.dashboard-workspace-hero .dashboard-status {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.dashboard-workspace-hero .dashboard-status[data-state="error"] {
+  background: rgba(175, 47, 47, 0.22);
+  color: #fff;
+}
+
+.dashboard-workspace-hero .dashboard-status[data-state="success"] {
+  background: rgba(11, 122, 71, 0.22);
+  color: #fff;
+}
+
 .workspace-hero-copy p {
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.95rem;
@@ -2349,4 +2365,14 @@ select {
     width: 100%;
     padding: 13px 16px;
   }
+  /* Excel button green style */
+.nav-login.excel-btn {
+  background-color: #16a34a !important;
+  color: white !important;
+  border: none !important;
+}
+
+.nav-login.excel-btn:hover {
+  background-color: #15803d !important;
+}
 }

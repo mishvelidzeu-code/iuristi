@@ -28,17 +28,31 @@ let modalMode = "create";
 let modalItemId = null;
 let isSubmitting = false;
 
+const DATE_FORMATTER = new Intl.DateTimeFormat("ka-GE", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Asia/Tbilisi"
+});
+
+const DATE_TIME_FORMATTER = new Intl.DateTimeFormat("ka-GE", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "Asia/Tbilisi"
+});
+
 const formatDate = (value) => {
   if (!value) return "თარიღი მითითებული არ არის";
-  return new Intl.DateTimeFormat("ka-GE", { dateStyle: "medium" }).format(new Date(value));
+  return DATE_FORMATTER.format(new Date(value));
 };
 
 const formatDateTime = (value) => {
   if (!value) return "თარიღი მითითებული არ არის";
-  return new Intl.DateTimeFormat("ka-GE", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
+  return DATE_TIME_FORMATTER.format(new Date(value));
 };
 
 const escapeHtml = (value) =>
