@@ -12,6 +12,7 @@ const nextHearing = document.querySelector("[data-next-hearing]");
 const nextDeadline = document.querySelector("[data-next-deadline]");
 const logoutButton = document.querySelector("[data-logout]");
 const clickablePanels = document.querySelectorAll("[data-href]");
+const excelNavLink = document.querySelector('.dashboard-nav a[href="sheets.html"]');
 
 const previewLists = {
   cases: document.querySelector('[data-preview-list="cases"]'),
@@ -79,6 +80,19 @@ async function loadDashboard() {
   }
 
   const authUserId = session.user.id;
+
+  excelNavLink?.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("sheet_url")
+      .eq("id", authUserId)
+      .single();
+
+    const target = profile?.sheet_url || "./sheets.html?manage=1";
+    window.open(target, "_blank", "noopener,noreferrer");
+  });
 
   const [
     profileRes,

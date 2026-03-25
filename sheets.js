@@ -39,13 +39,6 @@ const renderSheetState = (url) => {
   setStatus("ლინკი შენახულია. მარცხენა მენიუდან `ექსელი` ყოველთვის პირდაპირ შენს ცხრილს გახსნის.");
 };
 
-const maybeRedirectToSheet = (url) => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("manage") === "1") return;
-  if (!url) return;
-  window.location.href = url;
-};
-
 async function initPage() {
   const {
     data: { session }
@@ -72,7 +65,6 @@ async function initPage() {
   const savedUrl = profile?.sheet_url || DEFAULT_SHEET_URL;
   input.value = savedUrl;
   renderSheetState(savedUrl);
-  maybeRedirectToSheet(savedUrl);
 }
 
 form?.addEventListener("submit", async (event) => {
@@ -104,7 +96,7 @@ openButton?.addEventListener("click", () => {
     return;
   }
 
-  window.location.href = url;
+  window.open(url, "_blank", "noopener,noreferrer");
 });
 
 clearButton?.addEventListener("click", async () => {

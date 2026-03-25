@@ -19,6 +19,7 @@ const modalForm = document.querySelector("[data-modal-form]");
 const modalTitle = document.querySelector("[data-modal-title]");
 const modalFeedback = document.querySelector("[data-modal-feedback]");
 const closeModalButton = document.querySelector("[data-close-modal]");
+const excelNavLink = document.querySelector('.dashboard-nav a[href="sheets.html"]');
 
 let authUserId = null;
 let records = [];
@@ -656,6 +657,20 @@ async function init() {
   }
 
   authUserId = session.user.id;
+
+  excelNavLink?.addEventListener("click", async (event) => {
+    event.preventDefault();
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("sheet_url")
+      .eq("id", authUserId)
+      .single();
+
+    const target = profile?.sheet_url || "./sheets.html?manage=1";
+    window.open(target, "_blank", "noopener,noreferrer");
+  });
+
   await fetchRecords();
 }
 
