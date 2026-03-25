@@ -508,8 +508,25 @@ const openModal = (mode, item = null) => {
         </div>
       `;
 
-  modalForm.innerHTML = `${config.fields(mode, safeItem)}${submitButton}`;
+  modalForm.innerHTML = `
+  ${config.fields(mode, safeItem)}
+
+  ${mode === "view" ? `
+    <div class="case-files">
+      <h3>ფაილები</h3>
+      <div data-case-files>იტვირთება...</div>
+
+      <input type="file" data-upload-input accept=".pdf,.doc,.docx,.xls,.xlsx">
+      <button type="button" data-upload-btn>ფაილის ატვირთვა</button>
+    </div>
+  ` : ""}
+
+  ${submitButton}
+`;
   modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
+  if (mode === "view" && modalItemId) {
+  loadCaseFiles(modalItemId);
+}
 };
 
 const getItemById = (id) => records.find((item) => item.id === id);
@@ -655,6 +672,7 @@ logoutButton?.addEventListener("click", async () => {
   window.location.href = "./index.html";
 });
 
+
 async function init() {
   if (!config) {
     statusEl.textContent = "გვერდის კონფიგურაცია ვერ მოიძებნა.";
@@ -689,3 +707,78 @@ async function init() {
 }
 
 init();
+
+async function loadCaseFiles(caseId) {
+  const container = document.querySelector("[data-case-files]");
+  if (!container) return;
+
+  container.innerHTML = "იტვირთება...";
+
+  const { data, error } = await supabase.storage
+    .from("case-files")
+    .list(`cases/${caseId}`);
+
+  if (error) {
+    container.innerHTML = "ფაილები ვერ ჩაიტვირთა";
+    console.error(error);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = "ფაილები არ არის დამატებული";
+    return;
+  }
+
+  container.innerHTML = data.map(file => {
+    const path = `cases/${caseId}/${file.name}`;
+
+    const { data: urlData } = supabase.storage
+      .from("case-files")
+      .getPublicUrl(path);
+
+    return `
+      <div class="file-item">
+        <span>${file.name}</span>
+        <div>
+          <a href="${urlData.publicUrl}" target="_blank">გახსნა</a>
+          <a href="${urlData.publicUrl}" download>ჩამოწერა</a>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+document.addEventListener("click", async (e) => {
+  if (!e.target.matches("[data-upload-btn]")) return;
+
+  const input = document.querySelector("[data-upload-input]");
+  const file = input.files[0];
+
+  if (!file) {
+    alert("აირჩიე ფაილი");
+    return;
+  }
+
+  const caseId = modalItemId;
+  const path = `cases/${caseId}/${file.name}`;
+
+  const { error } = await supabase.storage
+    .from("case-files")
+    .upload(path, file);
+
+  if (error) {
+    alert("ატვირთვა ვერ მოხერხდა");
+    console.error(error);
+    return;
+  }
+
+  // DB შენახვა
+  await supabase.from("case_files").insert({
+    case_id: caseId,
+    owner_id: authUserId,
+    file_name: file.name,
+    file_path: path
+  });
+
+  alert("ატვირთულია!");
+  loadCaseFiles(caseId);
+});
