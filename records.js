@@ -251,13 +251,13 @@ const configs = {
     fileConfig: { storageSegment: "clients", dbColumn: "client_id" }
   },
   documents: {
-    title: "დოკუმენტები",
-    subtitle: "დრაფტები და მზა დოკუმენტები ერთ სივრცეში — ძებნა და რედაქტირება წამებში.",
+    title: "მზა შაბლონები",
+    subtitle: "მზა შაბლონები ერთ სივრცეში — ძებნა, სტატუსი და სწრაფი მართვა.",
     table: "documents",
     ownerColumn: "owner_id",
     select: "id, title, status, body, file_path, created_at",
     order: { column: "created_at", ascending: false },
-    empty: "დოკუმენტები ჯერ არ არის დამატებული.",
+    empty: "მზა შაბლონები ჯერ არ არის დამატებული.",
     searchFields: ["title", "status", "body", "file_path"],
     urgentText: (items) => items[0] ? `ბოლო დოკუმენტი: ${items[0].title}` : "ბოლო დოკუმენტი ჯერ არ არის",
     secondaryText: (items) => `${items.filter((item) => item.status === "draft").length} draft`,
@@ -314,7 +314,7 @@ const configs = {
     fileConfig: { storageSegment: "documents", dbColumn: "document_id" }
   },
   transcriptions: {
-    title: "AI ტრანსკრიფცია",
+    title: "AI აუდიოს ტექსტად გარდაქმნა",
     subtitle: "აუდიოდან ტექსტამდე: სტატუსი, ენა, რედაქტირება და შენახვა.",
     table: "transcriptions",
     ownerColumn: "owner_id",
@@ -729,7 +729,7 @@ const openModal = (mode, item = null) => {
       ? `
     <section class="entity-files" aria-label="ჩანაწერზე მიბმული ფაილები">
       <div class="entity-files-head">
-        <h3 class="entity-files-title">დოკუმენტები და ფაილები</h3>
+        <h3 class="entity-files-title">ფაილები და შაბლონები</h3>
         <p class="entity-files-hint">Word, Excel, PDF · გახსნა, დიდი ეკრანი (PDF), ჩამოწერა, წაშლა. იგივე სახელით ატვირთვა ჩაანაცვლებს ფაილს.</p>
       </div>
       <div class="entity-files-list-wrap">

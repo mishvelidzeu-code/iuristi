@@ -203,7 +203,7 @@ async function loadDashboard() {
     previewLists.documents,
     documents.slice(0, 3),
     (item) => renderLabelValue(item.title, item.status || "სტატუსი უცნობია"),
-    "დოკუმენტები ჯერ არ არის დამატებული."
+    "მზა შაბლონები ჯერ არ არის დამატებული."
   );
 
   renderPreviewList(
