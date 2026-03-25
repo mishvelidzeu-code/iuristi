@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LexManage - საქმეები</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans Georgian', sans-serif; }
+    .off { display: none; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
+      <div>
+        <div class="font-extrabold">LexManage</div>
+        <div class="text-[11px] text-slate-400">Cases Workspace</div>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <button id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
+      <button class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">საქმეები</button>
+      <button class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
+      <button class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
+    </nav>
+    <div class="p-4 border-t border-slate-100 bg-slate-50">
+      <div class="text-sm font-bold">საქმეების მართვა</div>
+      <div class="text-xs text-slate-500">ცალკე მოდული</div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-16 px-8 bg-white/80 border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <div id="eyebrow" class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Cases</div>
+        <div id="title" class="text-xl font-extrabold">საქმეები</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="gsearch" class="hidden xl:block w-72 px-4 py-2 rounded-full border border-slate-200 bg-white outline-none" placeholder="ძებნა...">
+        <button id="primary" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-blue-600">ახალი საქმე</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8">
+      <section id="cases" class="space-y-6">
+        <div class="rounded-[2rem] bg-white border overflow-hidden">
+          <div class="p-6 border-b">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+              <div>
+                <div class="inline-flex px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-[0.2em] mb-3">Cases Workspace</div>
+                <h2 class="text-3xl font-extrabold">საქმეები</h2>
+                <p class="text-slate-500 mt-2">სრული სივრცე საქმეების დასამატებლად, გასაფილტრად, საძებნად და დეტალურად გასახსნელად.</p>
+              </div>
+              <button id="newCase" class="px-4 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-blue-600">ახალი საქმის დამატება</button>
+            </div>
+          </div>
+
+          <div class="p-6 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              <button data-stage="მიმდინარე" class="stage rounded-2xl border bg-blue-50 px-4 py-4 text-left">
+                <div class="text-xs text-slate-400 uppercase font-bold">ტაბი</div>
+                <div class="mt-2 text-lg font-extrabold">მიმდინარე</div>
+                <div id="c1" class="text-sm text-slate-500 mt-1"></div>
+              </button>
+              <button data-stage="დასრულებული" class="stage rounded-2xl border bg-slate-50 px-4 py-4 text-left">
+                <div class="text-xs text-slate-400 uppercase font-bold">ტაბი</div>
+                <div class="mt-2 text-lg font-extrabold">დასრულებული</div>
+                <div id="c2" class="text-sm text-slate-500 mt-1"></div>
+              </button>
+              <button data-stage="შეწყვეტილი" class="stage rounded-2xl border bg-slate-50 px-4 py-4 text-left">
+                <div class="text-xs text-slate-400 uppercase font-bold">ტაბი</div>
+                <div class="mt-2 text-lg font-extrabold">შეწყვეტილი</div>
+                <div id="c3" class="text-sm text-slate-500 mt-1"></div>
+              </button>
+              <button data-stage="ყველა" class="stage rounded-2xl border bg-slate-50 px-4 py-4 text-left">
+                <div class="text-xs text-slate-400 uppercase font-bold">ტაბი</div>
+                <div class="mt-2 text-lg font-extrabold">ყველა</div>
+                <div id="c4" class="text-sm text-slate-500 mt-1"></div>
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex flex-col md:flex-row gap-3 md:items-center">
+                <input id="search" class="flex-1 px-4 py-3 rounded-2xl border bg-slate-50 outline-none" placeholder="ძებნა ყველაფრით: კოდი, კლიენტი, სასამართლო, ტიპი, შედეგი, პასუხისმგებელი...">
+                <div id="meta" class="text-sm text-slate-500"></div>
+              </div>
+              <div class="grid gap-4 lg:grid-cols-3">
+                <div>
+                  <div class="text-xs font-bold uppercase text-slate-400 mb-2">სასამართლო</div>
+                  <div id="courts" class="flex flex-wrap gap-2"></div>
+                </div>
+                <div>
+                  <div class="text-xs font-bold uppercase text-slate-400 mb-2">საქმის ტიპი</div>
+                  <div id="cats" class="flex flex-wrap gap-2"></div>
+                </div>
+                <div>
+                  <div class="text-xs font-bold uppercase text-slate-400 mb-2">შედეგი</div>
+                  <div id="results" class="flex flex-wrap gap-2"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
+              <div>
+                <div id="list" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+                <div id="empty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center mt-4">
+                  <div class="text-lg font-bold">საქმეები ვერ მოიძებნა</div>
+                  <div class="text-slate-500 mt-2">შეცვალე ფილტრები ან დაამატე ახალი საქმე.</div>
+                </div>
+              </div>
+
+              <aside class="rounded-[1.75rem] border bg-slate-50 p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <div class="text-xs uppercase font-bold text-slate-400">ფორმა</div>
+                    <div id="ftitle" class="text-lg font-extrabold mt-1">ახალი საქმე</div>
+                  </div>
+                  <button id="resetForm" class="text-sm font-bold text-blue-600">გასუფთავება</button>
+                </div>
+                <form id="form" class="space-y-4">
+                  <input id="fid" type="hidden">
+                  <input id="fname" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="საქმის დასახელება">
+                  <div class="grid grid-cols-2 gap-3">
+                    <input id="fcode" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="კოდი">
+                    <input id="fclient" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="კლიენტი">
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <select id="fcourt" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none"></select>
+                    <select id="fcat" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none"></select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <select id="fresult" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none"></select>
+                    <select id="fprio" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
+                      <option>მაღალი</option>
+                      <option>საშუალო</option>
+                      <option>დაბალი</option>
+                    </select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <input id="fowner" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="პასუხისმგებელი">
+                    <input id="fdeadline" type="date" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
+                  </div>
+                  <input id="fbudget" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="ბიუჯეტი / თანხა">
+                  <textarea id="fnotes" rows="4" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none resize-none" placeholder="ყველაფერი ამ საქმეზე..."></textarea>
+                  <div id="fmsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+                  <button class="w-full px-4 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-blue-600">შენახვა</button>
+                </form>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="detail" class="off">
+        <div class="rounded-[2rem] bg-white border overflow-hidden">
+          <div class="p-6 border-b flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <button id="back" class="text-sm font-bold text-blue-600 mb-3">&larr; უკან საქმეებზე</button>
+              <div id="dcode" class="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold"></div>
+              <h2 id="dname" class="text-3xl font-extrabold mt-2"></h2>
+              <div id="dclient" class="text-slate-500 mt-2"></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span id="dstage" class="px-3 py-1 rounded-full text-xs font-bold border"></span>
+              <span id="dresult" class="px-3 py-1 rounded-full text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700"></span>
+            </div>
+          </div>
+          <div class="p-6 grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6">
+            <div class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-2">სასამართლო</div><div id="dcourt" class="text-lg font-extrabold"></div></div>
+                <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-2">საქმის ტიპი</div><div id="dcat" class="text-lg font-extrabold"></div></div>
+                <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-2">პასუხისმგებელი</div><div id="downer" class="text-lg font-extrabold"></div></div>
+                <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-2">დედლაინი</div><div id="ddead" class="text-lg font-extrabold"></div></div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-3">აღწერა / შენიშვნები</div><div id="dnotes" class="leading-7 text-slate-700"></div></div>
+            </div>
+            <div class="space-y-6">
+              <div class="rounded-3xl bg-slate-50 p-5">
+                <div class="text-xs text-slate-400 uppercase font-bold mb-3">დოკუმენტები</div>
+                <label class="block w-full px-4 py-4 rounded-2xl border border-dashed border-slate-300 bg-white text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50">
+                  <input id="files" type="file" class="hidden" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+                  Word, Excel, PDF და სხვა ფაილების ატვირთვა
+                </label>
+                <div id="dmsg" class="off mt-4 rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+                <div id="dfiles" class="mt-4 space-y-3"></div>
+              </div>
+              <div class="rounded-3xl bg-slate-50 p-5"><div class="text-xs text-slate-400 uppercase font-bold mb-3">ბიუჯეტი</div><div id="dbudget" class="text-2xl font-black"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="supabase-config.js"></script>
+  <script>
+    const COURTS = ['ყველა', 'საქალაქო სასამართლო', 'სააპელაციო სასამართლო', 'უზენაესი სასამართლო'];
+    const CATS = ['ყველა', 'სისხლი', 'სამოქალაქო', 'ადმინისტრაციული'];
+    const RES = ['ყველა', 'მოგებული', 'წაგებული', 'მორიგებით დასრულებული', 'საპროცესო გამოფრებული', 'შეწყვეტილი'];
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+    const views = { cases: $('#cases'), detail: $('#detail') };
+    const fields = { id: $('#fid'), name: $('#fname'), code: $('#fcode'), client: $('#fclient'), court: $('#fcourt'), cat: $('#fcat'), result: $('#fresult'), prio: $('#fprio'), owner: $('#fowner'), deadline: $('#fdeadline'), budget: $('#fbudget'), notes: $('#fnotes') };
+    let view = 'cases', stage = 'მიმდინარე', court = 'ყველა', cat = 'ყველა', result = 'ყველა', term = '', selected = null, cases = [];
+
+    function stageOf(v) { if (v === 'შეწყვეტილი') return 'შეწყვეტილი'; if (['მოგებული', 'წაგებული', 'მორიგებით დასრულებული'].includes(v)) return 'დასრულებული'; return 'მიმდინარე'; }
+    function pill(v) { if (v === 'დასრულებული') return 'bg-emerald-50 text-emerald-700 border-emerald-100'; if (v === 'შეწყვეტილი') return 'bg-amber-50 text-amber-700 border-amber-100'; return 'bg-blue-50 text-blue-700 border-blue-100'; }
+    function chips(el, arr, key, current) { el.innerHTML = arr.map((v) => `<button data-k="${key}" data-v="${v}" class="${v === current ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-600 border border-slate-200'} px-3 py-2 rounded-full text-sm font-bold">${v}</button>`).join(''); }
+    function formMessage(type, text) { const el = $('#fmsg'); el.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`; el.textContent = text; el.classList.remove('off'); }
+    function detailMessage(type, text) { const el = $('#dmsg'); el.className = `mt-4 rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`; el.textContent = text; el.classList.remove('off'); }
+    function setView(nextView) { view = nextView; Object.entries(views).forEach(([name, el]) => el.classList.toggle('off', name !== nextView)); $('#eyebrow').textContent = nextView === 'detail' ? 'Case Detail' : 'Cases'; $('#title').textContent = nextView === 'detail' ? 'საქმის დეტალები' : 'საქმეები'; render(); }
+    function resetForm() { Object.values(fields).forEach((field) => { field.value = ''; }); fields.court.value = COURTS[1]; fields.cat.value = CATS[1]; fields.result.value = RES[1]; fields.prio.value = 'მაღალი'; $('#ftitle').textContent = 'ახალი საქმე'; $('#fmsg').classList.add('off'); }
+    function fill(item) { fields.id.value = item.id; fields.name.value = item.name; fields.code.value = item.code; fields.client.value = item.client; fields.court.value = item.court; fields.cat.value = item.cat; fields.result.value = item.result; fields.prio.value = item.prio; fields.owner.value = item.owner || ''; fields.deadline.value = item.deadline || ''; fields.budget.value = item.budget || ''; fields.notes.value = item.notes || ''; $('#ftitle').textContent = 'საქმის რედაქტირება'; $('#fmsg').classList.add('off'); fields.name.focus(); }
+    function filtered() { return cases.filter((item) => { if (stage !== 'ყველა' && stageOf(item.result) !== stage) return false; if (court !== 'ყველა' && item.court !== court) return false; if (cat !== 'ყველა' && item.cat !== cat) return false; if (result !== 'ყველა' && item.result !== result) return false; const q = term.trim().toLowerCase(); if (!q) return true; return [item.name, item.code, item.client, item.court, item.cat, item.result, item.prio, item.owner, item.deadline, item.budget, item.notes].join(' ').toLowerCase().includes(q); }); }
+    function updateCounters() { const active = cases.filter((item) => stageOf(item.result) === 'მიმდინარე').length; const done = cases.filter((item) => stageOf(item.result) === 'დასრულებული').length; const stopped = cases.filter((item) => stageOf(item.result) === 'შეწყვეტილი').length; $('#c1').textContent = `${active} საქმე`; $('#c2').textContent = `${done} საქმე`; $('#c3').textContent = `${stopped} საქმე`; $('#c4').textContent = `${cases.length} საქმე`; }
+    function renderList() { updateCounters(); $$('.stage').forEach((button) => button.className = button.dataset.stage === stage ? 'stage rounded-2xl border bg-blue-50 px-4 py-4 text-left' : 'stage rounded-2xl border bg-slate-50 px-4 py-4 text-left'); chips($('#courts'), COURTS, 'court', court); chips($('#cats'), CATS, 'cat', cat); chips($('#results'), RES, 'result', result); const items = filtered(); $('#meta').textContent = `${items.length} შედეგი`; $('#empty').classList.toggle('off', items.length !== 0); $('#list').innerHTML = items.map((item) => `<article data-open="${item.id}" class="rounded-3xl bg-white border p-5 shadow-[0_18px_40px_-26px_rgba(15,23,42,0.2)] cursor-pointer hover:-translate-y-0.5 transition-transform"><div class="flex items-start justify-between gap-4 mb-4"><div><div class="flex flex-wrap items-center gap-2 mb-2"><h3 class="text-lg font-extrabold">${item.name}</h3><span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${pill(stageOf(item.result))}">${stageOf(item.result)}</span></div><div class="text-sm text-slate-500">${item.code} • ${item.client}</div></div><div class="text-right"><div class="text-xs text-slate-400">შედეგი</div><div class="font-bold">${item.result}</div></div></div><div class="grid grid-cols-2 gap-3 mb-4 text-sm"><div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">სასამართლო</div><div class="font-bold">${item.court}</div></div><div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">ტიპი</div><div class="font-bold">${item.cat}</div></div><div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">პასუხისმგებელი</div><div class="font-bold">${item.owner || '-'}</div></div><div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">დედლაინი</div><div class="font-bold">${item.deadline || '-'}</div></div></div><div class="rounded-2xl bg-slate-50 px-4 py-3 mb-4"><div class="text-xs text-slate-400 mb-1">შენიშვნები</div><div class="text-sm leading-6">${item.notes || 'არ არის დამატებული.'}</div></div><div class="flex items-center justify-between gap-3"><div class="text-sm text-slate-500">ბიუჯეტი: <span class="font-bold text-slate-700">${item.budget || '-'}</span></div><div class="flex gap-2"><button data-act="edit" data-id="${item.id}" class="px-3 py-2 rounded-xl border text-sm font-bold text-slate-700 hover:bg-slate-50">რედაქტირება</button><button data-act="del" data-id="${item.id}" class="px-3 py-2 rounded-xl border border-rose-200 text-sm font-bold text-rose-600 hover:bg-rose-50">წაშლა</button></div></div></article>`).join(''); }
+    function renderDetail() { const item = cases.find((entry) => entry.id === selected); if (!item) return; $('#dcode').textContent = item.code; $('#dname').textContent = item.name; $('#dclient').textContent = item.client; $('#dcourt').textContent = item.court; $('#dcat').textContent = item.cat; $('#downer').textContent = item.owner || '-'; $('#ddead').textContent = item.deadline || '-'; $('#dnotes').textContent = item.notes || 'შენიშვნები არ არის დამატებული.'; $('#dbudget').textContent = item.budget || '-'; const s = stageOf(item.result); $('#dstage').className = `px-3 py-1 rounded-full text-xs font-bold border ${pill(s)}`; $('#dstage').textContent = s; $('#dresult').textContent = item.result; $('#dfiles').innerHTML = (item.files || []).length ? item.files.map((file) => `<div class="rounded-2xl bg-white border px-4 py-3"><div class="font-bold">${file.file_name}</div><div class="text-xs text-slate-500 mt-1">${file.file_type || 'ფაილი'} • ${file.file_size_kb || 0} KB</div></div>`).join('') : '<div class="rounded-2xl bg-white border border-dashed border-slate-300 px-4 py-6 text-center text-slate-500">ფაილები ჯერ არ არის ატვირთული</div>'; }
+    function render() { renderList(); if (view === 'detail') renderDetail(); }
+    async function getCurrentUser() { const { data, error } = await window.supabaseClient.auth.getUser(); if (error) throw error; if (!data.user) { window.location.href = 'login.html'; throw new Error('ავტორიზაცია საჭიროა.'); } return data.user; }
+    function mapCase(row) { return { id: row.id, user_id: row.user_id, name: row.title, code: row.code, client: row.client_name, court: row.court, cat: row.category, result: row.result, prio: row.priority, owner: row.owner_name, deadline: row.deadline, budget: row.budget, notes: row.notes, files: row.case_files || [] }; }
+    async function loadCasesFromDb() { const user = await getCurrentUser(); const { data, error } = await window.supabaseClient.from('cases').select('id,user_id,title,code,client_name,court,category,result,priority,owner_name,deadline,budget,notes,created_at,case_files(id,file_name,file_type,file_size_kb,file_path,created_at)').eq('user_id', user.id).order('created_at', { ascending: false }); if (error) throw error; cases = (data || []).map(mapCase); render(); }
+    async function saveCaseToDb(payload) { const user = await getCurrentUser(); const row = { user_id: user.id, title: payload.name, code: payload.code, client_name: payload.client, court: payload.court, category: payload.cat, result: payload.result, priority: payload.prio, owner_name: payload.owner || null, deadline: payload.deadline || null, budget: payload.budget || null, notes: payload.notes || null }; if (payload.id) { const { error } = await window.supabaseClient.from('cases').update(row).eq('id', payload.id).eq('user_id', user.id); if (error) throw error; return payload.id; } const { data, error } = await window.supabaseClient.from('cases').insert(row).select('id').single(); if (error) throw error; return data.id; }
+    async function deleteCaseFromDb(id) { const user = await getCurrentUser(); const { error } = await window.supabaseClient.from('cases').delete().eq('id', id).eq('user_id', user.id); if (error) throw error; }
+    async function uploadFilesToDb(caseId, files) { const user = await getCurrentUser(); const rows = Array.from(files).map((file) => ({ case_id: caseId, user_id: user.id, file_name: file.name, file_type: file.type || 'ფაილი', file_size_kb: Math.max(1, Math.round(file.size / 1024)), file_path: null })); const { error } = await window.supabaseClient.from('case_files').insert(rows); if (error) throw error; }
+
+    $('#fcourt').innerHTML = COURTS.slice(1).map((v) => `<option>${v}</option>`).join('');
+    $('#fcat').innerHTML = CATS.slice(1).map((v) => `<option>${v}</option>`).join('');
+    $('#fresult').innerHTML = RES.slice(1).map((v) => `<option>${v}</option>`).join('');
+    resetForm();
+    $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
+    $$('.stage').forEach((button) => { button.onclick = () => { stage = button.dataset.stage; renderList(); }; });
+    $('#courts').onclick = (e) => { const button = e.target.closest('button[data-v]'); if (!button) return; court = button.dataset.v; renderList(); };
+    $('#cats').onclick = (e) => { const button = e.target.closest('button[data-v]'); if (!button) return; cat = button.dataset.v; renderList(); };
+    $('#results').onclick = (e) => { const button = e.target.closest('button[data-v]'); if (!button) return; result = button.dataset.v; renderList(); };
+    $('#search').oninput = (e) => { term = e.target.value; renderList(); };
+    $('#gsearch').oninput = (e) => { term = e.target.value; $('#search').value = e.target.value; render(); };
+    $('#newCase').onclick = () => { setView('cases'); resetForm(); fields.name.focus(); };
+    $('#resetForm').onclick = resetForm;
+    $('#back').onclick = () => setView('cases');
+    $('#primary').onclick = () => { setView('cases'); resetForm(); fields.name.focus(); };
+    $('#list').onclick = async (e) => { const action = e.target.closest('button[data-act]'); if (action) { const item = cases.find((entry) => entry.id === action.dataset.id); if (!item) return; if (action.dataset.act === 'edit') { fill(item); } else { try { await deleteCaseFromDb(item.id); if (selected === item.id) selected = null; if (fields.id.value === item.id) resetForm(); await loadCasesFromDb(); } catch (error) { formMessage('err', error.message || 'წაშლა ვერ შესრულდა.'); } } return; } const card = e.target.closest('[data-open]'); if (!card) return; selected = card.dataset.open; setView('detail'); };
+    $('#form').onsubmit = async (e) => { e.preventDefault(); const payload = { id: fields.id.value || null, name: fields.name.value.trim(), code: fields.code.value.trim(), client: fields.client.value.trim(), court: fields.court.value, cat: fields.cat.value, result: fields.result.value, prio: fields.prio.value, owner: fields.owner.value.trim(), deadline: fields.deadline.value, budget: fields.budget.value.trim(), notes: fields.notes.value.trim() }; if (!payload.name || !payload.code || !payload.client) { formMessage('err', 'შეავსე მინიმუმ საქმის დასახელება, კოდი და კლიენტი.'); return; } try { const savedId = await saveCaseToDb(payload); stage = stageOf(payload.result); selected = savedId; formMessage('ok', payload.id ? 'საქმე განახლდა.' : 'ახალი საქმე დაემატა.'); await loadCasesFromDb(); setTimeout(resetForm, 700); } catch (error) { formMessage('err', error.message || 'შენახვა ვერ შესრულდა.'); } };
+    $('#files').onchange = async (e) => { const item = cases.find((entry) => entry.id === selected); if (!item || !e.target.files.length) return; try { await uploadFilesToDb(item.id, e.target.files); detailMessage('ok', 'ფაილები დაემატა ამ საქმეს.'); await loadCasesFromDb(); renderDetail(); e.target.value = ''; } catch (error) { detailMessage('err', error.message || 'ფაილების დამატება ვერ შესრულდა.'); } };
+    (async function init() {
+      try {
+        await loadCasesFromDb();
+        setView('cases');
+        if (new URLSearchParams(window.location.search).get('new') === '1') {
+          resetForm();
+          fields.name.focus();
+        }
+      } catch (error) {
+        console.error(error);
+        formMessage('err', error.message || 'საქმეების ჩატვირთვა ვერ შესრულდა.');
+      }
+    })();
+  </script>
+</body>
+</html>
