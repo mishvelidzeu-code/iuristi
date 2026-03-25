@@ -484,8 +484,17 @@ const config = configs[pageKey];
 
 const SIGNED_URL_TTL_SECONDS = 3600;
 
-function safeStorageFileName(name) {
-  return String(name).replace(/[/\\]/g, "_").trim() || "file";
+function getFileExtensionForStorage(name) {
+  const n = String(name);
+  const dot = n.lastIndexOf(".");
+  if (dot <= 0 || dot === n.length - 1) return "";
+  const ext = n.slice(dot);
+  return ext.length > 32 ? "" : ext;
+}
+
+function buildUniqueStorageObjectName(originalFileName) {
+  const ext = getFileExtensionForStorage(originalFileName);
+  return `${crypto.randomUUID()}${ext}`;
 }
 
 function getEntityStoragePrefix(entityId) {
@@ -897,25 +906,41 @@ document.addEventListener("click", async (e) => {
       return;
     }
 
-    const storageName = safeStorageFileName(file.name);
-    const path = `${prefix}/${storageName}`;
-
-    const { error: uploadError } = await supabase.storage.from("case-files").upload(path, file, {
-      upsert: true
-    });
-
-    if (uploadError) {
-      window.alert("ატვირთვა ვერ მოხერხდა");
-      console.error(uploadError);
-      return;
-    }
-
-    await supabase
+    const { data: sameNameRows, error: sameNameErr } = await supabase
       .from("files")
-      .delete()
+      .select("id, storage_path")
       .eq("owner_id", authUserId)
       .eq(config.fileConfig.dbColumn, modalItemId)
       .eq("file_name", file.name);
+
+    if (sameNameErr) {
+      console.error(sameNameErr);
+    } else if (sameNameRows?.length) {
+      const paths = sameNameRows.map((row) => row.storage_path).filter(Boolean);
+      if (paths.length) {
+        await supabase.storage.from("case-files").remove(paths);
+      }
+      await supabase
+        .from("files")
+        .delete()
+        .eq("owner_id", authUserId)
+        .eq(config.fileConfig.dbColumn, modalItemId)
+        .eq("file_name", file.name);
+    }
+
+    const storageObjectName = buildUniqueStorageObjectName(file.name);
+    const path = `${prefix}/${storageObjectName}`;
+
+    const { error: uploadError } = await supabase.storage.from("case-files").upload(path, file, {
+      upsert: false,
+      contentType: file.type || undefined
+    });
+
+    if (uploadError) {
+      window.alert(`ატვირთვა ვერ მოხერხდა: ${uploadError.message || "უცნობი შეცდომა"}`);
+      console.error(uploadError);
+      return;
+    }
 
     const insertPayload = {
       owner_id: authUserId,
@@ -931,9 +956,11 @@ document.addEventListener("click", async (e) => {
 
     if (dbError) {
       console.error(dbError);
+      await supabase.storage.from("case-files").remove([path]);
       window.alert(
-        "ფაილი ჩაიტვირთა, მაგრამ ბაზაში ვერ შეინახა. გაუშვი Supabase-ში supabase-migration-files-entity-fks.sql თუ სვეტები ჯერ არ გაქვს."
+        `ბაზაში ვერ შეინახა: ${dbError.message}. გაუშვი Supabase-ში supabase-migration-files-entity-fks.sql თუ სვეტები ჯერ არ გაქვს.`
       );
+      return;
     }
 
     if (input) input.value = "";
