@@ -10,7 +10,7 @@
   <style>
     body { font-family: 'Noto Sans Georgian', sans-serif; }
     .off { display: none; }
-    .calendar-cell { min-height: 10.5rem; }
+    .calendar-cell { min-height: 8rem; }
     .event-chip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
@@ -26,9 +26,9 @@
       </div>
     </div>
     <nav class="flex-1 p-3 space-y-1">
-      <button id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
-      <button id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
-      <button class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
+      <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
+      <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
+      <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
       <div>
@@ -46,61 +46,61 @@
         <div class="text-xl font-extrabold">კალენდარი</div>
       </div>
       <div class="flex items-center gap-3">
-        <button id="enableNotifications" class="hidden md:inline-flex px-4 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50">შეტყობინებები</button>
-        <button id="newEvent" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-blue-600">ახალი ჩანაწერი</button>
+        <button type="button" id="enableNotifications" class="hidden md:inline-flex px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">შეტყობინებები</button>
+        <button type="button" id="newEvent" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">ახალი ჩანაწერი</button>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
-      <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-6">
-        <article class="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-8">
+    <div class="flex-1 overflow-y-auto p-3 md:p-5 space-y-4">
+      <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-4">
+        <article class="rounded-[1.6rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-6">
           <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">Schedule Center</div>
-          <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4">საქმის პროცესები, ვადები და პირადი ჩანაწერები ახლა ერთ კალენდარზეა გაერთიანებული.</h1>
-          <p class="text-slate-300 leading-7 max-w-3xl">თუ საქმეში ჩაწერილი გაქვს სხდომის თარიღი, reminder ან ვადა, ეს დღე ავტომატურად გამოჩნდება კალენდარში. დამატებით, შეგიძლია შენი ჩანაწერებიც შეინახო და კონკრეტულ დღეზე სრული agenda ქვემოთ ნახო.</p>
-          <div class="grid sm:grid-cols-3 gap-4 mt-8">
-            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+          <h1 class="text-2xl md:text-3xl font-extrabold leading-tight mb-3">საქმის პროცესები, ვადები და პირადი ჩანაწერები ახლა ერთ კალენდარზეა გაერთიანებული.</h1>
+          <p class="text-slate-300 leading-6 text-sm max-w-3xl">თუ საქმეში ჩაწერილი გაქვს სხდომის თარიღი, reminder ან ვადა, ეს დღე ავტომატურად გამოჩნდება კალენდარში. დამატებით, შეგიძლია შენი ჩანაწერებიც შეინახო და კონკრეტულ დღეზე სრული agenda ქვემოთ ნახო.</p>
+          <div class="grid sm:grid-cols-3 gap-3 mt-6">
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-4 py-3">
               <div class="text-xs uppercase tracking-[0.18em] text-slate-300">დღეს</div>
-              <div id="todayCount" class="text-3xl font-black mt-2">0</div>
+              <div id="todayCount" class="text-2xl font-black mt-2">0</div>
             </div>
-            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-4 py-3">
               <div class="text-xs uppercase tracking-[0.18em] text-slate-300">ხვალ</div>
-              <div id="tomorrowCount" class="text-3xl font-black mt-2">0</div>
+              <div id="tomorrowCount" class="text-2xl font-black mt-2">0</div>
             </div>
-            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-4 py-3">
               <div class="text-xs uppercase tracking-[0.18em] text-slate-300">ამ თვეში</div>
-              <div id="monthCount" class="text-3xl font-black mt-2">0</div>
+              <div id="monthCount" class="text-2xl font-black mt-2">0</div>
             </div>
           </div>
         </article>
 
-        <article class="rounded-[2rem] bg-white border p-6 space-y-5">
+        <article class="rounded-[1.6rem] bg-white border p-5 space-y-4">
           <div class="flex items-center justify-between gap-3">
             <div>
               <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Reminder</div>
-              <div class="text-2xl font-extrabold mt-1">დღევანდელი შეხსენებები</div>
+              <div class="text-xl font-extrabold mt-1">დღევანდელი შეხსენებები</div>
             </div>
-            <button id="jumpToday" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">დღეს</button>
+            <button type="button" id="jumpToday" class="px-3.5 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">დღეს</button>
           </div>
           <div id="notificationNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600"></div>
           <div id="reminderList" class="space-y-3"></div>
         </article>
       </section>
 
-      <section class="rounded-[2rem] bg-white border p-4 md:p-6 space-y-6">
+      <section class="rounded-[1.6rem] bg-white border p-3 md:p-4 space-y-4">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
           <div class="flex items-center gap-3">
-            <button id="prevMonth" class="w-11 h-11 rounded-2xl border border-slate-200 bg-white text-xl font-bold hover:bg-slate-50">&larr;</button>
-            <button id="nextMonth" class="w-11 h-11 rounded-2xl border border-slate-200 bg-white text-xl font-bold hover:bg-slate-50">&rarr;</button>
-            <button id="goCurrentMonth" class="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 hover:bg-slate-100">მიმდინარე თვე</button>
+            <button type="button" id="prevMonth" class="w-10 h-10 rounded-2xl border border-slate-200 bg-white text-lg font-bold hover:bg-slate-50">&larr;</button>
+            <button type="button" id="nextMonth" class="w-10 h-10 rounded-2xl border border-slate-200 bg-white text-lg font-bold hover:bg-slate-50">&rarr;</button>
+            <button type="button" id="goCurrentMonth" class="px-3 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 hover:bg-slate-100">მიმდინარე თვე</button>
           </div>
           <div class="flex flex-col xl:items-center">
-            <div id="monthLabel" class="text-3xl font-extrabold"></div>
+            <div id="monthLabel" class="text-2xl font-extrabold"></div>
             <div id="monthMeta" class="text-sm text-slate-500 mt-1"></div>
           </div>
           <div id="sourceFilters" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <div class="grid grid-cols-7 gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+        <div class="grid grid-cols-7 gap-2 text-[11px] uppercase tracking-[0.18em] text-slate-400 font-bold">
           <div class="text-center">ორშ</div>
           <div class="text-center">სამ</div>
           <div class="text-center">ოთხ</div>
@@ -110,19 +110,19 @@
           <div class="text-center">კვი</div>
         </div>
 
-        <div id="calendarGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-7 gap-3"></div>
+        <div id="calendarGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-7 gap-2"></div>
       </section>
 
-      <section class="rounded-[2rem] bg-white border p-4 md:p-6 space-y-5">
+      <section class="rounded-[1.6rem] bg-white border p-3 md:p-4 space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Agenda</div>
-            <div id="selectedDateLabel" class="text-3xl font-extrabold mt-1"></div>
+            <div id="selectedDateLabel" class="text-2xl font-extrabold mt-1"></div>
             <div id="selectedDateMeta" class="text-sm text-slate-500 mt-2"></div>
           </div>
-          <button id="dayAddEvent" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-blue-600">ამ დღეზე ჩანაწერის დამატება</button>
+          <button type="button" id="dayAddEvent" class="px-4 py-2.5 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">ამ დღეზე ჩანაწერის დამატება</button>
         </div>
-        <div id="agendaEmpty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+        <div id="agendaEmpty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center">
           <div class="text-lg font-bold">ამ დღეზე ჩანაწერი არ არის</div>
           <div class="text-slate-500 mt-2">შეგიძლია ხელით დაამატო შეხვედრა, პირადი საქმე, შეხსენება ან სხვა ჩანაწერი.</div>
         </div>
@@ -133,22 +133,22 @@
 
   <section id="eventModal" class="off fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto">
     <div class="min-h-full flex items-start justify-center">
-      <div class="w-full max-w-3xl rounded-[2rem] bg-white border border-slate-200 overflow-hidden">
-        <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
+      <div class="w-full max-w-2xl rounded-[1.6rem] bg-white border border-slate-200 overflow-hidden">
+        <div class="px-5 py-5 border-b border-slate-100 flex items-start justify-between gap-4">
           <div>
             <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Calendar Event</div>
-            <div id="eventModalTitle" class="text-2xl font-extrabold mt-2">ახალი ჩანაწერი</div>
+            <div id="eventModalTitle" class="text-xl font-extrabold mt-2">ახალი ჩანაწერი</div>
           </div>
           <div class="flex gap-3">
-            <button id="resetEventForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
-            <button id="closeEventModal" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">დახურვა</button>
+            <button type="button" id="resetEventForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
+            <button type="button" id="closeEventModal" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">დახურვა</button>
           </div>
         </div>
-        <form id="eventForm" class="p-6 space-y-6">
+        <form id="eventForm" class="p-5 space-y-5">
           <input id="eventId" type="hidden">
           <div class="grid md:grid-cols-2 gap-4">
-            <input id="eventTitle" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ჩანაწერის სათაური">
-            <select id="eventCategory" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+            <input id="eventTitle" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="ჩანაწერის სათაური">
+            <select id="eventCategory" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
               <option value="პირადი">პირადი</option>
               <option value="შეხვედრა">შეხვედრა</option>
               <option value="სამუშაო">სამუშაო</option>
@@ -157,19 +157,19 @@
             </select>
           </div>
           <div class="grid md:grid-cols-3 gap-4">
-            <input id="eventDate" type="date" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
-            <input id="eventTime" type="time" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
-            <input id="eventReminderDate" type="date" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+            <input id="eventDate" type="date" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
+            <input id="eventTime" type="time" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
+            <input id="eventReminderDate" type="date" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
           </div>
           <div class="grid md:grid-cols-2 gap-4">
-            <input id="eventLocation" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ლოკაცია / მისამართი">
-            <select id="eventRelatedCase" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+            <input id="eventLocation" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="ლოკაცია / მისამართი">
+            <select id="eventRelatedCase" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
               <option value="">საქმესთან კავშირის გარეშე</option>
             </select>
           </div>
-          <textarea id="eventNotes" rows="6" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none resize-none" placeholder="დეტალური აღწერა, რაც ამ დღეზე უნდა გახსოვდეს..."></textarea>
+          <textarea id="eventNotes" rows="5" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none resize-none" placeholder="დეტალური აღწერა, რაც ამ დღეზე უნდა გახსოვდეს..."></textarea>
           <div id="eventFormMessage" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
-          <button class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+          <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
         </form>
       </div>
     </div>
@@ -262,8 +262,9 @@
     function renderSourceFilters() {
       $('#sourceFilters').innerHTML = SOURCE_FILTERS.map((item) => `
         <button
+          type="button"
           data-source-filter="${item.value}"
-          class="${item.value === sourceFilter ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-700 border border-slate-200'} px-3 py-2 rounded-full text-sm font-bold"
+          class="${item.value === sourceFilter ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-700 border border-slate-200'} px-3 py-1.5 rounded-full text-[13px] font-bold"
         >${item.label}</button>
       `).join('');
     }
@@ -456,13 +457,13 @@
       }
 
       $('#reminderList').innerHTML = reminders.map((event) => `
-        <article class="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4">
+        <article class="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3">
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
           </div>
-          <div class="font-extrabold text-lg">${escapeHtml(event.title)}</div>
-          <div class="text-sm text-slate-500 mt-2">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(event.time)}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
+          <div class="font-extrabold">${escapeHtml(event.title)}</div>
+          <div class="text-sm text-slate-500 mt-1.5">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(event.time)}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
         </article>
       `).join('');
     }
@@ -483,15 +484,15 @@
         const isSelected = dateKey === selectedDateKey;
 
         return `
-          <button data-date="${dateKey}" class="calendar-cell rounded-[1.6rem] border p-4 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50 shadow-[0_18px_45px_-35px_rgba(37,99,235,0.55)]' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'} ${isCurrentMonth ? '' : 'opacity-55'}">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <div class="text-lg font-extrabold">${date.getDate()}</div>
+          <button type="button" data-date="${dateKey}" class="calendar-cell rounded-[1.25rem] border p-3 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50 shadow-[0_18px_45px_-35px_rgba(37,99,235,0.55)]' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'} ${isCurrentMonth ? '' : 'opacity-55'}">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="text-base font-extrabold">${date.getDate()}</div>
               ${isToday ? '<span class="inline-flex items-center rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white">დღეს</span>' : ''}
             </div>
             <div class="space-y-2">
-              ${items.slice(0, 3).map((event) => `<div class="event-chip rounded-2xl px-3 py-2 text-xs font-bold ${event.source === 'case' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${escapeHtml(event.time ? `${event.time} • ${event.title}` : event.title)}</div>`).join('')}
-              ${items.length > 3 ? `<div class="text-xs font-bold text-slate-400">+${items.length - 3} დამატებით</div>` : ''}
-              ${items.length === 0 ? '<div class="text-xs text-slate-300 pt-4">ცარიელი დღე</div>' : ''}
+              ${items.slice(0, 3).map((event) => `<div class="event-chip rounded-2xl px-2.5 py-1.5 text-[11px] font-bold ${event.source === 'case' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${escapeHtml(event.time ? `${event.time} • ${event.title}` : event.title)}</div>`).join('')}
+              ${items.length > 3 ? `<div class="text-[11px] font-bold text-slate-400">+${items.length - 3} დამატებით</div>` : ''}
+              ${items.length === 0 ? '<div class="text-[11px] text-slate-300 pt-2">ცარიელი დღე</div>' : ''}
             </div>
           </button>
         `;
@@ -505,7 +506,7 @@
       $('#agendaEmpty').classList.toggle('off', items.length !== 0);
 
       $('#agendaList').innerHTML = items.map((event) => `
-        <article class="rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-5">
+        <article class="rounded-[1.35rem] border border-slate-200 bg-slate-50 px-4 py-4">
           <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
             <div class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
@@ -513,15 +514,15 @@
                 <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${escapeHtml(event.kind)}</span>
               </div>
               <div>
-                <h3 class="text-2xl font-extrabold">${escapeHtml(event.title)}</h3>
-                <div class="text-sm text-slate-500 mt-2">${escapeHtml(event.subtitle || '')}${event.time ? `${event.subtitle ? ' • ' : ''}${escapeHtml(event.time)}` : ''}${event.location ? `${event.subtitle || event.time ? ' • ' : ''}${escapeHtml(event.location)}` : ''}</div>
+                <h3 class="text-xl font-extrabold">${escapeHtml(event.title)}</h3>
+                <div class="text-sm text-slate-500 mt-1.5">${escapeHtml(event.subtitle || '')}${event.time ? `${event.subtitle ? ' • ' : ''}${escapeHtml(event.time)}` : ''}${event.location ? `${event.subtitle || event.time ? ' • ' : ''}${escapeHtml(event.location)}` : ''}</div>
               </div>
-              <div class="rounded-2xl bg-white border border-slate-200 px-4 py-4 text-sm leading-7 text-slate-600 whitespace-pre-line">${escapeHtml(event.note || 'დეტალური აღწერა არ არის დამატებული.')}</div>
+              <div class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm leading-6 text-slate-600 whitespace-pre-line">${escapeHtml(event.note || 'დეტალური აღწერა არ არის დამატებული.')}</div>
             </div>
             <div class="flex flex-wrap gap-2">
-              ${event.source === 'case' ? `<button data-open-case="${event.caseId}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">საქმის გახსნა</button>` : ''}
-              ${event.source === 'manual' ? `<button data-edit-event="${event.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">რედაქტირება</button>` : ''}
-              ${event.source === 'manual' ? `<button data-delete-event="${event.id}" class="px-3 py-2 rounded-xl border border-rose-200 text-sm font-bold text-rose-600 hover:bg-rose-50">წაშლა</button>` : ''}
+              ${event.source === 'case' ? `<button type="button" data-open-case="${event.caseId}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">საქმის გახსნა</button>` : ''}
+              ${event.source === 'manual' ? `<button type="button" data-edit-event="${event.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">რედაქტირება</button>` : ''}
+              ${event.source === 'manual' ? `<button type="button" data-delete-event="${event.id}" class="px-3 py-2 rounded-xl border border-rose-200 text-sm font-bold text-rose-600 hover:bg-rose-50">წაშლა</button>` : ''}
             </div>
           </div>
         </article>
