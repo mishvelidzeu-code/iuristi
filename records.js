@@ -62,6 +62,37 @@ const escapeHtml = (value) =>
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
 
+const formatFileSize = (bytes) => {
+  if (bytes == null || Number.isNaN(Number(bytes))) return "";
+  const n = Number(bytes);
+  if (n >= 1073741824) return `${(n / 1073741824).toFixed(1)} GB`;
+  if (n >= 1048576) return `${(n / 1048576).toFixed(1)} MB`;
+  if (n >= 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${n} B`;
+};
+
+function getFileKindKey(name, mime) {
+  const m = (mime || "").toLowerCase();
+  const lower = (name || "").toLowerCase();
+  if (m.includes("pdf") || lower.endsWith(".pdf")) return "pdf";
+  if (m.includes("word") || lower.endsWith(".doc") || lower.endsWith(".docx")) return "word";
+  if (
+    m.includes("excel") ||
+    m.includes("spreadsheet") ||
+    lower.endsWith(".xls") ||
+    lower.endsWith(".xlsx")
+  )
+    return "excel";
+  if (m.includes("audio") || lower.endsWith(".mp3") || lower.endsWith(".mpeg")) return "audio";
+  return "file";
+}
+
+function getFileKindLabel(name, mime) {
+  const key = getFileKindKey(name, mime);
+  const map = { pdf: "PDF", word: "Word", excel: "Excel", audio: "აუდიო", file: "ფაილი" };
+  return map[key] || key;
+}
+
 const toDateTimeLocalValue = (value) => {
   if (!value) return "";
   const date = new Date(value);
@@ -599,7 +630,7 @@ async function loadEntityFiles(entityId) {
     return;
   }
 
-  container.innerHTML = "იტვირთება...";
+  container.innerHTML = '<div class="entity-files-loading" role="status">იტვირთება...</div>';
 
   const col = config.fileConfig.dbColumn;
   const { data: rows, error } = await supabase
@@ -616,7 +647,11 @@ async function loadEntityFiles(entityId) {
   }
 
   if (!rows?.length) {
-    container.innerHTML = '<p class="entity-files-empty">ფაილები ჯერ არ არის.</p>';
+    container.innerHTML = `
+      <div class="entity-files-empty-state">
+        <p class="entity-files-empty-title">ფაილები ჯერ არ არის</p>
+        <p class="entity-files-empty-hint">Word, Excel ან PDF ატვირთე — ჩანაწერთან იქნება მიბმული.</p>
+      </div>`;
     return;
   }
 
@@ -624,20 +659,28 @@ async function loadEntityFiles(entityId) {
     .map((row) => {
       const name = row.file_name || "ფაილი";
       const mime = row.mime_type || "";
-      const size =
-        row.size_bytes != null ? `${(Number(row.size_bytes) / 1024).toFixed(1)} KB` : "";
+      const size = formatFileSize(row.size_bytes);
+      const kindKey = getFileKindKey(name, mime);
+      const kindLabel = getFileKindLabel(name, mime);
 
       return `
         <div class="file-item" data-file-row-id="${row.id}">
-          <div class="file-item-main">
-            <strong>${escapeHtml(name)}</strong>
-            <span class="file-item-meta">${escapeHtml(size)}${mime ? ` • ${escapeHtml(mime)}` : ""}</span>
-          </div>
-          <div class="file-item-actions">
-            <button type="button" class="item-action" data-open-entity-file data-file-id="${row.id}">გახსნა</button>
-            <button type="button" class="item-action" data-preview-entity-file data-file-id="${row.id}">დიდი ეკრანი</button>
-            <button type="button" class="item-action" data-download-entity-file data-file-id="${row.id}">ჩამოწერა</button>
-            <button type="button" class="item-action danger" data-delete-entity-file data-file-id="${row.id}">წაშლა</button>
+          <div class="file-item-icon file-item-icon--${kindKey}" aria-hidden="true"></div>
+          <div class="file-item-body">
+            <div class="file-item-main">
+              <strong class="file-item-name">${escapeHtml(name)}</strong>
+              <span class="file-item-meta">${escapeHtml(size)}${mime ? ` · ${escapeHtml(kindLabel)}` : ""}</span>
+            </div>
+            <div class="file-item-toolbar">
+              <div class="file-item-actions file-item-actions--primary">
+                <button type="button" class="file-btn file-btn--ghost" data-open-entity-file data-file-id="${row.id}">გახსნა</button>
+                <button type="button" class="file-btn file-btn--ghost" data-preview-entity-file data-file-id="${row.id}">დიდი ეკრანი</button>
+              </div>
+              <div class="file-item-actions file-item-actions--secondary">
+                <button type="button" class="file-btn file-btn--ghost" data-download-entity-file data-file-id="${row.id}">ჩამოწერა</button>
+                <button type="button" class="file-btn file-btn--danger" data-delete-entity-file data-file-id="${row.id}">წაშლა</button>
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -684,15 +727,23 @@ const openModal = (mode, item = null) => {
   ${
     mode === "view" && config.fileConfig
       ? `
-    <div class="entity-files">
-      <h3>ფაილები (Word, Excel, PDF)</h3>
-      <p class="entity-files-hint">ატვირთვა, გახსნა, დიდი ეკრანი (PDF), ჩამოწერა, წაშლა. იგივე სახელით ატვირთვა ჩაანაცვლებს ფაილს.</p>
-      <div data-entity-files-list>იტვირთება...</div>
-      <div class="entity-files-upload">
-        <input type="file" data-upload-input accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-        <button type="button" class="nav-cta" data-upload-btn>ატვირთვა</button>
+    <section class="entity-files" aria-label="ჩანაწერზე მიბმული ფაილები">
+      <div class="entity-files-head">
+        <h3 class="entity-files-title">დოკუმენტები და ფაილები</h3>
+        <p class="entity-files-hint">Word, Excel, PDF · გახსნა, დიდი ეკრანი (PDF), ჩამოწერა, წაშლა. იგივე სახელით ატვირთვა ჩაანაცვლებს ფაილს.</p>
       </div>
-    </div>
+      <div class="entity-files-list-wrap">
+        <div class="entity-files-list-inner" data-entity-files-list>იტვირთება...</div>
+      </div>
+      <div class="entity-files-upload">
+        <label class="entity-files-picker">
+          <span class="entity-files-picker-label">ფაილის არჩევა</span>
+          <input type="file" class="entity-files-input" data-upload-input accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        </label>
+        <p class="entity-files-filename" data-upload-filename hidden></p>
+        <button type="button" class="entity-files-submit" data-upload-btn>ატვირთვა</button>
+      </div>
+    </section>
   `
       : ""
   }
@@ -700,6 +751,21 @@ const openModal = (mode, item = null) => {
   ${submitButton}
 `;
   modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
+
+  const uploadInput = modalForm.querySelector("[data-upload-input]");
+  const uploadNameEl = modalForm.querySelector("[data-upload-filename]");
+  uploadInput?.addEventListener("change", (event) => {
+    const f = event.target.files?.[0];
+    if (!uploadNameEl) return;
+    if (f) {
+      uploadNameEl.textContent = f.name;
+      uploadNameEl.hidden = false;
+    } else {
+      uploadNameEl.textContent = "";
+      uploadNameEl.hidden = true;
+    }
+  });
+
   if (mode === "view" && modalItemId && config.fileConfig) {
     loadEntityFiles(modalItemId);
   }
