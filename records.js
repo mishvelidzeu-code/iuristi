@@ -525,8 +525,8 @@ const openModal = (mode, item = null) => {
 `;
   modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
   if (mode === "view" && modalItemId) {
-  loadCaseFiles(modalItemId);
-}
+    loadCaseFiles(modalItemId);
+  }
 };
 
 const getItemById = (id) => records.find((item) => item.id === id);
@@ -708,15 +708,26 @@ async function init() {
 
 init();
 
+const SIGNED_URL_TTL_SECONDS = 3600;
+
+function getCaseStoragePrefix(caseId) {
+  return `${authUserId}/cases/${caseId}`;
+}
+
 async function loadCaseFiles(caseId) {
   const container = document.querySelector("[data-case-files]");
   if (!container) return;
 
+  if (!authUserId) {
+    container.innerHTML = "სესია ვერ მოიძებნა.";
+    return;
+  }
+
   container.innerHTML = "იტვირთება...";
 
-  const { data, error } = await supabase.storage
-    .from("case-files")
-    .list(`cases/${caseId}`);
+  const prefix = getCaseStoragePrefix(caseId);
+
+  const { data, error } = await supabase.storage.from("case-files").list(prefix);
 
   if (error) {
     container.innerHTML = "ფაილები ვერ ჩაიტვირთა";
@@ -729,24 +740,43 @@ async function loadCaseFiles(caseId) {
     return;
   }
 
-  container.innerHTML = data.map(file => {
-    const path = `cases/${caseId}/${file.name}`;
+  const rows = await Promise.all(
+    data.map(async (file) => {
+      if (file.id === null && file.name === ".emptyFolderPlaceholder") {
+        return "";
+      }
+      const path = `${prefix}/${file.name}`;
+      const { data: signed, error: signError } = await supabase.storage
+        .from("case-files")
+        .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
 
-    const { data: urlData } = supabase.storage
-      .from("case-files")
-      .getPublicUrl(path);
-
-    return `
+      if (signError || !signed?.signedUrl) {
+        console.error(signError);
+        return `
       <div class="file-item">
-        <span>${file.name}</span>
+        <span>${escapeHtml(file.name)}</span>
+        <span>ბმული ვერ დაგენერირდა</span>
+      </div>
+    `;
+      }
+
+      const safeName = escapeHtml(file.name);
+      return `
+      <div class="file-item">
+        <span>${safeName}</span>
         <div>
-          <a href="${urlData.publicUrl}" target="_blank">გახსნა</a>
-          <a href="${urlData.publicUrl}" download>ჩამოწერა</a>
+          <a href="${signed.signedUrl}" target="_blank" rel="noopener noreferrer">გახსნა</a>
+          <a href="${signed.signedUrl}" download rel="noopener noreferrer">ჩამოწერა</a>
         </div>
       </div>
     `;
-  }).join("");
+    })
+  );
+
+  const html = rows.filter(Boolean).join("");
+  container.innerHTML = html || "ფაილები არ არის დამატებული";
 }
+
 document.addEventListener("click", async (e) => {
   if (!e.target.matches("[data-upload-btn]")) return;
 
@@ -759,26 +789,46 @@ document.addEventListener("click", async (e) => {
   }
 
   const caseId = modalItemId;
-  const path = `cases/${caseId}/${file.name}`;
-
-  const { error } = await supabase.storage
-    .from("case-files")
-    .upload(path, file);
-
-  if (error) {
-    alert("ატვირთვა ვერ მოხერხდა");
-    console.error(error);
+  if (!caseId || !authUserId) {
+    alert("სესია ან საქმე ვერ მოიძებნა");
     return;
   }
 
-  // DB შენახვა
-  await supabase.from("case_files").insert({
-    case_id: caseId,
-    owner_id: authUserId,
-    file_name: file.name,
-    file_path: path
+  const path = `${getCaseStoragePrefix(caseId)}/${file.name}`;
+
+  const { error: uploadError } = await supabase.storage.from("case-files").upload(path, file, {
+    upsert: true
   });
 
+  if (uploadError) {
+    alert("ატვირთვა ვერ მოხერხდა");
+    console.error(uploadError);
+    return;
+  }
+
+  await supabase
+    .from("files")
+    .delete()
+    .eq("owner_id", authUserId)
+    .eq("case_id", caseId)
+    .eq("file_name", file.name);
+
+  const { error: dbError } = await supabase.from("files").insert({
+    owner_id: authUserId,
+    case_id: caseId,
+    file_kind: "document",
+    file_name: file.name,
+    storage_path: path,
+    mime_type: file.type || null,
+    size_bytes: file.size != null ? file.size : null
+  });
+
+  if (dbError) {
+    console.error(dbError);
+    alert("ფაილი ჩაიტვირთა, მაგრამ ჩანაწერი ბაზაში ვერ შეინახა.");
+  }
+
+  if (input) input.value = "";
   alert("ატვირთულია!");
   loadCaseFiles(caseId);
 });
