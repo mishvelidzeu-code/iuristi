@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LexManage - კალენდარი</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans Georgian', sans-serif; }
+    .off { display: none; }
+    .calendar-cell { min-height: 10.5rem; }
+    .event-chip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden lg:flex">
+    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
+      <div>
+        <div class="font-extrabold">LexManage</div>
+        <div class="text-[11px] text-slate-400">Calendar Workspace</div>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <button id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
+      <button id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
+      <button class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
+    </nav>
+    <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+      <div>
+        <div class="text-sm font-bold">დღევანდელი ფოკუსი</div>
+        <div class="text-xs text-slate-500 mt-1">საქმის სხდომები, ვადები და შენი პირადი ჩანაწერები ერთ კალენდარში.</div>
+      </div>
+      <div id="storageBadge" class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-xs text-slate-500"></div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-16 px-4 md:px-8 bg-white border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Calendar</div>
+        <div class="text-xl font-extrabold">კალენდარი</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="enableNotifications" class="hidden md:inline-flex px-4 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50">შეტყობინებები</button>
+        <button id="newEvent" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-blue-600">ახალი ჩანაწერი</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+      <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-6">
+        <article class="rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-8">
+          <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">Schedule Center</div>
+          <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-4">საქმის პროცესები, ვადები და პირადი ჩანაწერები ახლა ერთ კალენდარზეა გაერთიანებული.</h1>
+          <p class="text-slate-300 leading-7 max-w-3xl">თუ საქმეში ჩაწერილი გაქვს სხდომის თარიღი, reminder ან ვადა, ეს დღე ავტომატურად გამოჩნდება კალენდარში. დამატებით, შეგიძლია შენი ჩანაწერებიც შეინახო და კონკრეტულ დღეზე სრული agenda ქვემოთ ნახო.</p>
+          <div class="grid sm:grid-cols-3 gap-4 mt-8">
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">დღეს</div>
+              <div id="todayCount" class="text-3xl font-black mt-2">0</div>
+            </div>
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">ხვალ</div>
+              <div id="tomorrowCount" class="text-3xl font-black mt-2">0</div>
+            </div>
+            <div class="rounded-3xl bg-white/10 border border-white/10 px-5 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">ამ თვეში</div>
+              <div id="monthCount" class="text-3xl font-black mt-2">0</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-[2rem] bg-white border p-6 space-y-5">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Reminder</div>
+              <div class="text-2xl font-extrabold mt-1">დღევანდელი შეხსენებები</div>
+            </div>
+            <button id="jumpToday" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">დღეს</button>
+          </div>
+          <div id="notificationNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600"></div>
+          <div id="reminderList" class="space-y-3"></div>
+        </article>
+      </section>
+
+      <section class="rounded-[2rem] bg-white border p-4 md:p-6 space-y-6">
+        <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <button id="prevMonth" class="w-11 h-11 rounded-2xl border border-slate-200 bg-white text-xl font-bold hover:bg-slate-50">&larr;</button>
+            <button id="nextMonth" class="w-11 h-11 rounded-2xl border border-slate-200 bg-white text-xl font-bold hover:bg-slate-50">&rarr;</button>
+            <button id="goCurrentMonth" class="px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 hover:bg-slate-100">მიმდინარე თვე</button>
+          </div>
+          <div class="flex flex-col xl:items-center">
+            <div id="monthLabel" class="text-3xl font-extrabold"></div>
+            <div id="monthMeta" class="text-sm text-slate-500 mt-1"></div>
+          </div>
+          <div id="sourceFilters" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="grid grid-cols-7 gap-3 text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">
+          <div class="text-center">ორშ</div>
+          <div class="text-center">სამ</div>
+          <div class="text-center">ოთხ</div>
+          <div class="text-center">ხუთ</div>
+          <div class="text-center">პარ</div>
+          <div class="text-center">შაბ</div>
+          <div class="text-center">კვი</div>
+        </div>
+
+        <div id="calendarGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-7 gap-3"></div>
+      </section>
+
+      <section class="rounded-[2rem] bg-white border p-4 md:p-6 space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Agenda</div>
+            <div id="selectedDateLabel" class="text-3xl font-extrabold mt-1"></div>
+            <div id="selectedDateMeta" class="text-sm text-slate-500 mt-2"></div>
+          </div>
+          <button id="dayAddEvent" class="px-4 py-3 rounded-2xl bg-slate-900 text-white font-bold hover:bg-blue-600">ამ დღეზე ჩანაწერის დამატება</button>
+        </div>
+        <div id="agendaEmpty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+          <div class="text-lg font-bold">ამ დღეზე ჩანაწერი არ არის</div>
+          <div class="text-slate-500 mt-2">შეგიძლია ხელით დაამატო შეხვედრა, პირადი საქმე, შეხსენება ან სხვა ჩანაწერი.</div>
+        </div>
+        <div id="agendaList" class="space-y-4"></div>
+      </section>
+    </div>
+  </main>
+
+  <section id="eventModal" class="off fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="min-h-full flex items-start justify-center">
+      <div class="w-full max-w-3xl rounded-[2rem] bg-white border border-slate-200 overflow-hidden">
+        <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Calendar Event</div>
+            <div id="eventModalTitle" class="text-2xl font-extrabold mt-2">ახალი ჩანაწერი</div>
+          </div>
+          <div class="flex gap-3">
+            <button id="resetEventForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
+            <button id="closeEventModal" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">დახურვა</button>
+          </div>
+        </div>
+        <form id="eventForm" class="p-6 space-y-6">
+          <input id="eventId" type="hidden">
+          <div class="grid md:grid-cols-2 gap-4">
+            <input id="eventTitle" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ჩანაწერის სათაური">
+            <select id="eventCategory" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+              <option value="პირადი">პირადი</option>
+              <option value="შეხვედრა">შეხვედრა</option>
+              <option value="სამუშაო">სამუშაო</option>
+              <option value="საოჯახო">საოჯახო</option>
+              <option value="შეხსენება">შეხსენება</option>
+            </select>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4">
+            <input id="eventDate" type="date" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+            <input id="eventTime" type="time" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+            <input id="eventReminderDate" type="date" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <input id="eventLocation" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ლოკაცია / მისამართი">
+            <select id="eventRelatedCase" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+              <option value="">საქმესთან კავშირის გარეშე</option>
+            </select>
+          </div>
+          <textarea id="eventNotes" rows="6" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none resize-none" placeholder="დეტალური აღწერა, რაც ამ დღეზე უნდა გახსოვდეს..."></textarea>
+          <div id="eventFormMessage" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+          <button class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script src="supabase-config.js"></script>
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const SOURCE_FILTERS = [
+      { value: 'all', label: 'ყველა' },
+      { value: 'case', label: 'საქმეები' },
+      { value: 'manual', label: 'ჩემი ჩანაწერები' }
+    ];
+    const LOCAL_EVENTS_KEY = 'lexmanage-calendar-events';
+    const LOCAL_NOTIFICATIONS_KEY = 'lexmanage-calendar-notified';
+
+    let currentUser = null;
+    let monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    let selectedDateKey = formatKey(new Date());
+    let sourceFilter = 'all';
+    let cases = [];
+    let manualEntries = [];
+    let calendarMode = 'local';
+
+    function formatKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseKey(value) {
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function addDays(value, amount) {
+      const date = parseKey(value);
+      date.setDate(date.getDate() + amount);
+      return formatKey(date);
+    }
+
+    function defaultReminderDate(eventDate) {
+      const todayKey = formatKey(new Date());
+      return parseKey(eventDate) <= parseKey(todayKey) ? eventDate : addDays(eventDate, -1);
+    }
+
+    function formatMonth(date) {
+      return new Intl.DateTimeFormat('ka-GE', { month: 'long', year: 'numeric' }).format(date);
+    }
+
+    function formatLongDate(value) {
+      return new Intl.DateTimeFormat('ka-GE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(parseKey(value));
+    }
+
+    function formatShortDate(value) {
+      return new Intl.DateTimeFormat('ka-GE', {
+        month: 'short',
+        day: 'numeric'
+      }).format(parseKey(value));
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sourceBadge(event) {
+      return event.source === 'case'
+        ? 'bg-blue-50 text-blue-700 border-blue-100'
+        : 'bg-slate-100 text-slate-700 border-slate-200';
+    }
+
+    function kindBadge(event) {
+      if (event.kind === 'პროცესი') return 'bg-indigo-50 text-indigo-700 border-indigo-100';
+      if (event.kind === 'ვადა') return 'bg-amber-50 text-amber-700 border-amber-100';
+      if (event.kind === 'შეხსენება') return 'bg-rose-50 text-rose-700 border-rose-100';
+      return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+    }
+
+    function renderSourceFilters() {
+      $('#sourceFilters').innerHTML = SOURCE_FILTERS.map((item) => `
+        <button
+          data-source-filter="${item.value}"
+          class="${item.value === sourceFilter ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-700 border border-slate-200'} px-3 py-2 rounded-full text-sm font-bold"
+        >${item.label}</button>
+      `).join('');
+    }
+
+    function openEventModal(entry = null, dateKey = selectedDateKey) {
+      resetEventForm(entry, dateKey);
+      $('#eventModal').classList.remove('off');
+      document.body.classList.add('overflow-hidden');
+      $('#eventTitle').focus();
+    }
+
+    function closeEventModal() {
+      $('#eventModal').classList.add('off');
+      document.body.classList.remove('overflow-hidden');
+      $('#eventFormMessage').classList.add('off');
+    }
+
+    function showEventFormMessage(type, text) {
+      const element = $('#eventFormMessage');
+      element.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`;
+      element.textContent = text;
+      element.classList.remove('off');
+    }
+
+    function resetEventForm(entry = null, dateKey = selectedDateKey) {
+      $('#eventForm').reset();
+      $('#eventId').value = entry?.id || '';
+      $('#eventTitle').value = entry?.title || '';
+      $('#eventCategory').value = entry?.category || 'პირადი';
+      $('#eventDate').value = entry?.event_date || dateKey;
+      $('#eventTime').value = entry?.event_time || '';
+      $('#eventReminderDate').value = entry?.reminder_date || defaultReminderDate(entry?.event_date || dateKey);
+      $('#eventLocation').value = entry?.location || '';
+      $('#eventRelatedCase').value = entry?.related_case_id || '';
+      $('#eventNotes').value = entry?.notes || '';
+      $('#eventModalTitle').textContent = entry ? 'ჩანაწერის რედაქტირება' : 'ახალი ჩანაწერი';
+      $('#eventFormMessage').classList.add('off');
+    }
+
+    function extractMeta(notes) {
+      if (!notes || !notes.includes('\n[[CASE_META]]\n')) {
+        return { cleanNotes: notes || '', meta: {} };
+      }
+      const parts = notes.split('\n[[CASE_META]]\n');
+      try {
+        return {
+          cleanNotes: (parts[0] || '').trim(),
+          meta: JSON.parse(parts[1]) || {}
+        };
+      } catch (error) {
+        return { cleanNotes: notes || '', meta: {} };
+      }
+    }
+
+    function mapCaseRow(row) {
+      const parsed = extractMeta(row.notes);
+      return {
+        id: row.id,
+        title: row.title,
+        code: row.code,
+        client_name: row.client_name,
+        deadline: row.deadline,
+        notes: parsed.cleanNotes,
+        meta: parsed.meta
+      };
+    }
+
+    function caseEventsFromRow(row) {
+      const items = [];
+      const meta = row.meta || {};
+      const label = `${row.code} • ${row.client_name}`;
+
+      if (meta.hearing_date) {
+        items.push({
+          id: `case-hearing-${row.id}-${meta.hearing_date}`,
+          source: 'case',
+          kind: 'პროცესი',
+          title: row.title,
+          subtitle: label,
+          dateKey: meta.hearing_date,
+          time: meta.hearing_time || '',
+          location: meta.meeting_location || '',
+          note: meta.next_action || row.notes || '',
+          caseId: row.id,
+          reminderDate: meta.reminder_date || defaultReminderDate(meta.hearing_date)
+        });
+      }
+
+      if (row.deadline) {
+        items.push({
+          id: `case-deadline-${row.id}-${row.deadline}`,
+          source: 'case',
+          kind: 'ვადა',
+          title: row.title,
+          subtitle: label,
+          dateKey: row.deadline,
+          time: '',
+          location: '',
+          note: meta.next_action || row.notes || 'საქმის ვადა',
+          caseId: row.id,
+          reminderDate: defaultReminderDate(row.deadline)
+        });
+      }
+
+      return items;
+    }
+
+    function manualEventFromRow(row) {
+      const relatedCase = cases.find((item) => item.id === row.related_case_id);
+      return {
+        id: row.id,
+        source: 'manual',
+        kind: row.category || 'პირადი',
+        title: row.title,
+        subtitle: relatedCase ? `${relatedCase.code} • ${relatedCase.client_name}` : '',
+        dateKey: row.event_date,
+        time: row.event_time || '',
+        location: row.location || '',
+        note: row.notes || '',
+        relatedCaseId: row.related_case_id || '',
+        reminderDate: row.reminder_date || defaultReminderDate(row.event_date),
+        raw: row
+      };
+    }
+
+    function allEvents() {
+      return [
+        ...cases.flatMap(caseEventsFromRow),
+        ...manualEntries.map(manualEventFromRow)
+      ];
+    }
+
+    function filteredEvents() {
+      return allEvents().filter((event) => sourceFilter === 'all' || event.source === sourceFilter);
+    }
+
+    function eventsForDate(dateKey) {
+      return filteredEvents()
+        .filter((event) => event.dateKey === dateKey)
+        .sort((left, right) => {
+          if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
+          if (!left.time) return 1;
+          if (!right.time) return -1;
+          return left.time.localeCompare(right.time);
+        });
+    }
+
+    function reminderEventsForToday() {
+      const todayKey = formatKey(new Date());
+      return allEvents().filter((event) => event.reminderDate === todayKey);
+    }
+
+    function calendarDates() {
+      const firstDay = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1);
+      const startOffset = (firstDay.getDay() + 6) % 7;
+      const startDate = new Date(firstDay);
+      startDate.setDate(firstDay.getDate() - startOffset);
+
+      return Array.from({ length: 42 }, (_, index) => {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + index);
+        return date;
+      });
+    }
+
+    function renderStorageBadge() {
+      $('#storageBadge').textContent = calendarMode === 'supabase'
+        ? 'ხელით დამატებული ჩანაწერები სინქრონიზდება Supabase-ზე.'
+        : 'ხელით დამატებული ჩანაწერები ახლა ინახება ამ ბრაუზერში. Supabase table რომ დაემატოს, ავტომატურად გადავა sync რეჟიმზე.';
+    }
+
+    function renderCounts() {
+      const items = allEvents();
+      const todayKey = formatKey(new Date());
+      const tomorrowKey = addDays(todayKey, 1);
+      const monthPrefix = `${monthCursor.getFullYear()}-${String(monthCursor.getMonth() + 1).padStart(2, '0')}`;
+
+      $('#todayCount').textContent = items.filter((event) => event.dateKey === todayKey).length;
+      $('#tomorrowCount').textContent = items.filter((event) => event.dateKey === tomorrowKey).length;
+      $('#monthCount').textContent = items.filter((event) => event.dateKey.startsWith(monthPrefix)).length;
+    }
+
+    function renderReminderList() {
+      const reminders = reminderEventsForToday();
+      $('#notificationNote').textContent = 'Browser notification იმუშავებს მხოლოდ მაშინ, როცა ამ საიტს გახსნილი გაქვს და შეტყობინებების უფლება მინიჭებულია.';
+
+      if (!reminders.length) {
+        $('#reminderList').innerHTML = '<div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-5 py-8 text-center text-slate-500">დღეს დამატებითი შეხსენება არ გაქვს.</div>';
+        return;
+      }
+
+      $('#reminderList').innerHTML = reminders.map((event) => `
+        <article class="rounded-3xl border border-slate-200 bg-slate-50 px-5 py-4">
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
+          </div>
+          <div class="font-extrabold text-lg">${escapeHtml(event.title)}</div>
+          <div class="text-sm text-slate-500 mt-2">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(event.time)}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
+        </article>
+      `).join('');
+    }
+
+    function renderCalendar() {
+      renderSourceFilters();
+      renderCounts();
+      renderReminderList();
+
+      $('#monthLabel').textContent = formatMonth(monthCursor);
+      $('#monthMeta').textContent = `${filteredEvents().length} ჩანაწერი არჩეული ფილტრით`;
+
+      $('#calendarGrid').innerHTML = calendarDates().map((date) => {
+        const dateKey = formatKey(date);
+        const items = eventsForDate(dateKey);
+        const isCurrentMonth = date.getMonth() === monthCursor.getMonth();
+        const isToday = dateKey === formatKey(new Date());
+        const isSelected = dateKey === selectedDateKey;
+
+        return `
+          <button data-date="${dateKey}" class="calendar-cell rounded-[1.6rem] border p-4 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50 shadow-[0_18px_45px_-35px_rgba(37,99,235,0.55)]' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'} ${isCurrentMonth ? '' : 'opacity-55'}">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div class="text-lg font-extrabold">${date.getDate()}</div>
+              ${isToday ? '<span class="inline-flex items-center rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-white">დღეს</span>' : ''}
+            </div>
+            <div class="space-y-2">
+              ${items.slice(0, 3).map((event) => `<div class="event-chip rounded-2xl px-3 py-2 text-xs font-bold ${event.source === 'case' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${escapeHtml(event.time ? `${event.time} • ${event.title}` : event.title)}</div>`).join('')}
+              ${items.length > 3 ? `<div class="text-xs font-bold text-slate-400">+${items.length - 3} დამატებით</div>` : ''}
+              ${items.length === 0 ? '<div class="text-xs text-slate-300 pt-4">ცარიელი დღე</div>' : ''}
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderAgenda() {
+      const items = eventsForDate(selectedDateKey);
+      $('#selectedDateLabel').textContent = formatLongDate(selectedDateKey);
+      $('#selectedDateMeta').textContent = items.length ? `${items.length} ჩანაწერი ამ დღეზე` : 'ჩანაწერები ამ დღეზე ჯერ არ არის';
+      $('#agendaEmpty').classList.toggle('off', items.length !== 0);
+
+      $('#agendaList').innerHTML = items.map((event) => `
+        <article class="rounded-[1.75rem] border border-slate-200 bg-slate-50 px-5 py-5">
+          <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${escapeHtml(event.kind)}</span>
+              </div>
+              <div>
+                <h3 class="text-2xl font-extrabold">${escapeHtml(event.title)}</h3>
+                <div class="text-sm text-slate-500 mt-2">${escapeHtml(event.subtitle || '')}${event.time ? `${event.subtitle ? ' • ' : ''}${escapeHtml(event.time)}` : ''}${event.location ? `${event.subtitle || event.time ? ' • ' : ''}${escapeHtml(event.location)}` : ''}</div>
+              </div>
+              <div class="rounded-2xl bg-white border border-slate-200 px-4 py-4 text-sm leading-7 text-slate-600 whitespace-pre-line">${escapeHtml(event.note || 'დეტალური აღწერა არ არის დამატებული.')}</div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              ${event.source === 'case' ? `<button data-open-case="${event.caseId}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">საქმის გახსნა</button>` : ''}
+              ${event.source === 'manual' ? `<button data-edit-event="${event.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-white">რედაქტირება</button>` : ''}
+              ${event.source === 'manual' ? `<button data-delete-event="${event.id}" class="px-3 py-2 rounded-xl border border-rose-200 text-sm font-bold text-rose-600 hover:bg-rose-50">წაშლა</button>` : ''}
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderCaseOptions() {
+      $('#eventRelatedCase').innerHTML = `<option value="">საქმესთან კავშირის გარეშე</option>${cases.map((item) => `<option value="${item.id}">${escapeHtml(item.code)} • ${escapeHtml(item.title)}</option>`).join('')}`;
+    }
+
+    function render() {
+      renderCalendar();
+      renderAgenda();
+      renderStorageBadge();
+    }
+
+    async function getCurrentUser() {
+      const { data, error } = await window.supabaseClient.auth.getUser();
+      if (error) throw error;
+      if (!data.user) {
+        window.location.href = 'login.html';
+        throw new Error('ავტორიზაცია საჭიროა.');
+      }
+      return data.user;
+    }
+
+    async function loadCases() {
+      const { data, error } = await window.supabaseClient
+        .from('cases')
+        .select('id,title,code,client_name,deadline,notes')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      cases = (data || []).map(mapCaseRow);
+      renderCaseOptions();
+    }
+
+    function readLocalEntries() {
+      const all = JSON.parse(localStorage.getItem(LOCAL_EVENTS_KEY) || '[]');
+      return all.filter((item) => item.user_id === currentUser.id);
+    }
+
+    function writeLocalEntries(entries) {
+      const all = JSON.parse(localStorage.getItem(LOCAL_EVENTS_KEY) || '[]').filter((item) => item.user_id !== currentUser.id);
+      localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify([...all, ...entries]));
+    }
+
+    async function loadManualEntries() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('calendar_events')
+          .select('id,user_id,related_case_id,title,category,event_date,event_time,reminder_date,location,notes,created_at,updated_at')
+          .eq('user_id', currentUser.id)
+          .order('event_date', { ascending: true })
+          .order('event_time', { ascending: true });
+
+        if (error) throw error;
+        manualEntries = data || [];
+        calendarMode = 'supabase';
+      } catch (error) {
+        manualEntries = readLocalEntries();
+        calendarMode = 'local';
+      }
+    }
+
+    async function saveManualEntry(payload) {
+      if (calendarMode === 'supabase') {
+        const row = {
+          user_id: currentUser.id,
+          related_case_id: payload.related_case_id || null,
+          title: payload.title,
+          category: payload.category,
+          event_date: payload.event_date,
+          event_time: payload.event_time || null,
+          reminder_date: payload.reminder_date || null,
+          location: payload.location || null,
+          notes: payload.notes || null
+        };
+
+        if (payload.id) {
+          const { error } = await window.supabaseClient
+            .from('calendar_events')
+            .update(row)
+            .eq('id', payload.id)
+            .eq('user_id', currentUser.id);
+          if (error) throw error;
+          return payload.id;
+        }
+
+        const { data, error } = await window.supabaseClient
+          .from('calendar_events')
+          .insert(row)
+          .select('id')
+          .single();
+        if (error) throw error;
+        return data.id;
+      }
+
+      const entries = readLocalEntries();
+      const id = payload.id || crypto.randomUUID();
+      const nextEntry = {
+        id,
+        user_id: currentUser.id,
+        related_case_id: payload.related_case_id || null,
+        title: payload.title,
+        category: payload.category,
+        event_date: payload.event_date,
+        event_time: payload.event_time || null,
+        reminder_date: payload.reminder_date || null,
+        location: payload.location || null,
+        notes: payload.notes || null,
+        created_at: payload.id ? (entries.find((item) => item.id === payload.id)?.created_at || new Date().toISOString()) : new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      writeLocalEntries([...entries.filter((item) => item.id !== id), nextEntry]);
+      return id;
+    }
+
+    async function deleteManualEntry(id) {
+      if (calendarMode === 'supabase') {
+        const { error } = await window.supabaseClient
+          .from('calendar_events')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
+        if (error) throw error;
+        return;
+      }
+
+      writeLocalEntries(readLocalEntries().filter((item) => item.id !== id));
+    }
+
+    function updateNotificationButton() {
+      const button = $('#enableNotifications');
+      if (!('Notification' in window)) {
+        button.textContent = 'შეტყობინებები მიუწვდომელია';
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        button.textContent = 'შეტყობინებები ჩართულია';
+        return;
+      }
+
+      if (Notification.permission === 'denied') {
+        button.textContent = 'შეტყობინებები დაბლოკილია';
+        return;
+      }
+
+      button.textContent = 'შეტყობინებების ჩართვა';
+    }
+
+    function readNotifiedKeys() {
+      return JSON.parse(localStorage.getItem(LOCAL_NOTIFICATIONS_KEY) || '[]');
+    }
+
+    function writeNotifiedKeys(values) {
+      localStorage.setItem(LOCAL_NOTIFICATIONS_KEY, JSON.stringify(values));
+    }
+
+    function triggerNotifications() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const todayKey = formatKey(new Date());
+      const notified = readNotifiedKeys();
+      const nextNotified = [...notified];
+
+      reminderEventsForToday().forEach((event) => {
+        const notificationKey = `${todayKey}:${event.id}`;
+        if (notified.includes(notificationKey)) return;
+
+        new Notification(`შეხსენება: ${event.title}`, {
+          body: `${formatShortDate(event.dateKey)}${event.time ? ` • ${event.time}` : ''}${event.location ? ` • ${event.location}` : ''}`,
+          tag: notificationKey
+        });
+
+        nextNotified.push(notificationKey);
+      });
+
+      writeNotifiedKeys(nextNotified.slice(-100));
+    }
+
+    async function refreshCalendar() {
+      await loadCases();
+      await loadManualEntries();
+      render();
+      triggerNotifications();
+    }
+
+    $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
+    $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
+    $('#jumpToday').onclick = () => {
+      selectedDateKey = formatKey(new Date());
+      monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      render();
+    };
+    $('#goCurrentMonth').onclick = () => {
+      monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      render();
+    };
+    $('#prevMonth').onclick = () => {
+      monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1);
+      render();
+    };
+    $('#nextMonth').onclick = () => {
+      monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1);
+      render();
+    };
+    $('#newEvent').onclick = () => openEventModal(null, selectedDateKey);
+    $('#dayAddEvent').onclick = () => openEventModal(null, selectedDateKey);
+    $('#closeEventModal').onclick = closeEventModal;
+    $('#resetEventForm').onclick = () => {
+      if (window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) {
+        resetEventForm(null, $('#eventDate').value || selectedDateKey);
+      }
+    };
+    $('#eventModal').onclick = (event) => {
+      if (event.target === $('#eventModal')) closeEventModal();
+    };
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !$('#eventModal').classList.contains('off')) closeEventModal();
+    });
+
+    $('#calendarGrid').onclick = (event) => {
+      const cell = event.target.closest('[data-date]');
+      if (!cell) return;
+      selectedDateKey = cell.dataset.date;
+      const selectedDate = parseKey(selectedDateKey);
+      if (selectedDate.getMonth() !== monthCursor.getMonth() || selectedDate.getFullYear() !== monthCursor.getFullYear()) {
+        monthCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      }
+      render();
+    };
+
+    $('#sourceFilters').onclick = (event) => {
+      const button = event.target.closest('[data-source-filter]');
+      if (!button) return;
+      sourceFilter = button.dataset.sourceFilter;
+      render();
+    };
+
+    $('#agendaList').onclick = async (event) => {
+      const editButton = event.target.closest('[data-edit-event]');
+      if (editButton) {
+        const entry = manualEntries.find((item) => item.id === editButton.dataset.editEvent);
+        if (entry) openEventModal(entry, entry.event_date);
+        return;
+      }
+
+      const deleteButton = event.target.closest('[data-delete-event]');
+      if (deleteButton) {
+        if (!window.confirm('დარწმუნებული ხარ, რომ ამ ჩანაწერის წაშლა გინდა?')) return;
+        try {
+          await deleteManualEntry(deleteButton.dataset.deleteEvent);
+          await refreshCalendar();
+        } catch (error) {
+          console.error(error);
+        }
+        return;
+      }
+
+      const openCaseButton = event.target.closest('[data-open-case]');
+      if (openCaseButton) {
+        window.location.href = `cases.html?id=${openCaseButton.dataset.openCase}`;
+      }
+    };
+
+    $('#eventForm').onsubmit = async (event) => {
+      event.preventDefault();
+      const payload = {
+        id: $('#eventId').value || null,
+        title: $('#eventTitle').value.trim(),
+        category: $('#eventCategory').value,
+        event_date: $('#eventDate').value,
+        event_time: $('#eventTime').value,
+        reminder_date: $('#eventReminderDate').value,
+        location: $('#eventLocation').value.trim(),
+        related_case_id: $('#eventRelatedCase').value || null,
+        notes: $('#eventNotes').value.trim()
+      };
+
+      if (!payload.title || !payload.event_date) {
+        showEventFormMessage('err', 'შეავსე მინიმუმ სათაური და თარიღი.');
+        return;
+      }
+
+      try {
+        selectedDateKey = payload.event_date;
+        await saveManualEntry(payload);
+        showEventFormMessage('ok', payload.id ? 'ჩანაწერი განახლდა.' : 'ახალი ჩანაწერი დაემატა.');
+        await refreshCalendar();
+        setTimeout(() => { closeEventModal(); }, 650);
+      } catch (error) {
+        showEventFormMessage('err', error.message || 'შენახვა ვერ შესრულდა.');
+      }
+    };
+
+    $('#enableNotifications').onclick = async () => {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      updateNotificationButton();
+      triggerNotifications();
+    };
+
+    (async function init() {
+      try {
+        currentUser = await getCurrentUser();
+        await refreshCalendar();
+        updateNotificationButton();
+        setInterval(triggerNotifications, 60000);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  </script>
+</body>
+</html>
