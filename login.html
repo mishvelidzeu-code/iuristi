@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexManage - შესვლა</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans Georgian', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 32%),
+        radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.14), transparent 30%),
+        linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+    }
+    .field-wrap:focus-within {
+      border-color: rgba(37, 99, 235, 0.45);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+    }
+    .fade-up { animation: fadeUp 0.7s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .shake { animation: shake 0.35s ease; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900 overflow-x-hidden">
+  <div class="min-h-screen relative">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-16 left-10 w-72 h-72 rounded-full bg-blue-300/30 blur-3xl"></div>
+      <div class="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-indigo-300/30 blur-3xl"></div>
+    </div>
+
+    <header class="relative z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+          </div>
+          <div>
+            <div class="text-2xl font-extrabold tracking-tight">LexManage</div>
+            <div class="text-sm text-slate-500 font-medium">იურიდიული სამუშაო სივრცე</div>
+          </div>
+        </a>
+        <a href="register.html" class="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-blue-700 bg-white/80 border border-blue-100 rounded-full px-4 py-2 shadow-sm hover:bg-white transition-colors">
+          ანგარიშის შექმნა
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </header>
+
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div class="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center min-h-[calc(100vh-112px)]">
+        <section class="fade-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-100 bg-white/80 text-blue-700 text-sm font-bold shadow-sm mb-6">
+            დაცული ავტორიზაცია
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.05] mb-6">
+            შედით თქვენს
+            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">LexManage სივრცეში</span>
+          </h1>
+          <p class="text-lg text-slate-600 max-w-xl leading-relaxed mb-8">
+            გააკონტროლეთ საქმეები, დავალებები, დოკუმენტები და კლიენტებთან კომუნიკაცია ერთი სუფთა და სწრაფი სამუშაო გარემოდან.
+          </p>
+
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div class="glass-card rounded-2xl border border-white/60 shadow-[0_18px_45px_-22px_rgba(15,23,42,0.35)] p-5">
+              <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              </div>
+              <h2 class="font-bold text-slate-900 mb-1">უსაფრთხო წვდომა</h2>
+              <p class="text-sm text-slate-500">ელფოსტა და პაროლი მოწმდება უშუალოდ ფორმაში.</p>
+            </div>
+            <div class="glass-card rounded-2xl border border-white/60 shadow-[0_18px_45px_-22px_rgba(15,23,42,0.35)] p-5">
+              <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"></path></svg>
+              </div>
+              <h2 class="font-bold text-slate-900 mb-1">დღის მართვა</h2>
+              <p class="text-sm text-slate-500">ვადები, შეხვედრები და ბილინგი ერთ დაფაზე.</p>
+            </div>
+            <div class="glass-card rounded-2xl border border-white/60 shadow-[0_18px_45px_-22px_rgba(15,23,42,0.35)] p-5">
+              <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V4H2v16h5m10 0v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6m10 0H7"></path></svg>
+              </div>
+              <h2 class="font-bold text-slate-900 mb-1">ფირმის კონტროლი</h2>
+              <p class="text-sm text-slate-500">კომანდის მუშაობა და პროცესები ერთ სისტემაში.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="fade-up lg:justify-self-end w-full max-w-xl">
+          <div class="glass-card rounded-[2rem] border border-white/70 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.35)] p-6 sm:p-8">
+            <div class="flex items-start justify-between gap-4 mb-8">
+              <div>
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-blue-600 mb-2">შესვლა</p>
+                <h2 class="text-3xl font-extrabold tracking-tight">მოგესალმებით უკან</h2>
+                <p class="text-slate-500 mt-2">შეიყვანეთ თქვენი მონაცემები სამუშაო სივრცეში შესასვლელად.</p>
+              </div>
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H3m0 0l4-4m-4 4l4 4m6 4h5a2 2 0 002-2V6a2 2 0 00-2-2h-5"></path></svg>
+              </div>
+            </div>
+
+            <div id="loginMessage" class="hidden mb-5 rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+
+            <form id="loginForm" class="space-y-5" novalidate>
+              <div>
+                <label for="loginEmail" class="block text-sm font-bold text-slate-700 mb-2">ელფოსტა</label>
+                <div class="field-wrap rounded-2xl border border-slate-200 bg-white transition-all">
+                  <input id="loginEmail" name="email" type="email" class="w-full bg-transparent px-4 py-4 rounded-2xl outline-none text-slate-900" placeholder="you@firm.ge" autocomplete="email">
+                </div>
+                <p class="text-sm text-rose-600 mt-2 hidden" data-error-for="loginEmail"></p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <label for="loginPassword" class="block text-sm font-bold text-slate-700">პაროლი</label>
+                  <a href="forgot-password.html" class="text-sm font-semibold text-blue-600 hover:text-blue-700">დაგავიწყდათ?</a>
+                </div>
+                <div class="field-wrap rounded-2xl border border-slate-200 bg-white transition-all flex items-center">
+                  <input id="loginPassword" name="password" type="password" class="w-full bg-transparent px-4 py-4 rounded-l-2xl outline-none text-slate-900" placeholder="შეიყვანეთ პაროლი" autocomplete="current-password">
+                  <button id="toggleLoginPassword" type="button" class="px-4 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">ჩვენება</button>
+                </div>
+                <p class="text-sm text-rose-600 mt-2 hidden" data-error-for="loginPassword"></p>
+              </div>
+
+              <div class="flex items-center justify-between gap-4 flex-wrap">
+                <label class="inline-flex items-center gap-3 text-sm text-slate-600 font-medium">
+                  <input type="checkbox" id="rememberMe" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                  დამიმახსოვრე
+                </label>
+                <div class="text-sm text-slate-500">დაცული კავშირი TLS-ით</div>
+              </div>
+
+              <button id="loginSubmit" type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-blue-600 text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-[0_16px_30px_-14px_rgba(15,23,42,0.5)] hover:-translate-y-0.5">
+                შესვლა
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+              <p class="text-slate-500">ჯერ არ გაქვთ ანგარიში?</p>
+              <a href="register.html" class="inline-flex items-center justify-center px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition-colors">რეგისტრაცია</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginMessage = document.getElementById('loginMessage');
+    const loginSubmit = document.getElementById('loginSubmit');
+    const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+
+    function setFieldError(fieldId, message) {
+      const error = document.querySelector(`[data-error-for="${fieldId}"]`);
+      const input = document.getElementById(fieldId);
+      if (!error || !input) return;
+      error.textContent = message;
+      error.classList.toggle('hidden', !message);
+      input.parentElement.classList.toggle('border-rose-300', Boolean(message));
+    }
+
+    function setMessage(type, text) {
+      loginMessage.className = 'mb-5 rounded-2xl border px-4 py-3 text-sm font-medium';
+      if (type === 'success') {
+        loginMessage.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
+      } else {
+        loginMessage.classList.add('border-rose-200', 'bg-rose-50', 'text-rose-700');
+      }
+      loginMessage.textContent = text;
+      loginMessage.classList.remove('hidden');
+    }
+
+    toggleLoginPassword.addEventListener('click', () => {
+      const isPassword = loginPassword.type === 'password';
+      loginPassword.type = isPassword ? 'text' : 'password';
+      toggleLoginPassword.textContent = isPassword ? 'დამალვა' : 'ჩვენება';
+    });
+
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setFieldError('loginEmail', '');
+      setFieldError('loginPassword', '');
+      loginMessage.classList.add('hidden');
+
+      let hasError = false;
+      const emailValue = loginEmail.value.trim();
+      const passwordValue = loginPassword.value.trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(emailValue)) {
+        setFieldError('loginEmail', 'გთხოვთ შეიყვანოთ სწორი ელფოსტა.');
+        hasError = true;
+      }
+
+      if (passwordValue.length < 6) {
+        setFieldError('loginPassword', 'პაროლი უნდა შეიცავდეს მინიმუმ 6 სიმბოლოს.');
+        hasError = true;
+      }
+
+      if (hasError) {
+        loginForm.classList.remove('shake');
+        void loginForm.offsetWidth;
+        loginForm.classList.add('shake');
+        setMessage('error', 'შესვლა ვერ შესრულდა. გადაამოწმეთ შეყვანილი ინფორმაცია.');
+        return;
+      }
+
+      loginSubmit.disabled = true;
+      loginSubmit.classList.add('opacity-80', 'cursor-not-allowed');
+      loginSubmit.innerHTML = 'იტვირთება...';
+
+      try {
+        const { error } = await window.supabaseClient.auth.signInWithPassword({
+          email: emailValue,
+          password: passwordValue
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        const remembered = document.getElementById('rememberMe').checked ? ' სესია შენახულია ამ მოწყობილობაზე.' : '';
+        setMessage('success', `შესვლა წარმატებულია.${remembered}`);
+        loginForm.reset();
+        toggleLoginPassword.textContent = 'ჩვენება';
+        loginPassword.type = 'password';
+        window.setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 700);
+      } catch (error) {
+        setMessage('error', error.message || 'შესვლა ვერ შესრულდა. გადაამოწმეთ მონაცემები.');
+      } finally {
+        loginSubmit.disabled = false;
+        loginSubmit.classList.remove('opacity-80', 'cursor-not-allowed');
+        loginSubmit.innerHTML = 'შესვლა <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
+      }
+    });
+  </script>
+</body>
+</html>
