@@ -2060,6 +2060,16 @@ select {
   margin-top: 16px;
   min-height: 24px;
 }
+/* Excel button green style */
+.nav-login.excel-btn {
+  background-color: #16a34a !important;
+  color: white !important;
+  border: none !important;
+}
+
+.nav-login.excel-btn:hover {
+  background-color: #15803d !important;
+}
 
 @media (max-width: 1100px) {
   .hero,
@@ -2365,14 +2375,5 @@ select {
     width: 100%;
     padding: 13px 16px;
   }
-  /* Excel button green style */
-.nav-login.excel-btn {
-  background-color: #16a34a !important;
-  color: white !important;
-  border: none !important;
-}
-
-.nav-login.excel-btn:hover {
-  background-color: #15803d !important;
-}
+  
 }
