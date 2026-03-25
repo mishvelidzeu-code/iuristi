@@ -1,15 +1,15 @@
 :root {
   --bg: #f5f1ea;
   --bg-deep: #132532;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: #fffaf4;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-strong: #fffdf9;
   --text: #18222c;
-  --muted: #65717c;
+  --muted: #61707b;
   --line: rgba(24, 34, 44, 0.08);
   --accent: #b48a4b;
   --accent-dark: #8c6630;
   --ink-soft: #d8d0c4;
-  --shadow: 0 16px 38px rgba(16, 34, 47, 0.09);
+  --shadow: 0 12px 28px rgba(16, 34, 47, 0.08);
 }
 
 * {
@@ -196,11 +196,11 @@ select {
 .module-hero {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
+  gap: 18px;
   align-items: flex-start;
-  padding: 24px;
+  padding: 20px;
   margin-top: 12px;
-  border-radius: 24px;
+  border-radius: 20px;
   background: rgba(255, 250, 242, 0.7);
   border: 1px solid rgba(16, 34, 47, 0.08);
   box-shadow: var(--shadow);
@@ -209,15 +209,15 @@ select {
 .module-hero h2 {
   margin: 0 0 10px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+  font-size: clamp(1.22rem, 1.9vw, 1.72rem);
 }
 
 .module-hero p {
   margin: 0;
   color: var(--muted);
   max-width: 60ch;
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font-size: 0.89rem;
+  line-height: 1.54;
 }
 
 .module-stats {
@@ -603,23 +603,23 @@ select {
 }
 
 .landing-copy {
-  padding: 34px;
-  border-radius: 28px;
+  padding: 26px;
+  border-radius: 22px;
 }
 
 .landing-copy h1 {
   margin: 16px 0 14px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2.3rem, 4vw, 4.1rem);
-  line-height: 1.05;
+  font-size: clamp(1.9rem, 3.3vw, 3.1rem);
+  line-height: 1.08;
   letter-spacing: -0.03em;
 }
 
 .landing-lead {
   max-width: 60ch;
   color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.72;
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 .landing-actions {
@@ -799,7 +799,7 @@ select {
 .landing-workspace-copy h2 {
   margin: 14px 0 12px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-size: clamp(1.45rem, 2.35vw, 2.15rem);
   line-height: 1.1;
 }
 
@@ -1039,8 +1039,8 @@ select {
 }
 
 .auth-layout-modern .auth-copy.auth-copy-modern {
-  padding: 30px;
-  border-radius: 28px;
+  padding: 24px;
+  border-radius: 22px;
   background:
     linear-gradient(135deg, rgba(16, 34, 47, 0.97), rgba(28, 53, 72, 0.93)),
     radial-gradient(circle at top left, rgba(180, 138, 75, 0.18), transparent 24%);
@@ -1062,14 +1062,14 @@ select {
 .auth-copy-modern h1 {
   margin: 16px 0 14px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-size: clamp(1.65rem, 2.9vw, 2.5rem);
   line-height: 1.08;
 }
 
 .auth-layout-modern .auth-copy.auth-copy-modern p {
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.96rem;
-  line-height: 1.72;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .auth-stat-grid {
@@ -1108,8 +1108,8 @@ select {
 }
 
 .auth-card-modern {
-  padding: 28px;
-  border-radius: 28px;
+  padding: 22px;
+  border-radius: 22px;
   background: rgba(255, 250, 242, 0.82);
 }
 
@@ -1119,7 +1119,7 @@ select {
 
 .auth-card-head h2 {
   margin: 0 0 8px;
-  font-size: 1.35rem;
+  font-size: 1.12rem;
 }
 
 .auth-card-head p {
@@ -1201,7 +1201,7 @@ select {
 .contact-card h2 {
   margin: 18px 0 16px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2.2rem, 4vw, 4.2rem);
+  font-size: clamp(1.85rem, 3.2vw, 3rem);
   line-height: 1.06;
   letter-spacing: -0.02em;
 }
@@ -1219,8 +1219,8 @@ select {
 
 .hero-text {
   max-width: 62ch;
-  font-size: 0.98rem;
-  line-height: 1.72;
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 .hero-text,
@@ -1234,8 +1234,8 @@ select {
 .pricing-card li,
 .editor-box,
 .transcript-card p {
-  font-size: 0.95rem;
-  line-height: 1.75;
+  font-size: 0.89rem;
+  line-height: 1.6;
 }
 
 .hero-actions {
@@ -1598,14 +1598,14 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
-  border-radius: 30px;
-  padding: 30px;
+  border-radius: 22px;
+  padding: 22px;
 }
 
 .auth-copy h1 {
   margin: 18px 0 14px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(2.1rem, 4vw, 3.6rem);
+  font-size: clamp(1.72rem, 3vw, 2.7rem);
   line-height: 1.08;
   letter-spacing: -0.015em;
 }
@@ -1613,7 +1613,7 @@ select {
 .auth-copy p,
 .auth-switch {
   color: var(--muted);
-  line-height: 1.8;
+  line-height: 1.62;
 }
 
 .auth-points {
@@ -1632,7 +1632,7 @@ select {
 
 .auth-card h2 {
   margin: 0 0 18px;
-  font-size: 2rem;
+  font-size: 1.46rem;
 }
 
 .auth-form {
@@ -1802,7 +1802,7 @@ select {
 .workspace-hero-copy h2 {
   margin: 16px 0 10px;
   font-family: "Noto Serif Georgian", "Noto Sans Georgian", serif;
-  font-size: clamp(1.7rem, 3vw, 2.75rem);
+  font-size: clamp(1.4rem, 2.25vw, 2.05rem);
   line-height: 1.12;
   letter-spacing: -0.02em;
 }
@@ -1835,11 +1835,11 @@ select {
 }
 
 .dashboard-workspace-hero {
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 20px;
+  padding: 20px;
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 18px;
+  gap: 14px;
   background:
     linear-gradient(135deg, rgba(16, 34, 47, 0.96), rgba(31, 57, 76, 0.92)),
     radial-gradient(circle at top left, rgba(185, 138, 61, 0.22), transparent 28%);
@@ -1870,8 +1870,8 @@ select {
 
 .workspace-hero-copy p {
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.95rem;
-  line-height: 1.68;
+  font-size: 0.89rem;
+  line-height: 1.56;
 }
 
 .workspace-mini-grid {
@@ -1895,12 +1895,12 @@ select {
 
 .mini-status-card strong {
   display: block;
-  font-size: 1.08rem;
+  font-size: 0.96rem;
 }
 
 .workspace-day-card {
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 16px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -1920,7 +1920,7 @@ select {
 .quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 14px;
 }
 
 .quick-action-card {
@@ -1966,8 +1966,8 @@ select {
 }
 
 .metric-tile {
-  border-radius: 20px;
-  padding: 18px;
+  border-radius: 18px;
+  padding: 16px;
   position: relative;
   overflow: hidden;
 }
@@ -1984,7 +1984,7 @@ select {
 
 .metric-tile strong {
   display: block;
-  font-size: 1.45rem;
+  font-size: 1.2rem;
   margin: 8px 0 6px;
 }
 
@@ -2011,12 +2011,12 @@ select {
 .dashboard-board {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 14px;
 }
 
 .dashboard-panel {
-  border-radius: 22px;
-  padding: 20px;
+  border-radius: 18px;
+  padding: 18px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 250, 242, 0.66));
 }
