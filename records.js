@@ -119,7 +119,7 @@ const getThreeDaysLaterValue = () => {
 const configs = {
   cases: {
     title: "საქმეები",
-    subtitle: "აქ უნდა იყოს სრული სია, სრული ძებნა, დამატება, რედაქტირება და დეტალები.",
+    subtitle: "საქმის ბარათები, ძებნა, სტატუსი და საქმეზე მიბმული ფაილები ერთ სიაში.",
     table: "cases",
     ownerColumn: "owner_id",
     select: "id, title, case_number, court_name, status, description, hearing_date, created_at",
@@ -190,7 +190,7 @@ const configs = {
   },
   clients: {
     title: "კლიენტები",
-    subtitle: "კლიენტების სრული ბაზა, ძებნა, ბარათები, კონტაქტები და შენიშვნები.",
+    subtitle: "კონტაქტები და შენიშვნები — ყველა კლიენტი სწრაფად მოსაძებნად.",
     table: "clients",
     ownerColumn: "owner_id",
     select: "id, first_name, last_name, phone, email, personal_id, address, notes, created_at",
@@ -252,7 +252,7 @@ const configs = {
   },
   documents: {
     title: "დოკუმენტები",
-    subtitle: "ყველა დოკუმენტი ერთ სივრცეში: drafts, generated ფაილები და სწრაფი ძებნა.",
+    subtitle: "დრაფტები და მზა დოკუმენტები ერთ სივრცეში — ძებნა და რედაქტირება წამებში.",
     table: "documents",
     ownerColumn: "owner_id",
     select: "id, title, status, body, file_path, created_at",
@@ -315,7 +315,7 @@ const configs = {
   },
   transcriptions: {
     title: "AI ტრანსკრიფცია",
-    subtitle: "ყველა ტრანსკრიფცია ერთ ადგილას: სტატუსი, ენა, ნედლი ტექსტი და რედაქტირება.",
+    subtitle: "აუდიოდან ტექსტამდე: სტატუსი, ენა, რედაქტირება და შენახვა.",
     table: "transcriptions",
     ownerColumn: "owner_id",
     select: "id, title, status, language_code, raw_text, edited_text, created_at, duration_seconds",
@@ -386,7 +386,7 @@ const configs = {
   },
   deadlines: {
     title: "ვადები",
-    subtitle: "აქ უნდა ჩანდეს უკვე ყველა ვადა სრული ძებნით, სტატუსით და ცვლილების მართვით.",
+    subtitle: "ვადების სრული სია და სტატუსი — ძებნა და რედაქტირება ერთ ადგილას.",
     table: "deadlines",
     ownerColumn: "owner_id",
     select: "id, title, due_date, base_date, status, notes, created_at",
@@ -452,7 +452,7 @@ const configs = {
   },
   events: {
     title: "სხდომები და მოვლენები",
-    subtitle: "დეშბორდზე მხოლოდ უახლოესი ჩანს. აქ კი უკვე სრული კალენდარული მოძრაობა და სრული ძებნაა.",
+    subtitle: "სხდომები და მოვლენები — სრული სია, ძებნა და კალენდარული მოძრაობა.",
     table: "calendar_events",
     ownerColumn: "owner_id",
     select: "id, title, location, starts_at, ends_at, notes, created_at",
@@ -820,7 +820,7 @@ const fetchRecords = async () => {
   userMeta.textContent = profile.bureau_name || "სამუშაო სივრცე";
   pageTitle.textContent = config.title;
   pageSubtitle.textContent = config.subtitle;
-  statusEl.textContent = `${config.title} გვერდზე ჩანს სრული სია, ხოლო dashboard-ზე მხოლოდ მოკლე preview.`;
+  statusEl.textContent = `სრული სია აქ — დეშბორდზე მხოლოდ მოკლე მიმოხილვაა.`;
   renderRecords();
 };
 

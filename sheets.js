@@ -31,12 +31,12 @@ const renderSheetState = (url) => {
     frame?.classList.add("hidden");
     frame?.removeAttribute("src");
     empty?.classList.remove("hidden");
-    setStatus("ჩასვი შენი Google Sheet-ის ლინკი და შეინახე.");
+    setStatus("ჩასვი Google Sheet-ის მისამართი და დააჭირე შენახვას.");
     return;
   }
 
   previewCard?.classList.add("hidden");
-  setStatus("ლინკი შენახულია. მარცხენა მენიუდან `ექსელი` ყოველთვის პირდაპირ შენს ცხრილს გახსნის.");
+  setStatus("ბმული შენახულია. მენიუდან „ექსელი“ შენს Sheet-ს გახსნის.");
 };
 
 async function initPage() {
@@ -59,7 +59,7 @@ async function initPage() {
 
   if (profile) {
     userName.textContent = [profile.first_name, profile.last_name].filter(Boolean).join(" ").trim() || "კაბინეტი";
-    userMeta.textContent = profile.bureau_name || "პირდაპირი Google Sheets კავშირი";
+    userMeta.textContent = profile.bureau_name || "Google Sheet · პირდაპირი ბმული";
   }
 
   const savedUrl = profile?.sheet_url || DEFAULT_SHEET_URL;
@@ -72,7 +72,7 @@ form?.addEventListener("submit", async (event) => {
   if (!currentUserId) return;
 
   const value = normalizeSheetUrl(input.value);
-  setStatus("Excel ბმული ინახება...");
+  setStatus("ბმული ინახება...");
 
   const { error } = await supabase
     .from("profiles")
@@ -86,13 +86,13 @@ form?.addEventListener("submit", async (event) => {
 
   input.value = value;
   renderSheetState(value);
-  setStatus("ბმული წარმატებით შეინახა. შემდეგში მენიუდან პირდაპირ შენს Excel-ს გახსნის.");
+  setStatus("შენახულია. მენიუდან „ექსელი“ იგივე Sheet-ს გახსნის.");
 });
 
 openButton?.addEventListener("click", () => {
   const url = normalizeSheetUrl(input.value || currentSheetUrl);
   if (!url) {
-    setStatus("ჯერ ჩასვი შენი Google Sheet-ის ლინკი.");
+    setStatus("ჯერ ჩასვი Sheet-ის მისამართი.");
     return;
   }
 
