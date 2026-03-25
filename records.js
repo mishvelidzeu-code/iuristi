@@ -154,7 +154,8 @@ const configs = {
         status: String(formData.get("status") || "active"),
         description: String(formData.get("description") || "").trim() || null
       };
-    }
+    },
+    fileConfig: { storageSegment: "cases", dbColumn: "case_id" }
   },
   clients: {
     title: "კლიენტები",
@@ -215,7 +216,8 @@ const configs = {
         address: String(formData.get("address") || "").trim() || null,
         notes: String(formData.get("notes") || "").trim() || null
       };
-    }
+    },
+    fileConfig: { storageSegment: "clients", dbColumn: "client_id" }
   },
   documents: {
     title: "დოკუმენტები",
@@ -277,7 +279,8 @@ const configs = {
         file_path: String(formData.get("file_path") || "").trim() || null,
         generated_data: {}
       };
-    }
+    },
+    fileConfig: { storageSegment: "documents", dbColumn: "document_id" }
   },
   transcriptions: {
     title: "AI ტრანსკრიფცია",
@@ -347,7 +350,8 @@ const configs = {
         raw_text: String(formData.get("raw_text") || "").trim() || null,
         edited_text: String(formData.get("edited_text") || "").trim() || null
       };
-    }
+    },
+    fileConfig: { storageSegment: "transcriptions", dbColumn: "transcription_id" }
   },
   deadlines: {
     title: "ვადები",
@@ -412,7 +416,8 @@ const configs = {
         status: String(formData.get("status") || "upcoming"),
         notes: String(formData.get("notes") || "").trim() || null
       };
-    }
+    },
+    fileConfig: { storageSegment: "deadlines", dbColumn: "deadline_id" }
   },
   events: {
     title: "სხდომები და მოვლენები",
@@ -470,13 +475,169 @@ const configs = {
         location: String(formData.get("location") || "").trim() || null,
         notes: String(formData.get("notes") || "").trim() || null
       };
-    }
+    },
+    fileConfig: { storageSegment: "events", dbColumn: "calendar_event_id" }
   }
 };
 
 const config = configs[pageKey];
 
+const SIGNED_URL_TTL_SECONDS = 3600;
+
+function safeStorageFileName(name) {
+  return String(name).replace(/[/\\]/g, "_").trim() || "file";
+}
+
+function getEntityStoragePrefix(entityId) {
+  if (!authUserId || !config?.fileConfig) return null;
+  return `${authUserId}/${config.fileConfig.storageSegment}/${entityId}`;
+}
+
+function ensureFilePreviewOverlay() {
+  let el = document.getElementById("entity-file-preview");
+  if (el) return el;
+  el = document.createElement("div");
+  el.id = "entity-file-preview";
+  el.className = "file-preview-backdrop hidden";
+  el.innerHTML = `
+    <div class="file-preview-inner">
+      <div class="file-preview-bar">
+        <span class="file-preview-title" data-preview-title>ფაილი</span>
+        <div class="file-preview-actions">
+          <a class="nav-login" href="#" target="_blank" rel="noopener noreferrer" data-preview-tab>ახალ ტაბში</a>
+          <button type="button" class="nav-cta" data-close-preview>დახურვა</button>
+        </div>
+      </div>
+      <iframe class="file-preview-frame hidden" title="PDF" data-preview-frame></iframe>
+      <div class="file-preview-body" data-preview-body></div>
+    </div>
+  `;
+  document.body.appendChild(el);
+  el.querySelector("[data-close-preview]")?.addEventListener("click", () => closeFilePreview());
+  el.addEventListener("click", (event) => {
+    if (event.target === el) closeFilePreview();
+  });
+  return el;
+}
+
+function closeFilePreview() {
+  const el = document.getElementById("entity-file-preview");
+  if (!el) return;
+  el.classList.add("hidden");
+  const frame = el.querySelector("[data-preview-frame]");
+  if (frame) {
+    frame.removeAttribute("src");
+    frame.classList.add("hidden");
+  }
+  const body = el.querySelector("[data-preview-body]");
+  if (body) body.innerHTML = "";
+}
+
+function openFilePreview(url, mime, fileName) {
+  const el = ensureFilePreviewOverlay();
+  const frame = el.querySelector("[data-preview-frame]");
+  const body = el.querySelector("[data-preview-body]");
+  const tab = el.querySelector("[data-preview-tab]");
+  const title = el.querySelector("[data-preview-title]");
+  if (title) title.textContent = fileName || "ფაილი";
+  if (tab) tab.href = url;
+  el.classList.remove("hidden");
+  const isPdf =
+    (mime && String(mime).toLowerCase().includes("pdf")) || /\.pdf$/i.test(fileName || "");
+  if (isPdf && frame) {
+    frame.src = url;
+    frame.classList.remove("hidden");
+    if (body) body.innerHTML = "";
+  } else {
+    frame?.classList.add("hidden");
+    frame?.removeAttribute("src");
+    if (body) {
+      body.innerHTML = `<p class="file-preview-note">Word/Excel ფაილი ბრაუზერში არ იხსნება. გახსენი „ახალ ტაბში“ ან ჩამოწერე და რედაქტირება გააკეთე Word/Excel-ში.</p>`;
+    }
+  }
+}
+
+async function getSignedFileAccess(fileId) {
+  const { data: row, error } = await supabase
+    .from("files")
+    .select("storage_path, file_name, mime_type")
+    .eq("id", fileId)
+    .eq("owner_id", authUserId)
+    .single();
+
+  if (error || !row) return null;
+
+  const { data: signed, error: signError } = await supabase.storage
+    .from("case-files")
+    .createSignedUrl(row.storage_path, SIGNED_URL_TTL_SECONDS);
+
+  if (signError || !signed?.signedUrl) return null;
+
+  return {
+    url: signed.signedUrl,
+    fileName: row.file_name || "ფაილი",
+    mime: row.mime_type || "",
+    storagePath: row.storage_path
+  };
+}
+
+async function loadEntityFiles(entityId) {
+  const container = document.querySelector("[data-entity-files-list]");
+  if (!container || !config.fileConfig) return;
+
+  if (!authUserId) {
+    container.innerHTML = "სესია ვერ მოიძებნა.";
+    return;
+  }
+
+  container.innerHTML = "იტვირთება...";
+
+  const col = config.fileConfig.dbColumn;
+  const { data: rows, error } = await supabase
+    .from("files")
+    .select("id, file_name, storage_path, mime_type, size_bytes, created_at")
+    .eq("owner_id", authUserId)
+    .eq(col, entityId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    container.innerHTML = "ფაილები ვერ ჩაიტვირთა.";
+    return;
+  }
+
+  if (!rows?.length) {
+    container.innerHTML = '<p class="entity-files-empty">ფაილები ჯერ არ არის.</p>';
+    return;
+  }
+
+  container.innerHTML = rows
+    .map((row) => {
+      const name = row.file_name || "ფაილი";
+      const mime = row.mime_type || "";
+      const size =
+        row.size_bytes != null ? `${(Number(row.size_bytes) / 1024).toFixed(1)} KB` : "";
+
+      return `
+        <div class="file-item" data-file-row-id="${row.id}">
+          <div class="file-item-main">
+            <strong>${escapeHtml(name)}</strong>
+            <span class="file-item-meta">${escapeHtml(size)}${mime ? ` • ${escapeHtml(mime)}` : ""}</span>
+          </div>
+          <div class="file-item-actions">
+            <button type="button" class="item-action" data-open-entity-file data-file-id="${row.id}">გახსნა</button>
+            <button type="button" class="item-action" data-preview-entity-file data-file-id="${row.id}">დიდი ეკრანი</button>
+            <button type="button" class="item-action" data-download-entity-file data-file-id="${row.id}">ჩამოწერა</button>
+            <button type="button" class="item-action danger" data-delete-entity-file data-file-id="${row.id}">წაშლა</button>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
 const closeModal = () => {
+  closeFilePreview();
   modalBackdrop.classList.add("hidden");
   modalForm.innerHTML = "";
   modalFeedback.textContent = "";
@@ -511,21 +672,27 @@ const openModal = (mode, item = null) => {
   modalForm.innerHTML = `
   ${config.fields(mode, safeItem)}
 
-  ${mode === "view" ? `
-    <div class="case-files">
-      <h3>ფაილები</h3>
-      <div data-case-files>იტვირთება...</div>
-
-      <input type="file" data-upload-input accept=".pdf,.doc,.docx,.xls,.xlsx">
-      <button type="button" data-upload-btn>ფაილის ატვირთვა</button>
+  ${
+    mode === "view" && config.fileConfig
+      ? `
+    <div class="entity-files">
+      <h3>ფაილები (Word, Excel, PDF)</h3>
+      <p class="entity-files-hint">ატვირთვა, გახსნა, დიდი ეკრანი (PDF), ჩამოწერა, წაშლა. იგივე სახელით ატვირთვა ჩაანაცვლებს ფაილს.</p>
+      <div data-entity-files-list>იტვირთება...</div>
+      <div class="entity-files-upload">
+        <input type="file" data-upload-input accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <button type="button" class="nav-cta" data-upload-btn>ატვირთვა</button>
+      </div>
     </div>
-  ` : ""}
+  `
+      : ""
+  }
 
   ${submitButton}
 `;
   modalForm.querySelector("[data-close-inline]")?.addEventListener("click", closeModal);
-  if (mode === "view" && modalItemId) {
-    loadCaseFiles(modalItemId);
+  if (mode === "view" && modalItemId && config.fileConfig) {
+    loadEntityFiles(modalItemId);
   }
 };
 
@@ -708,127 +875,146 @@ async function init() {
 
 init();
 
-const SIGNED_URL_TTL_SECONDS = 3600;
-
-function getCaseStoragePrefix(caseId) {
-  return `${authUserId}/cases/${caseId}`;
-}
-
-async function loadCaseFiles(caseId) {
-  const container = document.querySelector("[data-case-files]");
-  if (!container) return;
-
-  if (!authUserId) {
-    container.innerHTML = "სესია ვერ მოიძებნა.";
-    return;
-  }
-
-  container.innerHTML = "იტვირთება...";
-
-  const prefix = getCaseStoragePrefix(caseId);
-
-  const { data, error } = await supabase.storage.from("case-files").list(prefix);
-
-  if (error) {
-    container.innerHTML = "ფაილები ვერ ჩაიტვირთა";
-    console.error(error);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    container.innerHTML = "ფაილები არ არის დამატებული";
-    return;
-  }
-
-  const rows = await Promise.all(
-    data.map(async (file) => {
-      if (file.id === null && file.name === ".emptyFolderPlaceholder") {
-        return "";
-      }
-      const path = `${prefix}/${file.name}`;
-      const { data: signed, error: signError } = await supabase.storage
-        .from("case-files")
-        .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-
-      if (signError || !signed?.signedUrl) {
-        console.error(signError);
-        return `
-      <div class="file-item">
-        <span>${escapeHtml(file.name)}</span>
-        <span>ბმული ვერ დაგენერირდა</span>
-      </div>
-    `;
-      }
-
-      const safeName = escapeHtml(file.name);
-      return `
-      <div class="file-item">
-        <span>${safeName}</span>
-        <div>
-          <a href="${signed.signedUrl}" target="_blank" rel="noopener noreferrer">გახსნა</a>
-          <a href="${signed.signedUrl}" download rel="noopener noreferrer">ჩამოწერა</a>
-        </div>
-      </div>
-    `;
-    })
-  );
-
-  const html = rows.filter(Boolean).join("");
-  container.innerHTML = html || "ფაილები არ არის დამატებული";
-}
-
 document.addEventListener("click", async (e) => {
-  if (!e.target.matches("[data-upload-btn]")) return;
+  const uploadBtn = e.target.closest("[data-upload-btn]");
+  if (uploadBtn) {
+    const input = document.querySelector("[data-upload-input]");
+    const file = input?.files?.[0];
 
-  const input = document.querySelector("[data-upload-input]");
-  const file = input.files[0];
+    if (!file) {
+      window.alert("აირჩიე ფაილი");
+      return;
+    }
 
-  if (!file) {
-    alert("აირჩიე ფაილი");
+    if (!modalItemId || !authUserId || !config.fileConfig) {
+      window.alert("სესია ან ჩანაწერი ვერ მოიძებნა");
+      return;
+    }
+
+    const prefix = getEntityStoragePrefix(modalItemId);
+    if (!prefix) {
+      window.alert("ფაილის მისამართი ვერ დაგენერირდა");
+      return;
+    }
+
+    const storageName = safeStorageFileName(file.name);
+    const path = `${prefix}/${storageName}`;
+
+    const { error: uploadError } = await supabase.storage.from("case-files").upload(path, file, {
+      upsert: true
+    });
+
+    if (uploadError) {
+      window.alert("ატვირთვა ვერ მოხერხდა");
+      console.error(uploadError);
+      return;
+    }
+
+    await supabase
+      .from("files")
+      .delete()
+      .eq("owner_id", authUserId)
+      .eq(config.fileConfig.dbColumn, modalItemId)
+      .eq("file_name", file.name);
+
+    const insertPayload = {
+      owner_id: authUserId,
+      file_kind: "document",
+      file_name: file.name,
+      storage_path: path,
+      mime_type: file.type || null,
+      size_bytes: file.size != null ? file.size : null
+    };
+    insertPayload[config.fileConfig.dbColumn] = modalItemId;
+
+    const { error: dbError } = await supabase.from("files").insert(insertPayload);
+
+    if (dbError) {
+      console.error(dbError);
+      window.alert(
+        "ფაილი ჩაიტვირთა, მაგრამ ბაზაში ვერ შეინახა. გაუშვი Supabase-ში supabase-migration-files-entity-fks.sql თუ სვეტები ჯერ არ გაქვს."
+      );
+    }
+
+    if (input) input.value = "";
+    window.alert("ატვირთულია!");
+    loadEntityFiles(modalItemId);
     return;
   }
 
-  const caseId = modalItemId;
-  if (!caseId || !authUserId) {
-    alert("სესია ან საქმე ვერ მოიძებნა");
+  const openBtn = e.target.closest("[data-open-entity-file]");
+  if (openBtn) {
+    e.preventDefault();
+    const acc = await getSignedFileAccess(openBtn.dataset.fileId);
+    if (!acc) {
+      window.alert("ბმული ვერ მოიძებნა");
+      return;
+    }
+    window.open(acc.url, "_blank", "noopener,noreferrer");
     return;
   }
 
-  const path = `${getCaseStoragePrefix(caseId)}/${file.name}`;
-
-  const { error: uploadError } = await supabase.storage.from("case-files").upload(path, file, {
-    upsert: true
-  });
-
-  if (uploadError) {
-    alert("ატვირთვა ვერ მოხერხდა");
-    console.error(uploadError);
+  const previewBtn = e.target.closest("[data-preview-entity-file]");
+  if (previewBtn) {
+    e.preventDefault();
+    const acc = await getSignedFileAccess(previewBtn.dataset.fileId);
+    if (!acc) {
+      window.alert("ბმული ვერ მოიძებნა");
+      return;
+    }
+    openFilePreview(acc.url, acc.mime, acc.fileName);
     return;
   }
 
-  await supabase
-    .from("files")
-    .delete()
-    .eq("owner_id", authUserId)
-    .eq("case_id", caseId)
-    .eq("file_name", file.name);
-
-  const { error: dbError } = await supabase.from("files").insert({
-    owner_id: authUserId,
-    case_id: caseId,
-    file_kind: "document",
-    file_name: file.name,
-    storage_path: path,
-    mime_type: file.type || null,
-    size_bytes: file.size != null ? file.size : null
-  });
-
-  if (dbError) {
-    console.error(dbError);
-    alert("ფაილი ჩაიტვირთა, მაგრამ ჩანაწერი ბაზაში ვერ შეინახა.");
+  const downloadBtn = e.target.closest("[data-download-entity-file]");
+  if (downloadBtn) {
+    e.preventDefault();
+    const acc = await getSignedFileAccess(downloadBtn.dataset.fileId);
+    if (!acc) {
+      window.alert("ბმული ვერ მოიძებნა");
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = acc.url;
+    a.download = acc.fileName;
+    a.rel = "noopener noreferrer";
+    a.target = "_blank";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
   }
 
-  if (input) input.value = "";
-  alert("ატვირთულია!");
-  loadCaseFiles(caseId);
+  const deleteBtn = e.target.closest("[data-delete-entity-file]");
+  if (deleteBtn) {
+    e.preventDefault();
+    if (!window.confirm("ნამდვილად წავშალო ეს ფაილი?")) return;
+
+    const { data: row, error: selErr } = await supabase
+      .from("files")
+      .select("storage_path")
+      .eq("id", deleteBtn.dataset.fileId)
+      .eq("owner_id", authUserId)
+      .single();
+
+    if (selErr || !row) {
+      window.alert("ფაილი ვერ მოიძებნა");
+      return;
+    }
+
+    await supabase.storage.from("case-files").remove([row.storage_path]);
+
+    const { error: delErr } = await supabase
+      .from("files")
+      .delete()
+      .eq("id", deleteBtn.dataset.fileId)
+      .eq("owner_id", authUserId);
+
+    if (delErr) {
+      window.alert("წაშლა ვერ მოხერხდა");
+      return;
+    }
+
+    if (modalItemId) loadEntityFiles(modalItemId);
+  }
 });

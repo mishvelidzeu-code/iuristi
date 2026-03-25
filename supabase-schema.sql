@@ -1,12 +1,13 @@
 create extension if not exists "pgcrypto";
 
-create type public.user_role as enum ('lawyer', 'prosecutor', 'judge', 'admin');
-create type public.case_status as enum ('active', 'pending', 'closed', 'archived');
-create type public.transaction_type as enum ('topup', 'usage', 'refund', 'manual_adjustment');
-create type public.transcription_status as enum ('uploaded', 'processing', 'completed', 'failed');
-create type public.document_status as enum ('draft', 'generated', 'signed', 'archived');
-create type public.deadline_status as enum ('upcoming', 'done', 'missed');
-create type public.file_kind as enum ('audio', 'document', 'scan', 'evidence', 'other');
+-- უკვე არსებულ ბაზაზე ხელახლა გაშვებისას enum-ები არ უნდა ჩაირტყმას (42710 duplicate_object).
+do $$ begin create type public.user_role as enum ('lawyer', 'prosecutor', 'judge', 'admin'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.case_status as enum ('active', 'pending', 'closed', 'archived'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.transaction_type as enum ('topup', 'usage', 'refund', 'manual_adjustment'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.transcription_status as enum ('uploaded', 'processing', 'completed', 'failed'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.document_status as enum ('draft', 'generated', 'signed', 'archived'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.deadline_status as enum ('upcoming', 'done', 'missed'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.file_kind as enum ('audio', 'document', 'scan', 'evidence', 'other'); exception when duplicate_object then null; end $$;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -145,6 +146,10 @@ create table if not exists public.files (
   owner_id uuid not null references public.profiles(id) on delete cascade,
   case_id uuid references public.cases(id) on delete cascade,
   client_id uuid references public.clients(id) on delete set null,
+  document_id uuid references public.documents(id) on delete cascade,
+  transcription_id uuid references public.transcriptions(id) on delete cascade,
+  deadline_id uuid references public.deadlines(id) on delete cascade,
+  calendar_event_id uuid references public.calendar_events(id) on delete cascade,
   file_kind public.file_kind not null default 'document',
   file_name text not null,
   storage_path text not null,
@@ -188,6 +193,11 @@ create index if not exists idx_deadlines_case_id on public.deadlines(case_id);
 create index if not exists idx_calendar_events_owner_id on public.calendar_events(owner_id);
 create index if not exists idx_files_owner_id on public.files(owner_id);
 create index if not exists idx_files_case_id on public.files(case_id);
+create index if not exists idx_files_client_id on public.files(client_id);
+create index if not exists idx_files_document_id on public.files(document_id);
+create index if not exists idx_files_transcription_id on public.files(transcription_id);
+create index if not exists idx_files_deadline_id on public.files(deadline_id);
+create index if not exists idx_files_calendar_event_id on public.files(calendar_event_id);
 create index if not exists idx_ai_jobs_owner_id on public.ai_jobs(owner_id);
 
 drop trigger if exists trg_profiles_updated_at on public.profiles;
