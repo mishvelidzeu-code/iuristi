@@ -66,7 +66,7 @@
           <div id="overviewActive" class="mt-2 text-3xl font-black">0</div>
         </article>
         <article class="rounded-3xl bg-white border p-5">
-          <div class="text-xs text-slate-400 uppercase font-bold">დასრულებული საქმეები</div>
+          <div class="text-xs text-slate-400 uppercase font-bold">მოგებული საქმეები</div>
           <div id="overviewDone" class="mt-2 text-3xl font-black">0</div>
         </article>
         <article class="rounded-3xl bg-white border p-5">
@@ -143,7 +143,7 @@
 
       const rows = data || [];
       const active = rows.filter((item) => !['მოგებული', 'წაგებული', 'მორიგებით დასრულებული', 'შეწყვეტილი'].includes(item.result)).length;
-      const done = rows.filter((item) => ['მოგებული', 'წაგებული', 'მორიგებით დასრულებული'].includes(item.result)).length;
+      const done = rows.filter((item) => item.result === 'მოგებული').length;
       const stopped = rows.filter((item) => item.result === 'შეწყვეტილი').length;
 
       document.querySelector('#overviewActive').textContent = active;

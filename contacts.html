@@ -8,20 +8,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Noto Sans Georgian', sans-serif; }
-    .off { display: none; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    body{font-family:'Noto Sans Georgian',sans-serif}.off{display:none}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
-  <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden lg:flex">
+  <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex lg:flex-col">
     <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
-      <div>
-        <div class="font-extrabold">LexManage</div>
-        <div class="text-[11px] text-slate-400">Contacts Workspace</div>
-      </div>
+      <div><div class="font-extrabold">LexManage</div><div class="text-[11px] text-slate-400">Contacts Workspace</div></div>
     </div>
     <nav class="flex-1 p-3 space-y-1">
       <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
@@ -31,50 +26,36 @@
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50">
       <div class="text-sm font-bold">კონტაქტების ბაზა</div>
-      <div class="text-xs text-slate-500 mt-1">საქმეებში ჩაწერილი კონტაქტები აქ ავტომატურად გროვდება და საქმეებს ებმება.</div>
+      <div class="text-xs text-slate-500 mt-1">საქმეებიდან წამოსული და ხელით დამატებული კონტაქტები ერთიან სიაშია.</div>
     </div>
   </aside>
 
   <main class="flex-1 flex flex-col h-screen overflow-hidden">
     <header class="h-16 px-4 md:px-8 bg-white border-b border-slate-200 flex items-center justify-between gap-4">
-      <div>
-        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Contacts</div>
-        <div class="text-xl font-extrabold">კონტაქტები</div>
-      </div>
+      <div><div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Contacts</div><div class="text-xl font-extrabold">კონტაქტები</div></div>
       <div class="flex items-center gap-3">
-        <input id="globalSearch" class="w-64 max-w-[45vw] px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა კონტაქტებში...">
+        <input id="globalSearch" class="w-64 max-w-[40vw] px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა კონტაქტებში...">
+        <button type="button" id="newContact" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm">ახალი კონტაქტი</button>
       </div>
     </header>
 
     <div class="flex-1 overflow-y-auto p-3 md:p-5 space-y-4">
       <section class="grid md:grid-cols-3 gap-4">
-        <article class="rounded-[1.6rem] bg-white border p-5">
-          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სულ კონტაქტები</div>
-          <div id="contactsCount" class="text-2xl font-black mt-2">0</div>
-        </article>
-        <article class="rounded-[1.6rem] bg-white border p-5">
-          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">მიბმული საქმეები</div>
-          <div id="linkedCasesCount" class="text-2xl font-black mt-2">0</div>
-        </article>
-        <article class="rounded-[1.6rem] bg-white border p-5">
-          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ელფოსტა ან ტელეფონი</div>
-          <div id="reachableCount" class="text-2xl font-black mt-2">0</div>
-        </article>
+        <article class="rounded-[1.6rem] bg-white border p-5"><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სულ კონტაქტები</div><div id="contactsCount" class="text-2xl font-black mt-2">0</div></article>
+        <article class="rounded-[1.6rem] bg-white border p-5"><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">მიბმული საქმეები</div><div id="linkedCasesCount" class="text-2xl font-black mt-2">0</div></article>
+        <article class="rounded-[1.6rem] bg-white border p-5"><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ელფოსტა ან ტელეფონი</div><div id="reachableCount" class="text-2xl font-black mt-2">0</div></article>
       </section>
 
       <section class="grid xl:grid-cols-[0.92fr_1.08fr] gap-4">
         <article class="rounded-[1.6rem] bg-white border p-4 space-y-4">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სია</div>
-              <div class="text-xl font-extrabold mt-1">ყველა კონტაქტი</div>
-            </div>
-            <div id="listMeta" class="text-sm text-slate-500"></div>
+            <div><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სია</div><div class="text-xl font-extrabold mt-1">ყველა კონტაქტი</div></div>
+            <div class="flex items-center gap-3"><div id="storageBadge" class="rounded-2xl bg-slate-50 border border-slate-200 px-3 py-2 text-xs text-slate-500"></div><div id="listMeta" class="text-sm text-slate-500"></div></div>
           </div>
           <input id="search" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none text-sm" placeholder="ძებნა სახელით, ტელეფონით, ელფოსტით ან საქმით...">
           <div id="empty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
             <div class="text-lg font-bold">კონტაქტები ვერ მოიძებნა</div>
-            <div class="text-slate-500 mt-2">როცა საქმეში შეავსებ კონტაქტის ველებს, ეს გვერდიც ავტომატურად შეივსება.</div>
+            <div class="text-slate-500 mt-2">შეგიძლია ხელით დაამატო ახალი კონტაქტი ან საქმეებში შეავსო საკონტაქტო ველები.</div>
           </div>
           <div id="contactsList" class="space-y-3"></div>
         </article>
@@ -84,7 +65,6 @@
             <div class="text-lg font-bold">აირჩიე კონტაქტი</div>
             <div class="text-slate-500 mt-2">მარცხენა სიიდან დაკლიკების შემდეგ აქ გამოჩნდება დეტალები და მიბმული საქმეები.</div>
           </div>
-
           <div id="detailPanel" class="off space-y-4">
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
               <div>
@@ -92,364 +72,144 @@
                 <div id="contactName" class="text-2xl font-extrabold mt-1"></div>
                 <div id="contactSubtitle" class="text-sm text-slate-500 mt-2"></div>
               </div>
-              <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm">
-                <div class="text-slate-400">მიბმული საქმეები</div>
-                <div id="contactCasesCount" class="font-extrabold text-lg mt-1">0</div>
-              </div>
+              <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm"><div class="text-slate-400">მიბმული საქმეები</div><div id="contactCasesCount" class="font-extrabold text-lg mt-1">0</div></div>
             </div>
-
             <div id="contactInfoGrid" class="grid md:grid-cols-2 gap-3"></div>
-
-            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საქმეები</div>
-              <div id="linkedCasesList" class="mt-4 space-y-3"></div>
-            </div>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4"><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საქმეები</div><div id="linkedCasesList" class="mt-4 space-y-3"></div></div>
           </div>
         </article>
       </section>
     </div>
   </main>
 
+  <section id="contactModal" class="off fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="min-h-full flex items-start justify-center">
+      <div class="w-full max-w-4xl rounded-[2rem] bg-white border border-slate-200 overflow-hidden">
+        <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
+          <div><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Contacts</div><div class="text-2xl font-extrabold mt-2">ახალი კონტაქტი</div></div>
+          <div class="flex gap-3">
+            <button type="button" id="resetContactForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
+            <button type="button" id="closeContactModal" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">დახურვა</button>
+          </div>
+        </div>
+        <form id="contactForm" class="p-6 space-y-6">
+          <div class="grid lg:grid-cols-2 gap-6">
+            <section class="space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <input id="contactFirstName" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="სახელი">
+                <input id="contactLastName" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="გვარი">
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <input id="contactPhone" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ტელეფონი">
+                <input id="contactEmail" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ელფოსტა">
+              </div>
+              <div class="grid md:grid-cols-2 gap-4">
+                <input id="contactClientName" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="კლიენტი / კომპანია">
+                <input id="contactCompanyId" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="საიდენტიფიკაციო / პირადი ნომერი">
+              </div>
+            </section>
+            <section class="space-y-4">
+              <div class="grid md:grid-cols-2 gap-4">
+                <input id="contactCity" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="ქალაქი">
+                <input id="contactAddress" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="მისამართი">
+              </div>
+              <select id="contactRelatedCase" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none"><option value="">საქმესთან კავშირის გარეშე</option></select>
+              <textarea id="contactNotes" rows="6" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none resize-none" placeholder="დამატებითი ინფორმაცია კონტაქტზე..."></textarea>
+            </section>
+          </div>
+          <div id="contactFormMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+          <button class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
   <script src="supabase-config.js"></script>
   <script>
-    const $ = (selector) => document.querySelector(selector);
+    const $ = (s) => document.querySelector(s);
+    const LOCAL_KEY = 'lexmanage-manual-contacts';
+    let currentUser = null, caseRows = [], manualRows = [], contacts = [], selectedContactId = null, searchTerm = '', storeMode = 'local';
+    const modal = $('#contactModal');
+    const fields = {
+      first: $('#contactFirstName'), last: $('#contactLastName'), phone: $('#contactPhone'), email: $('#contactEmail'),
+      client: $('#contactClientName'), company: $('#contactCompanyId'), city: $('#contactCity'), address: $('#contactAddress'),
+      caseId: $('#contactRelatedCase'), notes: $('#contactNotes')
+    };
 
-    let currentUser = null;
-    let contacts = [];
-    let selectedContactId = null;
-    let searchTerm = '';
-
-    function escapeHtml(value) {
-      return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function normalizePhone(value) {
-      return String(value || '').replace(/[^\d+]/g, '');
-    }
-
-    function extractMeta(notes) {
-      if (!notes || !notes.includes('\n[[CASE_META]]\n')) {
-        return { cleanNotes: notes || '', meta: {} };
-      }
-      const parts = notes.split('\n[[CASE_META]]\n');
-      try {
-        return {
-          cleanNotes: (parts[0] || '').trim(),
-          meta: JSON.parse(parts[1]) || {}
-        };
-      } catch (error) {
-        return { cleanNotes: notes || '', meta: {} };
-      }
-    }
-
-    function getDisplayName(meta, row) {
-      const fullName = [meta.contact_first_name, meta.contact_last_name].filter(Boolean).join(' ').trim();
-      return fullName || row.client_name || 'უსახელო კონტაქტი';
-    }
-
-    function contactKey(meta, row) {
-      const email = String(meta.contact_email || '').trim().toLowerCase();
-      const phone = normalizePhone(meta.contact_phone);
-      const companyId = String(meta.company_id || '').trim().toLowerCase();
-      const fullName = [meta.contact_first_name, meta.contact_last_name].filter(Boolean).join(' ').trim().toLowerCase();
-
-      if (email) return `email:${email}`;
-      if (phone) return `phone:${phone}`;
-      if (companyId) return `company:${companyId}`;
-      if (fullName) return `name:${fullName}`;
-      return `case:${row.id}`;
-    }
-
-    function hasContactData(meta, row) {
-      return [
-        meta.contact_first_name,
-        meta.contact_last_name,
-        meta.contact_phone,
-        meta.contact_email,
-        meta.city,
-        meta.address,
-        meta.company_id,
-        row.client_name
-      ].some((value) => String(value || '').trim());
-    }
-
-    function buildContactCase(row) {
-      return {
-        id: row.id,
-        title: row.title,
-        code: row.code,
-        clientName: row.client_name,
-        court: row.court,
-        category: row.category,
-        result: row.result,
-        owner: row.owner_name || '',
-        deadline: row.deadline || ''
-      };
-    }
-
-    function mergePreferred(current, incoming) {
-      return current || incoming || '';
-    }
-
-    function findExistingContactKey(map, candidate) {
-      for (const [key, item] of map.entries()) {
-        if (candidate.email && item.email && candidate.email.toLowerCase() === item.email.toLowerCase()) {
-          return key;
-        }
-        if (candidate.phone && item.phone && normalizePhone(candidate.phone) === normalizePhone(item.phone)) {
-          return key;
-        }
-        if (candidate.companyId && item.companyId && candidate.companyId.toLowerCase() === item.companyId.toLowerCase()) {
-          return key;
-        }
-        if (
-          candidate.displayName &&
-          item.displayName &&
-          candidate.clientName &&
-          item.clientName &&
-          candidate.displayName.toLowerCase() === item.displayName.toLowerCase() &&
-          candidate.clientName.toLowerCase() === item.clientName.toLowerCase()
-        ) {
-          return key;
-        }
-      }
-      return candidate.fallbackKey;
-    }
-
-    function aggregateContacts(rows) {
+    const esc = (v) => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    const normPhone = (v) => String(v || '').replace(/[^\d+]/g, '');
+    function parseMeta(notes){ if(!notes || !notes.includes('\n[[CASE_META]]\n')) return {meta:{}}; const parts = notes.split('\n[[CASE_META]]\n'); try { return {meta: JSON.parse(parts[1]) || {}}; } catch { return {meta:{}}; } }
+    const displayName = (a,b,c) => [a,b].filter(Boolean).join(' ').trim() || c || 'უსახელო კონტაქტი';
+    const readLocal = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch { return []; } };
+    const writeLocal = (userId, rows) => { const others = readLocal().filter((i) => i.user_id !== userId); localStorage.setItem(LOCAL_KEY, JSON.stringify([...others, ...rows])); };
+    const buildCase = (r) => ({ id:r.id,title:r.title,code:r.code,clientName:r.client_name,court:r.court,category:r.category,result:r.result });
+    function seed(values, fallbackKey){ return { fallbackKey, displayName: displayName(values.first, values.last, values.client), first: values.first || '', last: values.last || '', phone: values.phone || '', email: values.email || '', city: values.city || '', address: values.address || '', company: values.company || '', client: values.client || '' }; }
+    function findKey(map, item){ for(const [key,val] of map.entries()){ if(item.email && val.email && item.email.toLowerCase() === val.email.toLowerCase()) return key; if(item.phone && val.phone && normPhone(item.phone) === normPhone(val.phone)) return key; if(item.company && val.company && item.company.toLowerCase() === val.company.toLowerCase()) return key; if(item.displayName && val.displayName && item.client && val.client && item.displayName.toLowerCase() === val.displayName.toLowerCase() && item.client.toLowerCase() === val.client.toLowerCase()) return key; } return item.fallbackKey; }
+    function ensure(map, item){ const key = findKey(map, item); const existing = map.get(key) || { id:key, displayName:item.displayName, first:item.first, last:item.last, phone:item.phone, email:item.email, city:item.city, address:item.address, company:item.company, client:item.client, linkedCases:[], notes:[] }; existing.displayName ||= item.displayName; existing.first ||= item.first; existing.last ||= item.last; existing.phone ||= item.phone; existing.email ||= item.email; existing.city ||= item.city; existing.address ||= item.address; existing.company ||= item.company; existing.client ||= item.client; map.set(key, existing); return existing; }
+    function aggregate(){
       const map = new Map();
-
-      rows.forEach((row) => {
-        const parsed = extractMeta(row.notes);
-        const meta = parsed.meta || {};
-
-        if (!hasContactData(meta, row)) return;
-
-        const seed = {
-          fallbackKey: contactKey(meta, row),
-          displayName: getDisplayName(meta, row),
-          firstName: meta.contact_first_name || '',
-          lastName: meta.contact_last_name || '',
-          phone: meta.contact_phone || '',
-          email: meta.contact_email || '',
-          city: meta.city || '',
-          address: meta.address || '',
-          companyId: meta.company_id || '',
-          clientName: row.client_name || ''
-        };
-        const key = findExistingContactKey(map, seed);
-        const existing = map.get(key) || {
-          id: key,
-          displayName: seed.displayName,
-          firstName: seed.firstName,
-          lastName: seed.lastName,
-          phone: seed.phone,
-          email: seed.email,
-          city: seed.city,
-          address: seed.address,
-          companyId: seed.companyId,
-          clientName: seed.clientName,
-          linkedCases: []
-        };
-
-        existing.displayName = mergePreferred(existing.displayName, getDisplayName(meta, row));
-        existing.firstName = mergePreferred(existing.firstName, meta.contact_first_name || '');
-        existing.lastName = mergePreferred(existing.lastName, meta.contact_last_name || '');
-        existing.phone = mergePreferred(existing.phone, meta.contact_phone || '');
-        existing.email = mergePreferred(existing.email, meta.contact_email || '');
-        existing.city = mergePreferred(existing.city, meta.city || '');
-        existing.address = mergePreferred(existing.address, meta.address || '');
-        existing.companyId = mergePreferred(existing.companyId, meta.company_id || '');
-        existing.clientName = mergePreferred(existing.clientName, row.client_name || '');
-
-        if (!existing.linkedCases.some((item) => item.id === row.id)) {
-          existing.linkedCases.push(buildContactCase(row));
-        }
-
-        map.set(key, existing);
+      caseRows.forEach((row) => {
+        const meta = parseMeta(row.notes).meta || {};
+        const has = [meta.contact_first_name,meta.contact_last_name,meta.contact_phone,meta.contact_email,meta.city,meta.address,meta.company_id,row.client_name].some((v) => String(v || '').trim());
+        if(!has) return;
+        const contact = ensure(map, seed({ first:meta.contact_first_name, last:meta.contact_last_name, phone:meta.contact_phone, email:meta.contact_email, city:meta.city, address:meta.address, company:meta.company_id, client:row.client_name }, `case:${row.id}`));
+        if(!contact.linkedCases.some((i) => i.id === row.id)) contact.linkedCases.push(buildCase(row));
       });
-
-      contacts = Array.from(map.values())
-        .map((contact) => ({
-          ...contact,
-          linkedCases: contact.linkedCases.sort((left, right) => left.title.localeCompare(right.title, 'ka')),
-          searchText: [
-            contact.displayName,
-            contact.clientName,
-            contact.phone,
-            contact.email,
-            contact.city,
-            contact.address,
-            contact.companyId,
-            ...contact.linkedCases.flatMap((item) => [item.title, item.code, item.clientName, item.court, item.category, item.result])
-          ].join(' ').toLowerCase()
-        }))
-        .sort((left, right) => left.displayName.localeCompare(right.displayName, 'ka'));
-
-      if (!contacts.some((item) => item.id === selectedContactId)) {
-        selectedContactId = contacts[0]?.id || null;
-      }
+      manualRows.forEach((row) => {
+        const contact = ensure(map, seed({ first:row.first_name, last:row.last_name, phone:row.phone, email:row.email, city:row.city, address:row.address, company:row.company_id, client:row.client_name }, `manual:${row.id}`));
+        if(row.notes && !contact.notes.includes(row.notes)) contact.notes.push(row.notes);
+        const linked = caseRows.find((i) => i.id === row.related_case_id);
+        if(linked && !contact.linkedCases.some((i) => i.id === linked.id)) contact.linkedCases.push(buildCase(linked));
+      });
+      contacts = Array.from(map.values()).map((c) => ({ ...c, linkedCases: c.linkedCases.sort((a,b) => a.title.localeCompare(b.title,'ka')), searchText:[c.displayName,c.client,c.phone,c.email,c.city,c.address,c.company,...c.notes,...c.linkedCases.flatMap((i)=>[i.title,i.code,i.clientName,i.court,i.category,i.result])].join(' ').toLowerCase() })).sort((a,b) => a.displayName.localeCompare(b.displayName,'ka'));
+      if(!contacts.some((i) => i.id === selectedContactId)) selectedContactId = contacts[0]?.id || null;
     }
-
-    function filteredContacts() {
-      const term = searchTerm.trim().toLowerCase();
-      return !term ? contacts : contacts.filter((contact) => contact.searchText.includes(term));
+    const filtered = () => { const q = searchTerm.trim().toLowerCase(); return !q ? contacts : contacts.filter((i) => i.searchText.includes(q)); };
+    const card = (label, value) => `<div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3"><div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">${label}</div><div class="font-extrabold text-slate-800 mt-2">${value}</div></div>`;
+    function renderSummary(){ $('#contactsCount').textContent = contacts.length; $('#linkedCasesCount').textContent = contacts.reduce((sum,i) => sum + i.linkedCases.length, 0); $('#reachableCount').textContent = contacts.filter((i) => i.phone || i.email).length; $('#storageBadge').textContent = storeMode === 'supabase' ? 'Supabase' : 'Local'; }
+    function renderList(){ const items = filtered(); if(items.length && !items.some((i) => i.id === selectedContactId)) selectedContactId = items[0].id; if(!items.length) selectedContactId = null; $('#listMeta').textContent = `${items.length} შედეგი`; $('#empty').classList.toggle('off', items.length !== 0); $('#contactsList').innerHTML = items.map((c) => `<button type="button" data-contact-id="${c.id}" class="w-full text-left rounded-[1.35rem] border px-4 py-4 transition ${c.id === selectedContactId ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'}"><div class="flex items-start justify-between gap-3"><div><div class="text-lg font-extrabold">${esc(c.displayName)}</div><div class="text-sm text-slate-500 mt-1">${esc(c.client || 'კლიენტი არ არის მითითებული')}</div></div><div class="rounded-full bg-slate-900 px-3 py-1 text-[11px] font-bold text-white">${c.linkedCases.length} საქმე</div></div><div class="grid md:grid-cols-2 gap-3 mt-4 text-sm"><div class="rounded-2xl bg-slate-50 px-3 py-3">${esc(c.phone || 'ტელეფონი არ არის')}</div><div class="rounded-2xl bg-slate-50 px-3 py-3">${esc(c.email || 'ელფოსტა არ არის')}</div></div></button>`).join(''); }
+    function renderDetail(){
+      const c = contacts.find((i) => i.id === selectedContactId); $('#detailEmpty').classList.toggle('off', !!c); $('#detailPanel').classList.toggle('off', !c); if(!c) return;
+      $('#contactName').textContent = c.displayName; $('#contactSubtitle').textContent = [c.client, c.city].filter(Boolean).join(' • ') || 'დამატებითი მონაცემი არ არის'; $('#contactCasesCount').textContent = c.linkedCases.length;
+      $('#contactInfoGrid').innerHTML = [card('ტელეფონი', esc(c.phone || 'არ არის')), card('ელფოსტა', esc(c.email || 'არ არის')), card('ქალაქი', esc(c.city || 'არ არის')), card('მისამართი', esc(c.address || 'არ არის')), card('საიდენტიფიკაციო', esc(c.company || 'არ არის')), card('კლიენტი / კომპანია', esc(c.client || 'არ არის')), card('წყარო', esc(c.notes.length ? 'საქმეები + ხელით დამატებული' : 'საქმეებიდან ავტომატურად')), card('შენიშვნა', esc(c.notes.join('\n\n') || 'არ არის'))].join('');
+      $('#linkedCasesList').innerHTML = !c.linkedCases.length ? '<div class="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-slate-500">ამ კონტაქტზე საქმე ჯერ არ არის მიბმული.</div>' : c.linkedCases.map((i) => `<article class="rounded-2xl bg-white border border-slate-200 px-4 py-4"><div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4"><div><div class="text-lg font-extrabold">${esc(i.title)}</div><div class="text-sm text-slate-500 mt-1">${esc(i.code)} • ${esc(i.clientName)}</div><div class="flex flex-wrap gap-2 mt-3 text-[11px] font-bold"><span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-2.5 py-1">${esc(i.court || 'სასამართლო არაა')}</span><span class="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-2.5 py-1">${esc(i.category || 'ტიპი არაა')}</span><span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1">${esc(i.result || 'სტატუსი არაა')}</span></div></div><div class="flex flex-wrap gap-2"><button type="button" data-case-id="${i.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">საქმის გახსნა</button></div></div></article>`).join('');
     }
-
-    function statInfoCard(label, value) {
-      return `
-        <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3">
-          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">${label}</div>
-          <div class="font-extrabold text-slate-800 mt-2">${value}</div>
-        </div>
-      `;
+    function render(){ renderSummary(); renderList(); renderDetail(); }
+    function caseOptions(){ $('#contactRelatedCase').innerHTML = `<option value="">საქმესთან კავშირის გარეშე</option>${caseRows.map((i) => `<option value="${i.id}">${esc(i.code)} • ${esc(i.title)}</option>`).join('')}`; }
+    function formMsg(type, text){ const el = $('#contactFormMsg'); el.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`; el.textContent = text; el.classList.remove('off'); }
+    function resetForm(){ Object.values(fields).forEach((f) => f.value = ''); $('#contactFormMsg').classList.add('off'); }
+    function openModal(){ caseOptions(); resetForm(); modal.classList.remove('off'); document.body.classList.add('overflow-hidden'); fields.first.focus(); }
+    function closeModal(){ modal.classList.add('off'); document.body.classList.remove('overflow-hidden'); }
+    async function getCurrentUser(){ const {data,error} = await window.supabaseClient.auth.getUser(); if(error) throw error; if(!data.user){ window.location.href = 'login.html'; throw new Error('ავტორიზაცია საჭიროა.'); } return data.user; }
+    async function loadCases(){ const {data,error} = await window.supabaseClient.from('cases').select('id,title,code,client_name,court,category,result,notes,created_at').eq('user_id', currentUser.id).order('created_at',{ascending:false}); if(error) throw error; caseRows = data || []; }
+    async function loadManual(){ try { const {data,error} = await window.supabaseClient.from('contacts').select('id,user_id,related_case_id,first_name,last_name,phone,email,city,address,company_id,client_name,notes,created_at').eq('user_id', currentUser.id).order('created_at',{ascending:false}); if(error) throw error; manualRows = data || []; storeMode = 'supabase'; } catch { manualRows = readLocal().filter((i) => i.user_id === currentUser.id); storeMode = 'local'; } }
+    async function saveManual(payload){
+      const row = { user_id: currentUser.id, related_case_id: payload.caseId || null, first_name: payload.first || null, last_name: payload.last || null, phone: payload.phone || null, email: payload.email || null, city: payload.city || null, address: payload.address || null, company_id: payload.company || null, client_name: payload.client || null, notes: payload.notes || null };
+      if(storeMode === 'supabase'){ try { const {error} = await window.supabaseClient.from('contacts').insert(row); if(error) throw error; return; } catch { storeMode = 'local'; } }
+      const rows = readLocal().filter((i) => i.user_id === currentUser.id); const next = { id: crypto.randomUUID(), ...row, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; writeLocal(currentUser.id, [...rows, next]);
     }
+    async function reload(){ await loadCases(); await loadManual(); aggregate(); render(); }
 
-    function renderSummary() {
-      $('#contactsCount').textContent = contacts.length;
-      $('#linkedCasesCount').textContent = contacts.reduce((sum, item) => sum + item.linkedCases.length, 0);
-      $('#reachableCount').textContent = contacts.filter((item) => item.phone || item.email).length;
-    }
-
-    function renderList() {
-      const items = filteredContacts();
-      if (items.length && !items.some((item) => item.id === selectedContactId)) {
-        selectedContactId = items[0].id;
-      }
-      if (!items.length) {
-        selectedContactId = null;
-      }
-      $('#listMeta').textContent = `${items.length} შედეგი`;
-      $('#empty').classList.toggle('off', items.length !== 0);
-
-      $('#contactsList').innerHTML = items.map((contact) => `
-        <button
-          type="button"
-          data-contact-id="${contact.id}"
-          class="w-full text-left rounded-[1.35rem] border px-4 py-4 transition ${contact.id === selectedContactId ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'}"
-        >
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <div class="text-lg font-extrabold">${escapeHtml(contact.displayName)}</div>
-              <div class="text-sm text-slate-500 mt-1">${escapeHtml(contact.clientName || 'კლიენტი არ არის მითითებული')}</div>
-            </div>
-            <div class="rounded-full bg-slate-900 px-3 py-1 text-[11px] font-bold text-white">${contact.linkedCases.length} საქმე</div>
-          </div>
-          <div class="grid md:grid-cols-2 gap-3 mt-4 text-sm">
-            <div class="rounded-2xl bg-slate-50 px-3 py-3">${escapeHtml(contact.phone || 'ტელეფონი არ არის')}</div>
-            <div class="rounded-2xl bg-slate-50 px-3 py-3">${escapeHtml(contact.email || 'ელფოსტა არ არის')}</div>
-          </div>
-        </button>
-      `).join('');
-    }
-
-    function renderDetail() {
-      const contact = contacts.find((item) => item.id === selectedContactId);
-      $('#detailEmpty').classList.toggle('off', !!contact);
-      $('#detailPanel').classList.toggle('off', !contact);
-      if (!contact) return;
-
-      $('#contactName').textContent = contact.displayName;
-      $('#contactSubtitle').textContent = [contact.clientName, contact.city].filter(Boolean).join(' • ') || 'დამატებითი მონაცემი არ არის';
-      $('#contactCasesCount').textContent = contact.linkedCases.length;
-
-      $('#contactInfoGrid').innerHTML = [
-        statInfoCard('ტელეფონი', escapeHtml(contact.phone || 'არ არის')),
-        statInfoCard('ელფოსტა', escapeHtml(contact.email || 'არ არის')),
-        statInfoCard('ქალაქი', escapeHtml(contact.city || 'არ არის')),
-        statInfoCard('მისამართი', escapeHtml(contact.address || 'არ არის')),
-        statInfoCard('საიდენტიფიკაციო', escapeHtml(contact.companyId || 'არ არის')),
-        statInfoCard('კლიენტი / კომპანია', escapeHtml(contact.clientName || 'არ არის'))
-      ].join('');
-
-      $('#linkedCasesList').innerHTML = contact.linkedCases.map((item) => `
-        <article class="rounded-2xl bg-white border border-slate-200 px-4 py-4">
-          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-            <div>
-              <div class="text-lg font-extrabold">${escapeHtml(item.title)}</div>
-              <div class="text-sm text-slate-500 mt-1">${escapeHtml(item.code)} • ${escapeHtml(item.clientName)}</div>
-              <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-bold">
-                <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-2.5 py-1">${escapeHtml(item.court || 'სასამართლო არაა')}</span>
-                <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-2.5 py-1">${escapeHtml(item.category || 'ტიპი არაა')}</span>
-                <span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2.5 py-1">${escapeHtml(item.result || 'სტატუსი არაა')}</span>
-              </div>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" data-case-id="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">საქმის გახსნა</button>
-            </div>
-          </div>
-        </article>
-      `).join('');
-    }
-
-    function render() {
-      renderSummary();
-      renderList();
-      renderDetail();
-    }
-
-    async function getCurrentUser() {
-      const { data, error } = await window.supabaseClient.auth.getUser();
-      if (error) throw error;
-      if (!data.user) {
-        window.location.href = 'login.html';
-        throw new Error('ავტორიზაცია საჭიროა.');
-      }
-      return data.user;
-    }
-
-    async function loadContacts() {
-      const { data, error } = await window.supabaseClient
-        .from('cases')
-        .select('id,title,code,client_name,court,category,result,owner_name,deadline,notes,created_at')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      aggregateContacts(data || []);
-      render();
-    }
-
-    $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
-    $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
-    $('#goCalendar').onclick = () => { window.location.href = 'calendar.html'; };
-    $('#search').oninput = (event) => {
-      searchTerm = event.target.value;
-      $('#globalSearch').value = event.target.value;
-      render();
-    };
-    $('#globalSearch').oninput = (event) => {
-      searchTerm = event.target.value;
-      $('#search').value = event.target.value;
-      render();
+    $('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
+    $('#goCases').onclick = () => window.location.href = 'cases.html';
+    $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
+    $('#newContact').onclick = () => openModal();
+    $('#closeContactModal').onclick = () => closeModal();
+    $('#resetContactForm').onclick = () => { if(window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) resetForm(); };
+    modal.onclick = (e) => { if(e.target === modal) closeModal(); };
+    $('#search').oninput = (e) => { searchTerm = e.target.value; $('#globalSearch').value = e.target.value; render(); };
+    $('#globalSearch').oninput = (e) => { searchTerm = e.target.value; $('#search').value = e.target.value; render(); };
+    $('#contactsList').onclick = (e) => { const button = e.target.closest('[data-contact-id]'); if(!button) return; selectedContactId = button.dataset.contactId; render(); };
+    $('#linkedCasesList').onclick = (e) => { const button = e.target.closest('[data-case-id]'); if(!button) return; window.location.href = `cases.html?id=${button.dataset.caseId}`; };
+    $('#contactForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const payload = { first: fields.first.value.trim(), last: fields.last.value.trim(), phone: fields.phone.value.trim(), email: fields.email.value.trim(), client: fields.client.value.trim(), company: fields.company.value.trim(), city: fields.city.value.trim(), address: fields.address.value.trim(), caseId: fields.caseId.value || null, notes: fields.notes.value.trim() };
+      if(!payload.first && !payload.last && !payload.client){ formMsg('err','შეავსე მინიმუმ სახელი, გვარი ან კლიენტი / კომპანია.'); return; }
+      if(!payload.phone && !payload.email){ formMsg('err','მიუთითე მინიმუმ ტელეფონი ან ელფოსტა.'); return; }
+      try { await saveManual(payload); formMsg('ok','ახალი კონტაქტი დაემატა.'); await reload(); setTimeout(() => { closeModal(); resetForm(); }, 700); } catch(error){ formMsg('err', error.message || 'კონტაქტის შენახვა ვერ შესრულდა.'); }
     };
 
-    $('#contactsList').onclick = (event) => {
-      const button = event.target.closest('[data-contact-id]');
-      if (!button) return;
-      selectedContactId = button.dataset.contactId;
-      render();
-    };
-
-    $('#linkedCasesList').onclick = (event) => {
-      const button = event.target.closest('[data-case-id]');
-      if (!button) return;
-      window.location.href = `cases.html?id=${button.dataset.caseId}`;
-    };
-
-    (async function init() {
-      try {
-        currentUser = await getCurrentUser();
-        await loadContacts();
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+    (async function init(){ try { currentUser = await getCurrentUser(); await reload(); } catch(error){ console.error(error); } })();
   </script>
 </body>
 </html>

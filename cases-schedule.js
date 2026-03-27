@@ -23,23 +23,23 @@
 
   if (!document.querySelector('#caseScheduleAdd') && secondDateRow) {
     secondDateRow.insertAdjacentHTML('afterend', `
-      <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 space-y-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50 p-3 space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <div>
-            <div class="text-sm font-extrabold text-slate-800">საქმის კალენდარი</div>
+            <div class="text-[13px] font-extrabold text-slate-800">საქმის კალენდარი</div>
             <div class="text-xs text-slate-500 mt-1">აქედან დაამატებ ვადებს, მითითებებს და შეხვედრებს ამ საქმეზე.</div>
           </div>
-          <button type="button" id="caseScheduleAdd" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">მითითების დამატება</button>
+          <button type="button" id="caseScheduleAdd" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold">მითითების დამატება</button>
         </div>
-        <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <button type="button" id="caseSchedulePrev" class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700">&larr;</button>
-            <button type="button" id="caseScheduleNext" class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700">&rarr;</button>
+            <button type="button" id="caseSchedulePrev" class="w-8 h-8 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">&larr;</button>
+            <button type="button" id="caseScheduleNext" class="w-8 h-8 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">&rarr;</button>
           </div>
-          <div id="caseScheduleMonth" class="text-sm font-extrabold text-slate-800"></div>
-          <button type="button" id="caseScheduleToday" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">დღეს</button>
+          <div id="caseScheduleMonth" class="text-[13px] font-extrabold text-slate-800"></div>
+          <button type="button" id="caseScheduleToday" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-[11px] font-bold text-slate-700">დღეს</button>
         </div>
-        <div class="grid grid-cols-7 gap-2 text-[10px] uppercase text-slate-400 font-bold">
+        <div class="grid grid-cols-7 gap-1 text-[9px] uppercase text-slate-400 font-bold">
           <div class="text-center">ორშ</div>
           <div class="text-center">სამ</div>
           <div class="text-center">ოთხ</div>
@@ -48,19 +48,19 @@
           <div class="text-center">შაბ</div>
           <div class="text-center">კვი</div>
         </div>
-        <div id="caseScheduleGrid" class="grid grid-cols-7 gap-2"></div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-4 space-y-3">
-          <div class="flex items-center justify-between gap-3">
-            <div id="caseScheduleSelected" class="text-sm font-extrabold text-slate-800"></div>
-            <button type="button" id="caseScheduleEditorToggle" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">რედაქტორი</button>
+        <div id="caseScheduleGrid" class="grid grid-cols-7 gap-1"></div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-3 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div id="caseScheduleSelected" class="text-[13px] font-extrabold text-slate-800"></div>
+            <button type="button" id="caseScheduleEditorToggle" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-[11px] font-bold text-slate-700">რედაქტორი</button>
           </div>
           <div id="caseScheduleAgenda" class="space-y-2"></div>
         </div>
-        <div id="caseScheduleEditor" class="off rounded-2xl bg-white border border-slate-200 p-4 space-y-3">
+        <div id="caseScheduleEditor" class="off rounded-2xl bg-white border border-slate-200 p-3 space-y-3">
           <input id="caseScheduleEventId" type="hidden">
           <div class="grid md:grid-cols-2 gap-3">
-            <input id="caseScheduleTitle" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="მოკლე სათაური">
-            <select id="caseScheduleCategory" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+            <input id="caseScheduleTitle" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm" placeholder="მოკლე სათაური">
+            <select id="caseScheduleCategory" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
               <option>ვადა</option>
               <option>შეხვედრა</option>
               <option>შეხსენება</option>
@@ -68,15 +68,15 @@
             </select>
           </div>
           <div class="grid md:grid-cols-2 gap-3">
-            <input id="caseScheduleDate" type="date" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
-            <input id="caseScheduleTime" type="time" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+            <input id="caseScheduleDate" type="date" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
+            <input id="caseScheduleTime" type="time" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
           </div>
-          <textarea id="caseScheduleNotes" rows="3" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="დეტალური მითითება ამ დღისთვის..."></textarea>
+          <textarea id="caseScheduleNotes" rows="3" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none resize-none text-sm" placeholder="დეტალური მითითება ამ დღისთვის..."></textarea>
           <div id="caseScheduleMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" id="caseScheduleSave" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">შენახვა</button>
-            <button type="button" id="caseScheduleCancel" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700">დახურვა</button>
-            <button type="button" id="caseScheduleReset" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700">გასუფთავება</button>
+            <button type="button" id="caseScheduleSave" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold">შენახვა</button>
+            <button type="button" id="caseScheduleCancel" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">დახურვა</button>
+            <button type="button" id="caseScheduleReset" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">გასუფთავება</button>
           </div>
         </div>
       </div>
@@ -378,14 +378,14 @@
       const isToday = dateKey === formatKey(new Date());
 
       return `
-        <button type="button" data-schedule-date="${dateKey}" class="min-h-[74px] rounded-2xl border p-2 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'} ${isCurrentMonth ? '' : 'opacity-55'}">
+        <button type="button" data-schedule-date="${dateKey}" class="min-h-[58px] rounded-xl border p-1.5 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'} ${isCurrentMonth ? '' : 'opacity-55'}">
           <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="text-xs font-extrabold">${date.getDate()}</div>
-            ${isToday ? '<span class="inline-flex items-center rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-white">დღეს</span>' : ''}
+            <div class="text-[11px] font-extrabold">${date.getDate()}</div>
+            ${isToday ? '<span class="inline-flex items-center rounded-full bg-slate-900 px-1.5 py-0.5 text-[9px] font-bold text-white">დღეს</span>' : ''}
           </div>
           <div class="space-y-1">
-            ${items.slice(0, 2).map((item) => `<div class="rounded-xl px-2 py-1 text-[10px] font-bold ${item.category === 'ვადა' ? 'bg-amber-50 text-amber-700' : item.category === 'პროცესი' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${item.title}</div>`).join('')}
-            ${items.length > 2 ? `<div class="text-[10px] font-bold text-slate-400">+${items.length - 2}</div>` : ''}
+            ${items.slice(0, 2).map((item) => `<div class="rounded-lg px-1.5 py-1 text-[9px] font-bold ${item.category === 'ვადა' ? 'bg-amber-50 text-amber-700' : item.category === 'პროცესი' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${item.title}</div>`).join('')}
+            ${items.length > 2 ? `<div class="text-[9px] font-bold text-slate-400">+${items.length - 2}</div>` : ''}
           </div>
         </button>
       `;
