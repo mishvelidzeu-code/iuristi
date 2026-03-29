@@ -36,6 +36,7 @@
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
       <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
+      <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
@@ -811,6 +812,7 @@
     $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
     $('#goContacts').onclick = () => { window.location.href = 'contacts.html'; };
     $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
+    $('#goContracts').onclick = () => { window.location.href = 'contracts.html'; };
     $('#jumpToday').onclick = () => {
       selectedDateKey = formatKey(new Date());
       monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);

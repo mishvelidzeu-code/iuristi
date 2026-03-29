@@ -21,7 +21,7 @@
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
       <div>
         <div class="font-extrabold">LexManage</div>
-        <div class="text-[11px] text-slate-400">Finance Workspace</div>
+        <div class="text-[11px] text-slate-400">ფინანსების სივრცე</div>
       </div>
     </div>
     <nav class="flex-1 p-3 space-y-1">
@@ -29,6 +29,7 @@
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">ფინანსები</button>
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
@@ -43,12 +44,12 @@
   <main class="flex-1 flex flex-col h-screen overflow-hidden">
     <header class="h-16 px-4 md:px-8 bg-white border-b border-slate-200 flex items-center justify-between gap-4">
       <div>
-        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Finances</div>
+        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">ფინანსები</div>
         <div class="text-xl font-extrabold">ფინანსები</div>
       </div>
       <div class="flex items-center gap-2 md:gap-3">
         <input id="globalSearch" class="hidden md:block w-72 px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა ინვოისებში, კლიენტებში, საქმეებში...">
-        <button type="button" id="exportCsv" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">CSV / Excel</button>
+        <button type="button" id="exportCsv" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">ცხრილის ექსპორტი</button>
         <button type="button" id="newInvoice" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">ახალი ინვოისი</button>
       </div>
     </header>
@@ -56,7 +57,7 @@
     <div class="flex-1 overflow-y-auto p-3 md:p-5 space-y-4">
       <section class="grid xl:grid-cols-[1.08fr_0.92fr] gap-4">
         <article class="rounded-[1.8rem] bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white p-6 panel-shadow">
-          <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">Billing Hub</div>
+          <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">ბილინგის ცენტრი</div>
           <h1 class="text-2xl md:text-3xl font-extrabold leading-tight">კლიენტის მოთხოვნები, საათობრივი აღრიცხვა, ხარჯები და ავანსები ახლა ერთიან ფინანსურ სამუშაო სივრცეშია.</h1>
           <p class="text-slate-300 leading-7 mt-4 max-w-3xl">ინვოისი შეგიძლია დააგენერირო კონკრეტული საქმის ან კლიენტის მიხედვით. ღია billable საათები და საქმეებთან მიბმული ხარჯები ავტომატურად შედის დათვლაში, ხოლო ავანსებზე ნაშთი ცალკე კონტროლდება.</p>
           <div class="grid md:grid-cols-3 gap-3 mt-5">
@@ -78,7 +79,7 @@
         <article class="rounded-[1.8rem] bg-white border p-5 panel-shadow space-y-4">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Overview</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">მიმოხილვა</div>
               <div class="text-2xl font-extrabold mt-2">ფინანსური სურათი</div>
             </div>
             <button type="button" id="openInvoiceFromOverview" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">ინვოისი</button>
@@ -130,7 +131,7 @@
         <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Invoicing</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისები</div>
               <div class="text-xl font-extrabold mt-1">ინვოისები და ბილინგი</div>
             </div>
             <button type="button" id="invoiceButtonInline" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">ახალი ინვოისი</button>
@@ -149,12 +150,12 @@
             <div id="statusBoard" class="space-y-3"></div>
           </article>
           <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow">
-            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Automation</div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ავტომატიკა</div>
             <div class="text-xl font-extrabold mt-1 mb-4">რა შედის ინვოისში</div>
             <div class="space-y-3 text-sm text-slate-600 leading-7">
-              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">ღია billable საათები ითვლება ავტომატურად: საათები × საათობრივი განაკვეთი.</div>
-              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">საქმეზე მიბმული ხარჯები ასევე ერთიანდება ინვოისში, თუ მათი billing target არის `ინვოისი`.</div>
-              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">ავანსზე მიბმული დრო და ხარჯები ცალკე ჩამოიჭრება retainer ბალანსიდან.</div>
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">ღია დასაბილინგებელი საათები ითვლება ავტომატურად: საათები × საათობრივი განაკვეთი.</div>
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">საქმეზე მიბმული ხარჯები ასევე ერთიანდება ინვოისში, თუ მათი ბილინგის ტიპი არის `ინვოისი`.</div>
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4">ავანსზე მიბმული დრო და ხარჯები ცალკე ჩამოიჭრება ავანსის ბალანსიდან.</div>
             </div>
           </article>
         </div>
@@ -164,7 +165,7 @@
         <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Billable Hours</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">დასაბილინგებელი საათები</div>
               <div class="text-xl font-extrabold mt-1">საათობრივი აღრიცხვა</div>
             </div>
             <div id="billableMeta" class="text-sm text-slate-500">0 ჩანაწერი</div>
@@ -203,7 +204,7 @@
         <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Case Expenses</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საქმის ხარჯები</div>
               <div class="text-xl font-extrabold mt-1">საქმესთან დაკავშირებული ხარჯები</div>
             </div>
             <div id="expenseMeta" class="text-sm text-slate-500">0 ჩანაწერი</div>
@@ -244,7 +245,7 @@
         <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Retainers</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ავანსები</div>
               <div class="text-xl font-extrabold mt-1">ავანსები / სატრასტო თანხები</div>
             </div>
             <div id="retainerMeta" class="text-sm text-slate-500">0 აქტიური</div>
@@ -255,9 +256,9 @@
             <input id="retainerDate" type="date" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
             <input id="retainerAmount" type="number" min="0" step="0.01" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="შემოტანილი ავანსი">
             <select id="retainerStatus" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
-              <option value="Active">Active</option>
-              <option value="Closed">Closed</option>
-              <option value="Refunded">Refunded</option>
+              <option value="Active">აქტიური</option>
+              <option value="Closed">დახურული</option>
+              <option value="Refunded">დაბრუნებული</option>
             </select>
             <input id="retainerReference" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="რეფერენსი / საბანკო ჩანაწერი">
             <textarea id="retainerNotes" rows="3" class="lg:col-span-2 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="რა ეტაპისთვისაა ავანსი, დამატებითი პირობები..."></textarea>
@@ -271,14 +272,14 @@
         <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex items-center justify-between gap-3">
             <div>
-              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Retainer Ledger</div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ავანსების ბალანსი</div>
               <div class="text-xl font-extrabold mt-1">ნაშთები და ჩამოჭრები</div>
             </div>
             <div class="text-sm text-slate-500">გამოთვლა ხდება მიბმული საათებით და ხარჯებით</div>
           </div>
           <div id="retainerEmpty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
             <div class="text-lg font-bold">ავანსები ჯერ არ არის დამატებული</div>
-            <div class="text-slate-500 mt-2">დაამატე retainer, შემდეგ კი billable hours ან expenses მიუბი მასზე.</div>
+            <div class="text-slate-500 mt-2">დაამატე ავანსი, შემდეგ კი საათები ან ხარჯები მიუბი მასზე.</div>
           </div>
           <div id="retainerList" class="grid lg:grid-cols-2 gap-3"></div>
         </article>
@@ -291,7 +292,7 @@
       <div class="w-full max-w-4xl rounded-[1.8rem] bg-white border border-slate-200 overflow-hidden">
         <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
           <div>
-            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Invoice Generator</div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისის გენერატორი</div>
             <div class="text-2xl font-extrabold mt-2">ახალი ინვოისის გენერაცია</div>
           </div>
           <div class="flex gap-3">
@@ -306,10 +307,10 @@
               <input id="invoiceClientName" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="კლიენტი / კომპანია">
               <div class="grid md:grid-cols-2 gap-4">
                 <select id="invoicePaymentModel" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none">
-                  <option value="Hourly">Hourly</option>
-                  <option value="Flat fee">Flat fee</option>
-                  <option value="Contingency">Contingency</option>
-                  <option value="Retainer drawdown">Retainer drawdown</option>
+                  <option value="Hourly">საათობრივი</option>
+                  <option value="Flat fee">ფიქსირებული</option>
+                  <option value="Contingency">პროცენტული ანაზღაურება</option>
+                  <option value="Retainer drawdown">ავანსიდან ჩამოჭრა</option>
                 </select>
                 <input id="invoiceServiceAmount" type="number" min="0" step="0.01" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ფიქსირებული / დამატებითი თანხა">
               </div>
@@ -322,7 +323,7 @@
               <input id="invoiceAdjustments" type="number" step="0.01" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="დამატება / ფასდაკლება (+ / -)">
               <textarea id="invoiceNotes" rows="6" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="ინვოისის კომენტარი, შეთანხმება, პროცენტული ანაზღაურების განმარტება..."></textarea>
               <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4 space-y-3">
-                <div class="flex items-center justify-between text-sm"><span>ღია billable entries</span><strong id="invoicePreviewBillables">₾0</strong></div>
+                <div class="flex items-center justify-between text-sm"><span>ღია საათობრივი ჩანაწერები</span><strong id="invoicePreviewBillables">₾0</strong></div>
                 <div class="flex items-center justify-between text-sm"><span>საქმესთან მიბმული ხარჯები</span><strong id="invoicePreviewExpenses">₾0</strong></div>
                 <div class="flex items-center justify-between text-sm"><span>ფიქსირებული / დამატებითი ნაწილი</span><strong id="invoicePreviewService">₾0</strong></div>
                 <div class="flex items-center justify-between text-sm"><span>კორექტირება</span><strong id="invoicePreviewAdjustment">₾0</strong></div>
@@ -330,7 +331,7 @@
               </div>
             </section>
           </div>
-          <div id="invoiceSourceMeta" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">აირჩიე საქმე ან კლიენტი, რომ სისტემა billable hours და ხარჯები დათვალოს.</div>
+          <div id="invoiceSourceMeta" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">აირჩიე საქმე ან კლიენტი, რომ სისტემამ საათები და ხარჯები დათვალოს.</div>
           <div id="invoiceFormMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           <div class="flex justify-end">
             <button class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">ინვოისის გენერაცია</button>
@@ -532,10 +533,21 @@
       return 'bg-blue-50 text-blue-700 border-blue-200';
     }
 
+    function statusLabel(status) {
+      if (status === 'Paid') return 'გადახდილი';
+      if (status === 'Overdue') return 'ვადაგადაცილებული';
+      if (status === 'Partially Paid') return 'ნაწილობრივ გადახდილი';
+      return 'გადასახდელი';
+    }
+
     function targetTone(target) {
       return target === 'retainer'
         ? 'bg-violet-50 text-violet-700 border-violet-200'
         : 'bg-slate-50 text-slate-700 border-slate-200';
+    }
+
+    function targetLabel(target) {
+      return target === 'retainer' ? 'ავანსი' : 'ინვოისი';
     }
 
     function modelTone(model) {
@@ -543,6 +555,27 @@
       if (model === 'Flat fee') return 'bg-indigo-50 text-indigo-700 border-indigo-200';
       if (model === 'Retainer drawdown') return 'bg-violet-50 text-violet-700 border-violet-200';
       return 'bg-cyan-50 text-cyan-700 border-cyan-200';
+    }
+
+    function modelLabel(model) {
+      if (model === 'Contingency') return 'პროცენტული ანაზღაურება';
+      if (model === 'Flat fee') return 'ფიქსირებული';
+      if (model === 'Retainer drawdown') return 'ავანსიდან ჩამოჭრა';
+      return 'საათობრივი';
+    }
+
+    function retainerStatusLabel(status) {
+      if (status === 'Closed') return 'დახურული';
+      if (status === 'Refunded') return 'დაბრუნებული';
+      return 'აქტიური';
+    }
+
+    function typeLabel(type) {
+      if (type === 'Invoice') return 'ინვოისი';
+      if (type === 'Billable') return 'საათობრივი ჩანაწერი';
+      if (type === 'Expense') return 'ხარჯი';
+      if (type === 'Retainer') return 'ავანსი';
+      return type;
     }
 
     function readLocalStore(kind) {
@@ -671,7 +704,7 @@
       billables = await loadCollection('billables');
       expenses = await loadCollection('expenses');
       retainers = await loadCollection('retainers');
-      $('#storageBadge').textContent = financeMode === 'supabase' ? 'Supabase persistence' : 'Local fallback რეჟიმი';
+      $('#storageBadge').textContent = financeMode === 'supabase' ? 'Supabase რეჟიმი' : 'ლოკალური რეჟიმი';
     }
 
     async function reload() {
@@ -764,7 +797,7 @@
       $('#statusBoard').innerHTML = Object.entries(counts).map(([status, count]) => `
         <div class="rounded-2xl border px-4 py-4 ${statusTone(status)}">
           <div class="flex items-center justify-between gap-3">
-            <div class="font-bold">${status}</div>
+            <div class="font-bold">${statusLabel(status)}</div>
             <div class="text-lg font-black">${count}</div>
           </div>
         </div>
@@ -778,7 +811,7 @@
       $('#overviewModels').innerHTML = Object.keys(models).length
         ? Object.entries(models).map(([model, count]) => `
             <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 flex items-center justify-between gap-3">
-              <div class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${modelTone(model)}">${escapeHtml(model)}</div>
+              <div class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${modelTone(model)}">${escapeHtml(modelLabel(model))}</div>
               <div class="font-black">${count}</div>
             </div>
           `).join('')
@@ -800,8 +833,8 @@
               <div>
                 <div class="flex flex-wrap items-center gap-2">
                   <div class="text-lg font-extrabold">${escapeHtml(item.invoice_number || 'INV')}</div>
-                  <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${statusTone(status)}">${status}</span>
-                  <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${modelTone(item.payment_model || 'Hourly')}">${escapeHtml(item.payment_model || 'Hourly')}</span>
+                  <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${statusTone(status)}">${statusLabel(status)}</span>
+                  <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${modelTone(item.payment_model || 'Hourly')}">${escapeHtml(modelLabel(item.payment_model || 'Hourly'))}</span>
                 </div>
                 <div class="text-sm text-slate-500 mt-2">${escapeHtml(item.client_name || 'კლიენტი არ არის')}</div>
                 <div class="text-sm text-slate-500 mt-1">${escapeHtml(caseLabel(item.case_id))}</div>
@@ -819,7 +852,7 @@
               <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">ხარჯები</div><div class="font-bold">${linkedExpensesCount}</div></div>
             </div>
             <div class="flex flex-wrap gap-2 mt-4">
-              <button type="button" data-invoice-pdf="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">PDF / Print</button>
+              <button type="button" data-invoice-pdf="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">PDF / ბეჭდვა</button>
               <button type="button" data-invoice-payment="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">გადახდის ჩაწერა</button>
               ${item.case_id ? `<button type="button" data-open-case="${item.case_id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">საქმე</button>` : ''}
             </div>
@@ -837,7 +870,7 @@
             <div>
               <div class="flex flex-wrap items-center gap-2">
                 <div class="font-extrabold">${escapeHtml(item.work_type || 'სამუშაო')}</div>
-                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${targetTone(item.billing_target)}">${item.billing_target === 'retainer' ? 'Retainer' : 'Invoice'}</span>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${targetTone(item.billing_target)}">${targetLabel(item.billing_target)}</span>
               </div>
               <div class="text-sm text-slate-500 mt-2">${escapeHtml(caseLabel(item.case_id))}</div>
               <div class="text-sm text-slate-500 mt-1">${escapeHtml(item.description || 'აღწერა არ არის')}</div>
@@ -861,7 +894,7 @@
             <div>
               <div class="flex flex-wrap items-center gap-2">
                 <div class="font-extrabold">${escapeHtml(item.expense_type || 'ხარჯი')}</div>
-                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${targetTone(item.billing_target)}">${item.billing_target === 'retainer' ? 'Retainer' : 'Invoice'}</span>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${targetTone(item.billing_target)}">${targetLabel(item.billing_target)}</span>
               </div>
               <div class="text-sm text-slate-500 mt-2">${escapeHtml(caseLabel(item.case_id))}</div>
               <div class="text-sm text-slate-500 mt-1">${escapeHtml(item.description || 'აღწერა არ არის')}</div>
@@ -892,7 +925,7 @@
                 <div class="text-sm text-slate-500 mt-1">${escapeHtml(caseLabel(item.case_id))}</div>
                 <div class="text-sm text-slate-500 mt-1">${formatDate(item.deposit_date)}</div>
               </div>
-              <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${item.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200'}">${escapeHtml(item.status || 'Active')}</span>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${item.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200'}">${escapeHtml(retainerStatusLabel(item.status || 'Active'))}</span>
             </div>
             <div class="grid grid-cols-3 gap-3 mt-4 text-sm">
               <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">შემოტანილი</div><div class="font-bold">${formatMoney(item.total_amount)}</div></div>
@@ -944,7 +977,7 @@
       $('#invoicePreviewService').textContent = formatMoney(service);
       $('#invoicePreviewAdjustment').textContent = formatMoney(adjustments);
       $('#invoicePreviewTotal').textContent = formatMoney(total);
-      $('#invoiceSourceMeta').textContent = `ღია entries: ${openBillables.length} billable • ${openExpenses.length} expense`;
+      $('#invoiceSourceMeta').textContent = `ღია ჩანაწერები: ${openBillables.length} საათობრივი • ${openExpenses.length} ხარჯი`;
     }
 
     function message(target, type, text) {
@@ -1071,7 +1104,7 @@
         billing_target: target,
         invoice_id: null,
         retainer_id: retainerId,
-        status: target === 'retainer' ? 'Drawn from Retainer' : 'Open'
+        status: target === 'retainer' ? 'ავანსიდან ჩამოჭრილი' : 'ღია'
       });
 
       message('#billableFormMsg', 'ok', 'საათობრივი ჩანაწერი დაემატა.');
@@ -1105,7 +1138,7 @@
         billing_target: target,
         invoice_id: null,
         retainer_id: retainerId,
-        status: target === 'retainer' ? 'Drawn from Retainer' : 'Open'
+        status: target === 'retainer' ? 'ავანსიდან ჩამოჭრილი' : 'ღია'
       });
 
       message('#expenseFormMsg', 'ok', 'ხარჯი დაემატა.');
@@ -1166,10 +1199,10 @@
     function printableRows(invoiceId) {
       const rows = [];
       relatedBillables(invoiceId).forEach((item) => {
-        rows.push({ label: `${item.work_type || 'Billable'} • ${formatHours(item.hours)}`, amount: item.amount });
+        rows.push({ label: `${item.work_type || 'საათობრივი ჩანაწერი'} • ${formatHours(item.hours)}`, amount: item.amount });
       });
       relatedExpenses(invoiceId).forEach((item) => {
-        rows.push({ label: `${item.expense_type || 'Expense'} • ${item.description || 'საქმის ხარჯი'}`, amount: item.amount });
+        rows.push({ label: `${item.expense_type || 'ხარჯი'} • ${item.description || 'საქმის ხარჯი'}`, amount: item.amount });
       });
       return rows;
     }
@@ -1211,23 +1244,23 @@
             <div class="card">
               <div class="row">
                 <div>
-                  <div class="muted">LexManage • Invoice</div>
-                  <h1 class="title">${escapeHtml(item.invoice_number || 'Invoice')}</h1>
+                  <div class="muted">LexManage • ინვოისი</div>
+                  <h1 class="title">${escapeHtml(item.invoice_number || 'ინვოისი')}</h1>
                   <div class="muted" style="margin-top:10px">${escapeHtml(item.client_name || 'კლიენტი')}</div>
                   <div class="muted" style="margin-top:6px">${escapeHtml(caseLabel(item.case_id))}</div>
                 </div>
                 <div style="text-align:right">
-                  <div class="pill">${escapeHtml(invoiceStatus(item))}</div>
+                  <div class="pill">${escapeHtml(statusLabel(invoiceStatus(item)))}</div>
                   <div class="muted" style="margin-top:16px">გამოშვება: ${escapeHtml(formatDate(item.issue_date))}</div>
                   <div class="muted" style="margin-top:6px">ვადა: ${escapeHtml(formatDate(item.due_date))}</div>
-                  <div class="muted" style="margin-top:6px">მოდელი: ${escapeHtml(item.payment_model || 'Hourly')}</div>
+                  <div class="muted" style="margin-top:6px">მოდელი: ${escapeHtml(modelLabel(item.payment_model || 'Hourly'))}</div>
                 </div>
               </div>
               <table>
                 <thead><tr><th>პოზიცია</th><th>თანხა</th></tr></thead>
                 <tbody>
                   ${rows.map((row) => `<tr><td>${escapeHtml(row.label)}</td><td>${escapeHtml(formatMoney(row.amount))}</td></tr>`).join('')}
-                  ${extra ? `<tr><td>${escapeHtml(item.payment_model || 'Service')} • ძირითადი თანხა</td><td>${escapeHtml(formatMoney(extra))}</td></tr>` : ''}
+                  ${extra ? `<tr><td>${escapeHtml(modelLabel(item.payment_model || 'Hourly'))} • ძირითადი თანხა</td><td>${escapeHtml(formatMoney(extra))}</td></tr>` : ''}
                   ${adjustments ? `<tr><td>კორექტირება</td><td>${escapeHtml(formatMoney(adjustments))}</td></tr>` : ''}
                 </tbody>
               </table>
@@ -1244,7 +1277,7 @@
                 </div>
               </div>
               <div class="actions">
-                <button onclick="window.print()">PDF / Print</button>
+                <button onclick="window.print()">PDF / ბეჭდვა</button>
                 <button onclick="window.close()">დახურვა</button>
               </div>
             </div>
@@ -1257,23 +1290,23 @@
 
     function exportCsv() {
       const rows = [];
-      filteredInvoices().forEach((item) => rows.push(['Invoice', item.invoice_number, item.client_name, caseLabel(item.case_id), item.issue_date, invoiceStatus(item), item.payment_model, item.total_amount, item.paid_amount, invoiceBalance(item), item.notes || '']));
-      filteredBillables().forEach((item) => rows.push(['Billable', item.work_type, item.client_name, caseLabel(item.case_id), item.entry_date, item.status || '', item.billing_target, item.amount, '', '', item.description || '']));
-      filteredExpenses().forEach((item) => rows.push(['Expense', item.expense_type, item.client_name, caseLabel(item.case_id), item.expense_date, item.status || '', item.billing_target, item.amount, '', '', item.description || '']));
-      filteredRetainers().forEach((item) => rows.push(['Retainer', item.reference_code || 'Deposit', item.client_name, caseLabel(item.case_id), item.deposit_date, item.status || '', 'retainer', item.total_amount, retainerUsage(item.id), retainerBalance(item), item.notes || '']));
+      filteredInvoices().forEach((item) => rows.push([typeLabel('Invoice'), item.invoice_number, item.client_name, caseLabel(item.case_id), item.issue_date, statusLabel(invoiceStatus(item)), modelLabel(item.payment_model), item.total_amount, item.paid_amount, invoiceBalance(item), item.notes || '']));
+      filteredBillables().forEach((item) => rows.push([typeLabel('Billable'), item.work_type, item.client_name, caseLabel(item.case_id), item.entry_date, item.status || '', targetLabel(item.billing_target), item.amount, '', '', item.description || '']));
+      filteredExpenses().forEach((item) => rows.push([typeLabel('Expense'), item.expense_type, item.client_name, caseLabel(item.case_id), item.expense_date, item.status || '', targetLabel(item.billing_target), item.amount, '', '', item.description || '']));
+      filteredRetainers().forEach((item) => rows.push([typeLabel('Retainer'), item.reference_code || 'ავანსი', item.client_name, caseLabel(item.case_id), item.deposit_date, retainerStatusLabel(item.status), 'ავანსი', item.total_amount, retainerUsage(item.id), retainerBalance(item), item.notes || '']));
 
       if (!rows.length) {
         window.alert('ექსპორტისთვის მონაცემები ჯერ არ არის.');
         return;
       }
 
-      const header = ['Type', 'Reference', 'Client', 'Case', 'Date', 'Status', 'Model', 'Amount', 'Paid/Used', 'Balance', 'Notes'];
+      const header = ['ტიპი', 'რეფერენსი', 'კლიენტი', 'საქმე', 'თარიღი', 'სტატუსი', 'მოდელი', 'თანხა', 'გადახდილი/გამოყენებული', 'ნაშთი', 'შენიშვნა'];
       const csv = [header, ...rows].map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `finances-${todayKey()}.csv`;
+      link.download = `finansebi-${todayKey()}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -1293,6 +1326,7 @@
     $('#goCases').onclick = () => window.location.href = 'cases.html';
     $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
     $('#goContacts').onclick = () => window.location.href = 'contacts.html';
+    $('#goContracts').onclick = () => window.location.href = 'contracts.html';
     $('#globalSearch').oninput = (event) => { filters.search = event.target.value; $('#search').value = event.target.value; render(); };
     $('#search').oninput = (event) => { filters.search = event.target.value; $('#globalSearch').value = event.target.value; render(); };
     $('#clientFilter').onchange = (event) => { filters.client = event.target.value; render(); };

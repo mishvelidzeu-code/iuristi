@@ -1,0 +1,1361 @@
+<!doctype html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LexManage - ხელშეკრულებები</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans Georgian', sans-serif; }
+    .off { display: none; }
+    .panel-shadow { box-shadow: 0 24px 80px -44px rgba(15, 23, 42, 0.28); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex lg:flex-col">
+    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
+      <div>
+        <div class="font-extrabold">LexManage</div>
+        <div class="text-[11px] text-slate-400">ხელშეკრულებების სივრცე</div>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
+      <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
+      <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
+      <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
+      <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">ხელშეკრულებები</button>
+    </nav>
+    <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+      <div>
+        <div class="text-sm font-bold">სტანდარტული შაბლონები</div>
+        <div class="text-xs text-slate-500 mt-1">ერთგან შეცვლილი მონაცემი ავტომატურად აისახება ტექსტის ყველა მონაკვეთში.</div>
+      </div>
+      <div id="storageBadge" class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-xs text-slate-500">იტვირთება...</div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-16 px-4 md:px-8 bg-white border-b border-slate-200 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">ხელშეკრულებები</div>
+        <div class="text-xl font-extrabold">ხელშეკრულებების გენერატორი</div>
+      </div>
+      <div class="flex items-center gap-2 md:gap-3">
+        <input id="search" class="hidden md:block w-72 px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა ხელშეკრულებებში...">
+        <button type="button" id="copyContract" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">კოპირება</button>
+        <button type="button" id="excelContract" class="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-700 hover:bg-emerald-100">Excel</button>
+        <button type="button" id="printContract" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-blue-600">PDF / ბეჭდვა</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-3 md:p-5 space-y-4">
+      <section class="grid xl:grid-cols-[1.04fr_0.96fr] gap-4">
+        <article class="rounded-[1.8rem] bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 panel-shadow">
+          <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">შაბლონის რეჟიმი</div>
+          <h1 class="text-2xl md:text-3xl font-extrabold leading-tight">საქმეები, კონტაქტები, ფინანსები და ინვოისები ერთიანდება ხელშეკრულების ერთ შაბლონში.</h1>
+          <p class="text-slate-300 leading-7 mt-4 max-w-3xl">აირჩიე საქმე, კონტაქტი ან ინვოისი და სტანდარტული ტექსტი ავტომატურად შეივსება. თუ რომელიმე სახელი, თანხა, სასამართლო ან პირი შეცვალე ფორმაში, იგივე ცვლილება ხელშეკრულების ყველა ნაწილში გამოჩნდება.</p>
+          <div class="grid md:grid-cols-4 gap-3 mt-5">
+            <div class="rounded-[1.2rem] bg-white/10 border border-white/10 px-4 py-3">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">შაბლონები</div>
+              <div id="templateCount" class="text-xl font-black mt-2">0</div>
+            </div>
+            <div class="rounded-[1.2rem] bg-white/10 border border-white/10 px-4 py-3">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">დრაფტები</div>
+              <div id="draftCount" class="text-xl font-black mt-2">0</div>
+            </div>
+            <div class="rounded-[1.2rem] bg-white/10 border border-white/10 px-4 py-3">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">მოქმედი</div>
+              <div id="activeCount" class="text-xl font-black mt-2">0</div>
+            </div>
+            <div class="rounded-[1.2rem] bg-white/10 border border-white/10 px-4 py-3">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-300">ხელმოწერილი</div>
+              <div id="signedCount" class="text-xl font-black mt-2">0</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-[1.8rem] bg-white border p-5 panel-shadow space-y-4">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სტანდარტული პაკეტი</div>
+            <div class="text-2xl font-extrabold mt-2">მონაცემების კვანძები</div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საქმე</div>
+              <div class="font-extrabold mt-2">სასამართლო, კოდი, დავის აღწერა</div>
+            </div>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">კონტაქტი</div>
+              <div class="font-extrabold mt-2">სახელი, ტელეფონი, ელფოსტა, მისამართი</div>
+            </div>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ფინანსები</div>
+              <div class="font-extrabold mt-2">ფიქსირებული თანხა, საათობრივი, პროცენტი</div>
+            </div>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისი</div>
+              <div class="font-extrabold mt-2">ნომერი, თანხა, ვადა და გადახდის მოდელი</div>
+            </div>
+          </div>
+          <div id="linkedSummary" class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4 text-sm text-slate-600">აირჩიე დაკავშირებული ჩანაწერები და გენერატორი ავტომატურად შეავსებს ველებს.</div>
+        </article>
+      </section>
+
+      <section class="grid xl:grid-cols-[0.92fr_1.08fr] gap-4">
+        <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">გენერატორი</div>
+              <div class="text-xl font-extrabold mt-1">ხელშეკრულების მონაცემები</div>
+            </div>
+            <button type="button" id="resetForm" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">გასუფთავება</button>
+          </div>
+          <form id="contractForm" class="space-y-5">
+            <input id="contractId" type="hidden">
+            <div class="grid md:grid-cols-2 gap-4">
+              <select id="templateKey" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none"></select>
+              <select id="contractStatus" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+                <option value="დრაფტი">დრაფტი</option>
+                <option value="მოქმედი">მოქმედი</option>
+                <option value="ხელმოწერილი">ხელმოწერილი</option>
+                <option value="შეწყვეტილი">შეწყვეტილი</option>
+              </select>
+            </div>
+            <input id="contractTitle" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ხელშეკრულების დასახელება">
+            <div class="grid md:grid-cols-3 gap-4">
+              <select id="caseId" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none"></select>
+              <select id="contactId" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none"></select>
+              <select id="invoiceId" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none"></select>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <input id="contractDate" type="date" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+              <input id="startDate" type="date" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+              <input id="endDate" type="date" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none">
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <input id="lawFirmName" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="იურიდიული ფირმა / ორგანიზაცია">
+              <input id="lawyerName" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="იურისტის სახელი და გვარი">
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <input id="lawyerRole" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="იურისტის პოზიცია">
+              <input id="lawyerId" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="იურისტის საიდენტიფიკაციო / ბარის ნომერი">
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <input id="clientName" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="კლიენტი / კომპანია">
+              <input id="clientId" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="საიდენტიფიკაციო / პირადი ნომერი">
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <input id="contactName" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="საკონტაქტო პირი">
+              <input id="contactPhone" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ტელეფონი">
+              <input id="contactEmail" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ელფოსტა">
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <input id="courtName" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="სასამართლო">
+              <input id="city" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ქალაქი">
+              <input id="address" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="მისამართი">
+            </div>
+            <div class="grid md:grid-cols-4 gap-4">
+              <input id="invoiceNumber" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ინვოისის ნომერი">
+              <input id="invoiceAmount" type="number" min="0" step="0.01" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ინვოისის თანხა">
+              <input id="flatFee" type="number" min="0" step="0.01" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="ფიქსირებული თანხა">
+              <input id="hourlyRate" type="number" min="0" step="0.01" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="საათობრივი განაკვეთი">
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <input id="paymentModel" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="გადახდის მოდელი">
+              <input id="contingencyPercent" type="number" min="0" step="0.01" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="პროცენტული ანაზღაურება (%)">
+            </div>
+            <textarea id="extraClauses" rows="5" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="დამატებითი პირობები, შეზღუდვები ან ინდივიდუალური ჩანაწერები..."></textarea>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div>
+                  <div class="text-sm font-extrabold">ხელმოწერა</div>
+                  <div class="text-xs text-slate-500 mt-1">ერთხელ ატვირთული ხელმოწერა შემდეგ ხელშეკრულებებზე ავტომატურად დაედება.</div>
+                </div>
+                <div id="signatureStatus" class="text-xs font-bold text-slate-500">ხელმოწერა ჯერ არ არის ატვირთული</div>
+              </div>
+              <div class="flex flex-col md:flex-row md:items-center gap-3">
+                <label class="inline-flex items-center justify-center px-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 cursor-pointer hover:bg-slate-50">
+                  <input id="signatureFile" type="file" accept="image/png,image/jpeg,image/webp" class="hidden">
+                  ხელმოწერის ატვირთვა
+                </label>
+                <button type="button" id="clearSignature" class="px-4 py-3 rounded-2xl border border-rose-200 bg-rose-50 text-sm font-bold text-rose-600 hover:bg-rose-100">ხელმოწერის წაშლა</button>
+              </div>
+              <div id="signaturePanel" class="off rounded-2xl bg-white border border-slate-200 p-4">
+                <img id="signatureImage" class="max-h-24 w-auto object-contain" alt="ხელმოწერა">
+              </div>
+            </div>
+            <div id="formMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+            <div class="flex justify-end">
+              <button class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ცოცხალი პრევიუ</div>
+              <div class="text-xl font-extrabold mt-1">სტანდარტული ტექსტი</div>
+            </div>
+            <div id="previewMeta" class="text-sm text-slate-500">შაბლონის შევსება მიმდინარეობს</div>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3">
+              <div class="text-xs text-slate-400 mb-1">საქმე</div>
+              <div id="previewCase" class="font-bold">არჩეული არ არის</div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3">
+              <div class="text-xs text-slate-400 mb-1">კონტაქტი</div>
+              <div id="previewContact" class="font-bold">არჩეული არ არის</div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3">
+              <div class="text-xs text-slate-400 mb-1">ინვოისი</div>
+              <div id="previewInvoice" class="font-bold">არჩეული არ არის</div>
+            </div>
+          </div>
+          <div id="templateCards" class="grid sm:grid-cols-2 gap-3"></div>
+          <div class="rounded-[1.5rem] bg-slate-50 border border-slate-200 p-5">
+            <div id="contractPreview" class="text-sm leading-7 whitespace-pre-line"></div>
+            <div id="signaturePreviewWrap" class="off mt-6 pt-5 border-t border-slate-200">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold mb-3">ხელმოწერა</div>
+              <img id="signaturePreviewImage" class="max-h-24 w-auto object-contain" alt="ხელმოწერა">
+              <div id="signaturePreviewMeta" class="text-sm text-slate-500 mt-2"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ისტორია და არქივი</div>
+            <div class="text-xl font-extrabold mt-1">შენახული ხელშეკრულებები და ცვლილებები</div>
+          </div>
+          <div id="listMeta" class="text-sm text-slate-500">0 ჩანაწერი</div>
+        </div>
+        <div id="emptyContracts" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+          <div class="text-lg font-bold">ხელშეკრულებები ჯერ არ არის შენახული</div>
+          <div class="text-slate-500 mt-2">აირჩიე შაბლონი, შეავსე მონაცემები და შექმენი პირველი ხელშეკრულება.</div>
+        </div>
+        <div class="grid xl:grid-cols-[0.85fr_1.15fr] gap-4">
+          <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Timeline</div>
+                <div class="text-lg font-extrabold mt-1">ცვლილებების ისტორია</div>
+              </div>
+              <div id="historyMeta" class="text-xs text-slate-500">0 ვერსია</div>
+            </div>
+            <div id="emptyHistory" class="off rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-500">ცვლილებების ისტორია ჯერ არ არის.</div>
+            <div id="historyList" class="space-y-3"></div>
+          </div>
+          <div id="contractsList" class="grid gap-3"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="supabase-config.js"></script>
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const CONTRACTS_LOCAL_KEY = 'lexmanage-contracts';
+    const CONTRACT_HISTORY_LOCAL_KEY = 'lexmanage-contract-history';
+    const CONTACTS_LOCAL_KEY = 'lexmanage-manual-contacts';
+    const INVOICES_LOCAL_KEY = 'lexmanage-finance-invoices';
+    const SIGNATURE_LOCAL_KEY = 'lexmanage-contract-signature';
+
+    const TEMPLATES = {
+      service: {
+        label: 'იურიდიული მომსახურების ხელშეკრულება',
+        description: 'ფართო მომსახურების პაკეტი საქმეზე, ფინანსური პირობებით და ძირითად ვალდებულებებით.',
+        body: `ხელშეკრულება: {{contract_title}}
+
+ქალაქი {{city}}, თარიღი {{contract_date}}
+
+ერთის მხრივ {{law_firm_name}}, წარმოდგენილი {{lawyer_name}}-ს მიერ, პოზიცია {{lawyer_role}}, საიდენტიფიკაციო ნომერი {{lawyer_id}}, შემდგომში „იურისტი“, და მეორეს მხრივ {{client_name}}, წარმომადგენელი {{contact_name}}, საიდენტიფიკაციო ნომერი {{client_id}}, შემდგომში „კლიენტი“, ვდებთ წინამდებარე ხელშეკრულებას.
+
+1. ხელშეკრულების საგანი
+იურისტი იღებს ვალდებულებას, რომ კლიენტს გაუწიოს იურიდიული მომსახურება საქმეზე {{case_code}} - {{case_title}}, რომელიც დაკავშირებულია {{court_name}}-ში მიმდინარე ან დაგეგმილ წარმოებასთან.
+
+2. საკონტაქტო მონაცემები
+კლიენტის წარმომადგენელი: {{contact_name}}
+ტელეფონი: {{contact_phone}}
+ელფოსტა: {{contact_email}}
+მისამართი: {{address}}
+
+3. ფინანსური პირობები
+გადახდის მოდელი: {{payment_model}}
+ინვოისის ნომერი: {{invoice_number}}
+ინვოისის თანხა: {{invoice_amount}}
+ფიქსირებული მომსახურება: {{flat_fee}}
+საათობრივი განაკვეთი: {{hourly_rate}}
+წარმატების პროცენტი: {{contingency_percent}}
+
+4. ვადა
+ხელშეკრულება ძალაში შედის {{start_date}}-დან და მოქმედებს {{end_date}}-მდე.
+
+5. დამატებითი პირობები
+{{extra_clauses}}
+
+მხარეები ადასტურებენ, რომ აღნიშნული ინფორმაცია და ფინანსური პირობები არის შეთანხმებული და სავალდებულო შესრულებისთვის.`
+      },
+      representation: {
+        label: 'სასამართლო წარმომადგენლობის ხელშეკრულება',
+        description: 'სასამართლოში წარმომადგენლობის, კომუნიკაციის და საპროცესო მოქმედებების სტანდარტული ტექსტი.',
+        body: `წარმომადგენლობის შეთანხმება: {{contract_title}}
+
+{{contract_date}}-ს, ქალაქ {{city}}-ში, {{law_firm_name}} და {{client_name}} თანხმდებიან შემდეგზე:
+
+1. წარმომადგენლობა
+იურისტი {{lawyer_name}} წარმოადგენს კლიენტის ინტერესებს საქმეზე {{case_code}} - {{case_title}} და განახორციელებს პროცესუალურ მოქმედებებს {{court_name}}-ში.
+
+2. უფლებამოსილი პირები
+იურისტი: {{lawyer_name}} / {{lawyer_role}}
+კლიენტის წარმომადგენელი: {{contact_name}}
+ტელეფონი: {{contact_phone}}
+ელფოსტა: {{contact_email}}
+
+3. ფინანსური ბლოკი
+გადახდის მოდელი: {{payment_model}}
+ფიქსირებული თანხა: {{flat_fee}}
+საათობრივი განაკვეთი: {{hourly_rate}}
+ინვოისი: {{invoice_number}}
+ინვოისის თანხა: {{invoice_amount}}
+
+4. მოქმედების ვადა
+წარმომადგენლობის ვადა იწყება {{start_date}}-დან და სრულდება {{end_date}}-ს.
+
+5. ინდივიდუალური პირობები
+{{extra_clauses}}
+
+მხარეები თანხმდებიან, რომ ნებისმიერი ცვლილება წერილობით ფორმდება და ამ ხელშეკრულების განუყოფელი ნაწილი ხდება.`
+      },
+      retainer: {
+        label: 'საავანსო მომსახურების შეთანხმება',
+        description: 'ავანსზე დაფუძნებული მომსახურების მოდელი, ჩამოჭრის წესით და ნაშთის კონტროლით.',
+        body: `საავანსო მომსახურების შეთანხმება: {{contract_title}}
+
+ქალაქი {{city}}, თარიღი {{contract_date}}
+
+{{law_firm_name}} და {{client_name}} თანხმდებიან, რომ საქმეზე {{case_code}} - {{case_title}} მომსახურება გაიწევა ავანსის საფუძველზე.
+
+1. ავანსი და მომსახურება
+კლიენტი ავანსის სახით იხდის თანხას {{flat_fee}}, რომელიც გამოიყენება საქმესთან დაკავშირებული მომსახურების, დროის და საჭირო ხარჯების დასაფარად.
+
+2. კავშირი ინვოისთან
+ინვოისი: {{invoice_number}}
+ინვოისის თანხა: {{invoice_amount}}
+გადახდის მოდელი: {{payment_model}}
+
+3. საკონტაქტო პირები
+კლიენტის წარმომადგენელი: {{contact_name}}
+ტელეფონი: {{contact_phone}}
+ელფოსტა: {{contact_email}}
+მისამართი: {{address}}
+
+4. ვადა
+ხელშეკრულება ძალაშია {{start_date}}-დან {{end_date}}-მდე.
+
+5. დამატებითი დებულებები
+{{extra_clauses}}
+
+მხარეები თანხმდებიან, რომ ავანსის ბალანსი პერიოდულად გადაიხედება და საჭიროების შემთხვევაში დამატებითი ინვოისი გაიცემა.`
+      },
+      invoice: {
+        label: 'ინვოისზე მიბმული შეთანხმება',
+        description: 'კონკრეტულ ინვოისზე დაფუძნებული ფინანსური შეთანხმება, ვადებით და გადახდის პირობებით.',
+        body: `ფინანსური შეთანხმება: {{contract_title}}
+
+{{contract_date}}-ს {{law_firm_name}} და {{client_name}} ადასტურებენ, რომ ქვემოთ ჩამოთვლილი პირობები ვრცელდება ინვოისზე {{invoice_number}}.
+
+1. მომსახურების აღწერა
+ინვოისი უკავშირდება საქმეს {{case_code}} - {{case_title}}, სასამართლო: {{court_name}}.
+
+2. თანხები
+ინვოისის თანხა: {{invoice_amount}}
+ფიქსირებული თანხა: {{flat_fee}}
+საათობრივი განაკვეთი: {{hourly_rate}}
+წარმატების პროცენტი: {{contingency_percent}}
+გადახდის მოდელი: {{payment_model}}
+
+3. პასუხისმგებელი პირები
+იურისტი: {{lawyer_name}}
+კლიენტის წარმომადგენელი: {{contact_name}}
+ტელეფონი: {{contact_phone}}
+ელფოსტა: {{contact_email}}
+
+4. მოქმედება
+ფინანსური პირობები ძალაში შედის {{start_date}}-დან და საბოლოოდ სრულდება {{end_date}}-ს.
+
+5. დამატებითი პირობები
+{{extra_clauses}}
+
+ინვოისის მონაცემის ან თანხის ცვლილების შემთხვევაში, ეს ხელშეკრულება ავტომატურად გადაიხედება იმავე ჩანაწერების მიხედვით.`
+      }
+    };
+
+    const fields = {
+      id: $('#contractId'),
+      templateKey: $('#templateKey'),
+      contractStatus: $('#contractStatus'),
+      contractTitle: $('#contractTitle'),
+      caseId: $('#caseId'),
+      contactId: $('#contactId'),
+      invoiceId: $('#invoiceId'),
+      contractDate: $('#contractDate'),
+      startDate: $('#startDate'),
+      endDate: $('#endDate'),
+      lawFirmName: $('#lawFirmName'),
+      lawyerName: $('#lawyerName'),
+      lawyerRole: $('#lawyerRole'),
+      lawyerId: $('#lawyerId'),
+      clientName: $('#clientName'),
+      clientId: $('#clientId'),
+      contactName: $('#contactName'),
+      contactPhone: $('#contactPhone'),
+      contactEmail: $('#contactEmail'),
+      courtName: $('#courtName'),
+      city: $('#city'),
+      address: $('#address'),
+      invoiceNumber: $('#invoiceNumber'),
+      invoiceAmount: $('#invoiceAmount'),
+      flatFee: $('#flatFee'),
+      hourlyRate: $('#hourlyRate'),
+      paymentModel: $('#paymentModel'),
+      contingencyPercent: $('#contingencyPercent'),
+      extraClauses: $('#extraClauses')
+    };
+
+    let currentUser = null;
+    let contractsMode = 'local';
+    let cases = [];
+    let contacts = [];
+    let invoices = [];
+    let contracts = [];
+    let contractHistory = [];
+    let signatureState = null;
+
+    function todayKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return '____________';
+      return new Intl.DateTimeFormat('ka-GE', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(value));
+    }
+
+    function formatDateTime(value) {
+      if (!value) return '____________';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat('ka-GE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    }
+
+    function formatMoney(value) {
+      const amount = Number(value);
+      if (!Number.isFinite(amount) || amount <= 0) return '____________';
+      return new Intl.NumberFormat('ka-GE', { style: 'currency', currency: 'GEL', maximumFractionDigits: 2 }).format(amount);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, '&#96;');
+    }
+
+    function safeFileName(value, fallback = 'contract') {
+      return String(value || fallback)
+        .toLowerCase()
+        .replace(/[^a-z0-9\u10A0-\u10FF]+/gi, '-')
+        .replace(/^-+|-+$/g, '') || fallback;
+    }
+
+    function signatureStorageKey() {
+      return `${SIGNATURE_LOCAL_KEY}:${currentUser?.id || 'guest'}`;
+    }
+
+    function readLocalObject(key, fallback = null) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+        return parsed ?? fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function parseCaseMeta(notes) {
+      if (!notes || !notes.includes('\n[[CASE_META]]\n')) return { cleanNotes: notes || '', meta: {} };
+      const parts = notes.split('\n[[CASE_META]]\n');
+      try {
+        return { cleanNotes: (parts[0] || '').trim(), meta: JSON.parse(parts[1]) || {} };
+      } catch {
+        return { cleanNotes: notes || '', meta: {} };
+      }
+    }
+
+    function paymentModelLabel(value) {
+      if (value === 'Flat fee') return 'ფიქსირებული';
+      if (value === 'Hourly') return 'საათობრივი';
+      if (value === 'Contingency') return 'პროცენტული ანაზღაურება';
+      if (value === 'Retainer drawdown') return 'ავანსიდან ჩამოჭრა';
+      return value || '____________';
+    }
+
+    function statusTone(status) {
+      if (status === 'ხელმოწერილი') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      if (status === 'მოქმედი') return 'bg-blue-50 text-blue-700 border-blue-200';
+      if (status === 'შეწყვეტილი') return 'bg-rose-50 text-rose-700 border-rose-200';
+      return 'bg-slate-50 text-slate-700 border-slate-200';
+    }
+
+    function readLocalRaw(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function readLocalRows(key) {
+      return readLocalRaw(key).filter((item) => item.user_id === currentUser.id);
+    }
+
+    function writeLocalRows(key, rows) {
+      const others = readLocalRaw(key).filter((item) => item.user_id !== currentUser.id);
+      localStorage.setItem(key, JSON.stringify([...others, ...rows]));
+    }
+
+    async function getCurrentUser() {
+      const { data, error } = await window.supabaseClient.auth.getUser();
+      if (error) throw error;
+      if (!data.user) {
+        window.location.href = 'login.html';
+        throw new Error('სისტემაში შესვლა აუცილებელია.');
+      }
+      return data.user;
+    }
+
+    async function loadCases() {
+      const { data, error } = await window.supabaseClient
+        .from('cases')
+        .select('id,title,code,client_name,court,notes,created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      cases = (data || []).map((row) => ({ ...row, parsedMeta: parseCaseMeta(row.notes).meta || {} }));
+    }
+
+    function deriveContactsFromCases() {
+      return cases
+        .map((row) => {
+          const meta = row.parsedMeta || {};
+          const fullName = [meta.contact_first_name, meta.contact_last_name].filter(Boolean).join(' ').trim();
+          if (!fullName && !meta.contact_phone && !meta.contact_email && !row.client_name) return null;
+          return {
+            id: `case:${row.id}`,
+            user_id: currentUser.id,
+            source: 'case',
+            related_case_id: row.id,
+            first_name: meta.contact_first_name || '',
+            last_name: meta.contact_last_name || '',
+            full_name: fullName || row.client_name || 'კონტაქტი',
+            phone: meta.contact_phone || '',
+            email: meta.contact_email || '',
+            city: meta.city || '',
+            address: meta.address || '',
+            company_id: meta.company_id || '',
+            client_name: row.client_name || '',
+            notes: ''
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function mergeContacts(primary, secondary) {
+      const map = new Map();
+      [...primary, ...secondary].forEach((item) => {
+        const key = item.email || item.phone || `${item.client_name}:${item.full_name}`;
+        if (!key) return;
+        if (!map.has(key)) {
+          map.set(key, item);
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    async function loadContacts() {
+      let manual = [];
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('contacts')
+          .select('id,user_id,related_case_id,first_name,last_name,phone,email,city,address,company_id,client_name,notes,created_at')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        manual = (data || []).map((row) => ({
+          ...row,
+          source: 'manual',
+          full_name: [row.first_name, row.last_name].filter(Boolean).join(' ').trim() || row.client_name || 'კონტაქტი'
+        }));
+      } catch {
+        manual = readLocalRows(CONTACTS_LOCAL_KEY).map((row) => ({
+          ...row,
+          source: 'manual',
+          full_name: [row.first_name, row.last_name].filter(Boolean).join(' ').trim() || row.client_name || 'კონტაქტი'
+        }));
+      }
+      contacts = mergeContacts(manual, deriveContactsFromCases()).sort((a, b) => a.full_name.localeCompare(b.full_name, 'ka'));
+    }
+
+    async function loadInvoices() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('invoices')
+          .select('id,case_id,client_name,invoice_number,total_amount,issue_date,due_date,payment_model,created_at')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        invoices = data || [];
+      } catch {
+        invoices = readLocalRows(INVOICES_LOCAL_KEY);
+      }
+    }
+
+    async function loadContracts() {
+      contractsMode = 'supabase';
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('contracts')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        contracts = data || [];
+      } catch {
+        contractsMode = 'local';
+        contracts = readLocalRows(CONTRACTS_LOCAL_KEY);
+      }
+      $('#storageBadge').textContent = contractsMode === 'supabase' ? 'Supabase რეჟიმი' : 'ლოკალური რეჟიმი';
+    }
+
+    async function loadContractHistory() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('contract_history')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        contractHistory = data || [];
+      } catch {
+        contractHistory = readLocalRows(CONTRACT_HISTORY_LOCAL_KEY).sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+      }
+    }
+
+    function loadSignature() {
+      signatureState = readLocalObject(signatureStorageKey(), null);
+      renderSignatureState();
+    }
+
+    function setSignatureState(nextState) {
+      signatureState = nextState;
+      if (nextState) {
+        localStorage.setItem(signatureStorageKey(), JSON.stringify(nextState));
+      } else {
+        localStorage.removeItem(signatureStorageKey());
+      }
+      renderSignatureState();
+      renderPreview();
+    }
+
+    function renderSignatureState() {
+      const hasSignature = Boolean(signatureState?.dataUrl);
+      $('#signatureStatus').textContent = hasSignature ? `ატვირთულია • ${formatDateTime(signatureState.updated_at)}` : 'ხელმოწერა ჯერ არ არის ატვირთული';
+      $('#signaturePanel').classList.toggle('off', !hasSignature);
+      $('#signaturePreviewWrap').classList.toggle('off', !hasSignature);
+      if (hasSignature) {
+        $('#signatureImage').src = signatureState.dataUrl;
+        $('#signaturePreviewImage').src = signatureState.dataUrl;
+        $('#signaturePreviewMeta').textContent = [fields.lawyerName.value.trim() || fields.lawFirmName.value.trim(), fields.lawyerRole.value.trim()].filter(Boolean).join(' • ');
+      } else {
+        $('#signatureImage').removeAttribute('src');
+        $('#signaturePreviewImage').removeAttribute('src');
+        $('#signaturePreviewMeta').textContent = '';
+      }
+    }
+
+    function renderSelects() {
+      fields.templateKey.innerHTML = Object.entries(TEMPLATES).map(([key, template]) => `<option value="${key}">${template.label}</option>`).join('');
+      fields.caseId.innerHTML = `<option value="">საქმის გარეშე</option>${cases.map((item) => `<option value="${item.id}">${escapeHtml(item.code)} • ${escapeHtml(item.title)}</option>`).join('')}`;
+      fields.contactId.innerHTML = `<option value="">კონტაქტის გარეშე</option>${contacts.map((item) => `<option value="${item.id}">${escapeHtml(item.full_name)} • ${escapeHtml(item.client_name || 'კლიენტი')}</option>`).join('')}`;
+      fields.invoiceId.innerHTML = `<option value="">ინვოისის გარეშე</option>${invoices.map((item) => `<option value="${item.id}">${escapeHtml(item.invoice_number || 'INV')} • ${escapeHtml(item.client_name || 'კლიენტი')}</option>`).join('')}`;
+    }
+
+    function suggestionTitle() {
+      const template = TEMPLATES[fields.templateKey.value];
+      const caseItem = cases.find((item) => item.id === fields.caseId.value);
+      const clientName = fields.clientName.value.trim();
+      return [template?.label || 'ხელშეკრულება', caseItem?.code || clientName || ''].filter(Boolean).join(' • ');
+    }
+
+    function syncFromCase() {
+      const item = cases.find((row) => row.id === fields.caseId.value);
+      if (!item) return;
+      const meta = item.parsedMeta || {};
+      if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+      fields.clientName.value = item.client_name || fields.clientName.value;
+      fields.courtName.value = item.court || fields.courtName.value;
+      fields.clientId.value = meta.company_id || fields.clientId.value;
+      fields.city.value = meta.city || fields.city.value;
+      fields.address.value = meta.address || fields.address.value;
+      fields.contactName.value = [meta.contact_first_name, meta.contact_last_name].filter(Boolean).join(' ').trim() || fields.contactName.value;
+      fields.contactPhone.value = meta.contact_phone || fields.contactPhone.value;
+      fields.contactEmail.value = meta.contact_email || fields.contactEmail.value;
+      if (!fields.extraClauses.value.trim()) {
+        fields.extraClauses.value = meta.next_action
+          ? `საქმეზე მიმდინარე შემდეგი ნაბიჯია: ${meta.next_action}.`
+          : 'მხარეები დამატებით პირობებს წერილობით დაადასტურებენ საჭიროებისამებრ.';
+      }
+    }
+
+    function syncFromContact() {
+      const item = contacts.find((row) => row.id === fields.contactId.value);
+      if (!item) return;
+      fields.contactName.value = item.full_name || fields.contactName.value;
+      fields.contactPhone.value = item.phone || fields.contactPhone.value;
+      fields.contactEmail.value = item.email || fields.contactEmail.value;
+      fields.city.value = item.city || fields.city.value;
+      fields.address.value = item.address || fields.address.value;
+      fields.clientId.value = item.company_id || fields.clientId.value;
+      fields.clientName.value = item.client_name || fields.clientName.value;
+      if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+    }
+
+    function syncFromInvoice() {
+      const item = invoices.find((row) => row.id === fields.invoiceId.value);
+      if (!item) return;
+      fields.invoiceNumber.value = item.invoice_number || fields.invoiceNumber.value;
+      fields.invoiceAmount.value = item.total_amount || fields.invoiceAmount.value;
+      fields.paymentModel.value = paymentModelLabel(item.payment_model);
+      fields.clientName.value = item.client_name || fields.clientName.value;
+      if (!fields.caseId.value && item.case_id) fields.caseId.value = item.case_id;
+      if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+    }
+
+    function placeholder(value, type = 'text') {
+      if (type === 'money') return formatMoney(value);
+      if (type === 'date') return formatDate(value);
+      if (type === 'percent') return value ? `${Number(value).toFixed(2)}%` : '____________';
+      if (type === 'rate') return value ? `${formatMoney(value)} / საათი` : '____________';
+      return String(value || '').trim() || '____________';
+    }
+
+    function formState() {
+      return Object.fromEntries(Object.entries(fields).map(([key, element]) => [key, element.value]));
+    }
+
+    function buildPreviewText() {
+      const state = formState();
+      const caseItem = cases.find((item) => item.id === state.caseId);
+      const template = TEMPLATES[state.templateKey] || TEMPLATES.service;
+      const replacements = {
+        contract_title: placeholder(state.contractTitle),
+        contract_date: placeholder(state.contractDate, 'date'),
+        start_date: placeholder(state.startDate, 'date'),
+        end_date: placeholder(state.endDate, 'date'),
+        law_firm_name: placeholder(state.lawFirmName),
+        lawyer_name: placeholder(state.lawyerName),
+        lawyer_role: placeholder(state.lawyerRole),
+        lawyer_id: placeholder(state.lawyerId),
+        client_name: placeholder(state.clientName),
+        client_id: placeholder(state.clientId),
+        contact_name: placeholder(state.contactName),
+        contact_phone: placeholder(state.contactPhone),
+        contact_email: placeholder(state.contactEmail),
+        court_name: placeholder(state.courtName),
+        city: placeholder(state.city),
+        address: placeholder(state.address),
+        case_title: placeholder(caseItem?.title),
+        case_code: placeholder(caseItem?.code),
+        invoice_number: placeholder(state.invoiceNumber),
+        invoice_amount: placeholder(state.invoiceAmount, 'money'),
+        flat_fee: placeholder(state.flatFee, 'money'),
+        hourly_rate: placeholder(state.hourlyRate, 'rate'),
+        payment_model: placeholder(state.paymentModel),
+        contingency_percent: placeholder(state.contingencyPercent, 'percent'),
+        extra_clauses: placeholder(state.extraClauses)
+      };
+      const rendered = template.body.replace(/\{\{(.*?)\}\}/g, (_, token) => replacements[token.trim()] || '____________');
+      return { template, rendered, caseItem };
+    }
+
+    function renderTemplateCards(activeKey) {
+      $('#templateCards').innerHTML = Object.entries(TEMPLATES).map(([key, item]) => `
+        <button type="button" data-template="${key}" class="rounded-3xl border px-4 py-4 text-left transition ${key === activeKey ? 'border-blue-300 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'}">
+          <div class="text-sm font-extrabold">${escapeHtml(item.label)}</div>
+          <div class="text-sm text-slate-500 mt-2">${escapeHtml(item.description)}</div>
+        </button>
+      `).join('');
+    }
+
+    function renderPreview() {
+      const { template, rendered, caseItem } = buildPreviewText();
+      $('#previewMeta').textContent = `${template.label} • ${fields.contractStatus.value}`;
+      $('#previewCase').textContent = caseItem ? `${caseItem.code} • ${caseItem.title}` : 'არჩეული არ არის';
+      $('#previewContact').textContent = fields.contactName.value.trim() || 'არჩეული არ არის';
+      $('#previewInvoice').textContent = fields.invoiceNumber.value.trim() || 'არჩეული არ არის';
+      $('#linkedSummary').textContent = [
+        caseItem ? `საქმე: ${caseItem.code}` : '',
+        fields.contactName.value.trim() ? `კონტაქტი: ${fields.contactName.value.trim()}` : '',
+        fields.invoiceNumber.value.trim() ? `ინვოისი: ${fields.invoiceNumber.value.trim()}` : '',
+        signatureState?.dataUrl ? 'ხელმოწერა: ავტომატურად დაემატება' : ''
+      ].filter(Boolean).join(' • ') || 'აირჩიე დაკავშირებული ჩანაწერები და გენერატორი ავტომატურად შეავსებს ველებს.';
+      $('#contractPreview').textContent = rendered;
+      if (signatureState?.dataUrl) {
+        $('#signaturePreviewMeta').textContent = [fields.lawyerName.value.trim() || fields.lawFirmName.value.trim(), fields.lawyerRole.value.trim()].filter(Boolean).join(' • ');
+      }
+      renderTemplateCards(fields.templateKey.value);
+    }
+
+    function formMessage(type, text) {
+      const box = $('#formMsg');
+      box.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-700'}`;
+      box.textContent = text;
+      box.classList.remove('off');
+    }
+
+    function clearMessage() {
+      $('#formMsg').classList.add('off');
+    }
+
+    function resetForm() {
+      fields.id.value = '';
+      fields.templateKey.value = Object.keys(TEMPLATES)[0];
+      fields.contractStatus.value = 'დრაფტი';
+      fields.contractTitle.value = '';
+      fields.caseId.value = '';
+      fields.contactId.value = '';
+      fields.invoiceId.value = '';
+      fields.contractDate.value = todayKey();
+      fields.startDate.value = todayKey();
+      fields.endDate.value = '';
+      fields.lawFirmName.value = 'LexManage Legal';
+      fields.lawyerName.value = '';
+      fields.lawyerRole.value = 'ადვოკატი';
+      fields.lawyerId.value = '';
+      fields.clientName.value = '';
+      fields.clientId.value = '';
+      fields.contactName.value = '';
+      fields.contactPhone.value = '';
+      fields.contactEmail.value = '';
+      fields.courtName.value = '';
+      fields.city.value = 'თბილისი';
+      fields.address.value = '';
+      fields.invoiceNumber.value = '';
+      fields.invoiceAmount.value = '';
+      fields.flatFee.value = '';
+      fields.hourlyRate.value = '';
+      fields.paymentModel.value = '';
+      fields.contingencyPercent.value = '';
+      fields.extraClauses.value = 'მხარეები დამატებით პირობებს წერილობით დაადასტურებენ საჭიროებისამებრ.';
+      clearMessage();
+      renderSignatureState();
+      renderPreview();
+      renderHistoryList();
+    }
+
+    function contractSearchText(item) {
+      const payload = item.fields || {};
+      return [
+        item.title,
+        item.status,
+        item.client_name,
+        payload.caseCode,
+        payload.caseTitle,
+        payload.invoiceNumber,
+        payload.contactName,
+        item.template_key
+      ].filter(Boolean).join(' ').toLowerCase();
+    }
+
+    function filteredContracts() {
+      const query = $('#search').value.trim().toLowerCase();
+      if (!query) return contracts;
+      return contracts.filter((item) => contractSearchText(item).includes(query));
+    }
+
+    function historySearchText(item) {
+      return [
+        item.contract_title,
+        item.status,
+        item.version_no,
+        item.snapshot?.caseCode,
+        item.snapshot?.caseTitle,
+        item.snapshot?.invoiceNumber,
+        item.snapshot?.contactName
+      ].filter(Boolean).join(' ').toLowerCase();
+    }
+
+    function filteredHistory() {
+      const query = $('#search').value.trim().toLowerCase();
+      const base = fields.id.value ? contractHistory.filter((item) => item.contract_id === fields.id.value) : contractHistory;
+      if (!query) return base;
+      return base.filter((item) => historySearchText(item).includes(query));
+    }
+
+    function renderHistoryList() {
+      const items = filteredHistory().slice(0, 12);
+      $('#historyMeta').textContent = `${items.length} ვერსია`;
+      $('#emptyHistory').classList.toggle('off', items.length !== 0);
+      $('#historyList').innerHTML = items.map((item) => `
+        <article class="rounded-2xl bg-white border border-slate-200 px-4 py-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="font-extrabold">${escapeHtml(item.contract_title || 'ხელშეკრულება')}</div>
+              <div class="text-sm text-slate-500 mt-1">ვერსია ${escapeHtml(item.version_no || 1)} • ${formatDateTime(item.created_at)}</div>
+            </div>
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${statusTone(item.status)}">${escapeHtml(item.status || 'დრაფტი')}</span>
+          </div>
+          <div class="text-sm text-slate-500 mt-3">${escapeHtml(item.snapshot?.caseCode || 'საქმის კოდი არ არის')} • ${escapeHtml(item.snapshot?.invoiceNumber || 'ინვოისი არ არის')}</div>
+        </article>
+      `).join('');
+    }
+
+    function renderContractsList() {
+      const items = filteredContracts();
+      $('#listMeta').textContent = `${items.length} ჩანაწერი`;
+      $('#emptyContracts').classList.toggle('off', items.length !== 0);
+      $('#contractsList').innerHTML = items.map((item) => `
+        <article class="rounded-[1.35rem] border border-slate-200 bg-white px-4 py-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="text-lg font-extrabold">${escapeHtml(item.title || 'ხელშეკრულება')}</div>
+              <div class="text-sm text-slate-500 mt-1">${escapeHtml(TEMPLATES[item.template_key]?.label || 'შაბლონი')}</div>
+              <div class="text-sm text-slate-500 mt-1">${escapeHtml(item.client_name || 'კლიენტი არ არის')}</div>
+            </div>
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${statusTone(item.status)}">${escapeHtml(item.status || 'დრაფტი')}</span>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3 mt-4 text-sm">
+            <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">თარიღი</div><div class="font-bold">${formatDate(item.contract_date)}</div></div>
+            <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">საქმე</div><div class="font-bold">${escapeHtml(item.fields?.caseCode || 'არ არის')}</div></div>
+            <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">ინვოისი</div><div class="font-bold">${escapeHtml(item.fields?.invoiceNumber || 'არ არის')}</div></div>
+          </div>
+          <div class="text-xs text-slate-400 mt-3">განახლდა: ${formatDateTime(item.updated_at || item.created_at)}</div>
+          <div class="flex flex-wrap gap-2 mt-4">
+            <button type="button" data-load="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">გახსნა</button>
+            <button type="button" data-print="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">PDF / ბეჭდვა</button>
+            <button type="button" data-excel="${item.id}" class="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-700 hover:bg-emerald-100">Excel</button>
+          </div>
+        </article>
+      `).join('');
+
+      $('#templateCount').textContent = Object.keys(TEMPLATES).length;
+      $('#draftCount').textContent = contracts.filter((item) => item.status === 'დრაფტი').length;
+      $('#activeCount').textContent = contracts.filter((item) => item.status === 'მოქმედი').length;
+      $('#signedCount').textContent = contracts.filter((item) => item.status === 'ხელმოწერილი').length;
+      renderHistoryList();
+    }
+
+    function rowFromState(state, rendered) {
+      const caseItem = cases.find((item) => item.id === state.caseId);
+      const createdAt = state.id ? (contracts.find((item) => item.id === state.id)?.created_at || new Date().toISOString()) : new Date().toISOString();
+      return {
+        id: state.id || crypto.randomUUID(),
+        user_id: currentUser.id,
+        case_id: state.caseId || null,
+        contact_id: state.contactId || null,
+        invoice_id: state.invoiceId || null,
+        title: state.contractTitle || suggestionTitle(),
+        template_key: state.templateKey,
+        status: state.contractStatus,
+        client_name: state.clientName || '',
+        contract_date: state.contractDate || todayKey(),
+        start_date: state.startDate || null,
+        end_date: state.endDate || null,
+        rendered_text: rendered,
+        created_at: createdAt,
+        fields: {
+          lawFirmName: state.lawFirmName,
+          lawyerName: state.lawyerName,
+          lawyerRole: state.lawyerRole,
+          lawyerId: state.lawyerId,
+          clientId: state.clientId,
+          contactName: state.contactName,
+          contactPhone: state.contactPhone,
+          contactEmail: state.contactEmail,
+          courtName: state.courtName,
+          city: state.city,
+          address: state.address,
+          invoiceNumber: state.invoiceNumber,
+          invoiceAmount: state.invoiceAmount,
+          flatFee: state.flatFee,
+          hourlyRate: state.hourlyRate,
+          paymentModel: state.paymentModel,
+          contingencyPercent: state.contingencyPercent,
+          extraClauses: state.extraClauses,
+          signatureFileName: signatureState?.fileName || '',
+          signatureUpdatedAt: signatureState?.updated_at || '',
+          caseCode: caseItem?.code || '',
+          caseTitle: caseItem?.title || ''
+        },
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function currentSignerLabel(payload = null) {
+      return payload?.lawyerName || fields.lawyerName.value.trim() || payload?.lawFirmName || fields.lawFirmName.value.trim() || 'ხელმომწერი';
+    }
+
+    async function saveHistoryEntry(row) {
+      const entry = {
+        id: crypto.randomUUID(),
+        user_id: currentUser.id,
+        contract_id: row.id,
+        contract_title: row.title,
+        status: row.status,
+        version_no: contractHistory.filter((item) => item.contract_id === row.id).length + 1,
+        rendered_text: row.rendered_text,
+        snapshot: row.fields,
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await window.supabaseClient.from('contract_history').insert(entry);
+        if (error) throw error;
+      } catch {
+        const rows = readLocalRows(CONTRACT_HISTORY_LOCAL_KEY);
+        writeLocalRows(CONTRACT_HISTORY_LOCAL_KEY, [entry, ...rows]);
+      }
+
+      contractHistory = [entry, ...contractHistory];
+    }
+
+    function downloadBlob(filename, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportContractExcel(item = null) {
+      const active = item || rowFromState(formState(), $('#contractPreview').textContent.trim());
+      const payload = active.fields || {};
+      const rows = [
+        ['სათაური', active.title || 'ხელშეკრულება'],
+        ['სტატუსი', active.status || 'დრაფტი'],
+        ['თარიღი', active.contract_date || ''],
+        ['დაწყება', active.start_date || ''],
+        ['დასრულება', active.end_date || ''],
+        ['საქმის კოდი', payload.caseCode || ''],
+        ['საქმის სათაური', payload.caseTitle || ''],
+        ['კლიენტი', active.client_name || ''],
+        ['საკონტაქტო პირი', payload.contactName || ''],
+        ['ტელეფონი', payload.contactPhone || ''],
+        ['ელფოსტა', payload.contactEmail || ''],
+        ['სასამართლო', payload.courtName || ''],
+        ['ინვოისი', payload.invoiceNumber || ''],
+        ['ინვოისის თანხა', payload.invoiceAmount || ''],
+        ['ფიქსირებული თანხა', payload.flatFee || ''],
+        ['საათობრივი განაკვეთი', payload.hourlyRate || ''],
+        ['გადახდის მოდელი', payload.paymentModel || ''],
+        ['პროცენტული ანაზღაურება', payload.contingencyPercent || ''],
+        ['ხელმოწერა ატვირთულია', signatureState?.dataUrl ? 'კი' : 'არა']
+      ];
+      const html = `<!doctype html><html><head><meta charset="utf-8"></head><body>
+        <table border="1">
+          <tr><th colspan="2">${escapeHtml(active.title || 'ხელშეკრულება')}</th></tr>
+          ${rows.map(([label, value]) => `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(value)}</td></tr>`).join('')}
+          <tr><td>ტექსტი</td><td>${escapeHtml(active.rendered_text || $('#contractPreview').textContent.trim()).replace(/\n/g, '<br>')}</td></tr>
+        </table>
+      </body></html>`;
+      downloadBlob(`${safeFileName(active.title || 'contract')}.xls`, `\ufeff${html}`, 'application/vnd.ms-excel;charset=utf-8;');
+    }
+
+    async function saveContract() {
+      const state = formState();
+      if (!state.contractTitle.trim()) return formMessage('err', 'მიუთითე ხელშეკრულების სათაური.');
+      const { rendered } = buildPreviewText();
+      const row = rowFromState(state, rendered);
+
+      if (contractsMode === 'supabase') {
+        try {
+          if (state.id) {
+            const { error } = await window.supabaseClient.from('contracts').update(row).eq('id', state.id).eq('user_id', currentUser.id);
+            if (error) throw error;
+          } else {
+            const { error } = await window.supabaseClient.from('contracts').insert(row);
+            if (error) throw error;
+          }
+        } catch {
+          contractsMode = 'local';
+        }
+      }
+
+      if (contractsMode === 'local') {
+        const rows = readLocalRows(CONTRACTS_LOCAL_KEY);
+        const nextRows = state.id
+          ? rows.map((item) => item.id === state.id ? { ...item, ...row } : item)
+          : [{ ...row, created_at: new Date().toISOString() }, ...rows];
+        writeLocalRows(CONTRACTS_LOCAL_KEY, nextRows);
+      }
+
+      await saveHistoryEntry(row);
+      formMessage('ok', state.id ? 'ხელშეკრულება განახლდა.' : 'ხელშეკრულება შეიქმნა.');
+      await loadContracts();
+      await loadContractHistory();
+      renderContractsList();
+      if (!state.id) fields.id.value = row.id;
+    }
+
+    function loadContract(id) {
+      const item = contracts.find((row) => row.id === id);
+      if (!item) return;
+      const payload = item.fields || {};
+      fields.id.value = item.id;
+      fields.templateKey.value = item.template_key || 'service';
+      fields.contractStatus.value = item.status || 'დრაფტი';
+      fields.contractTitle.value = item.title || '';
+      fields.caseId.value = item.case_id || '';
+      fields.contactId.value = item.contact_id || '';
+      fields.invoiceId.value = item.invoice_id || '';
+      fields.contractDate.value = item.contract_date || todayKey();
+      fields.startDate.value = item.start_date || '';
+      fields.endDate.value = item.end_date || '';
+      fields.lawFirmName.value = payload.lawFirmName || 'LexManage Legal';
+      fields.lawyerName.value = payload.lawyerName || '';
+      fields.lawyerRole.value = payload.lawyerRole || 'ადვოკატი';
+      fields.lawyerId.value = payload.lawyerId || '';
+      fields.clientName.value = item.client_name || '';
+      fields.clientId.value = payload.clientId || '';
+      fields.contactName.value = payload.contactName || '';
+      fields.contactPhone.value = payload.contactPhone || '';
+      fields.contactEmail.value = payload.contactEmail || '';
+      fields.courtName.value = payload.courtName || '';
+      fields.city.value = payload.city || '';
+      fields.address.value = payload.address || '';
+      fields.invoiceNumber.value = payload.invoiceNumber || '';
+      fields.invoiceAmount.value = payload.invoiceAmount || '';
+      fields.flatFee.value = payload.flatFee || '';
+      fields.hourlyRate.value = payload.hourlyRate || '';
+      fields.paymentModel.value = payload.paymentModel || '';
+      fields.contingencyPercent.value = payload.contingencyPercent || '';
+      fields.extraClauses.value = payload.extraClauses || '';
+      clearMessage();
+      renderSignatureState();
+      renderPreview();
+      renderHistoryList();
+    }
+
+    function printText(title, text, options = {}) {
+      const popup = window.open('', '_blank', 'width=980,height=900');
+      if (!popup) return;
+      const signatureBlock = options.signatureDataUrl ? `
+        <div class="signature-wrap">
+          <div class="signature-label">ხელმოწერა</div>
+          <img class="signature-image" src="${escapeAttr(options.signatureDataUrl)}" alt="ხელმოწერა">
+          <div class="signature-signer">${escapeHtml(options.signer || 'ხელმომწერი')}</div>
+        </div>
+      ` : '';
+      popup.document.write(`
+        <!doctype html>
+        <html lang="ka">
+        <head>
+          <meta charset="utf-8">
+          <title>${escapeHtml(title)}</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+          <style>
+            body{font-family:'Noto Sans Georgian',sans-serif;margin:0;background:#f8fafc;color:#0f172a}
+            .sheet{max-width:920px;margin:0 auto;padding:32px}
+            .card{background:#fff;border:1px solid #e2e8f0;border-radius:28px;padding:32px}
+            .title{font-size:30px;font-weight:800;margin:0 0 18px}
+            .body{white-space:pre-line;line-height:1.85;font-size:14px}
+            .signature-wrap{margin-top:28px;padding-top:18px;border-top:1px solid #e2e8f0}
+            .signature-label{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#64748b;font-weight:700;margin-bottom:12px}
+            .signature-image{max-height:86px;width:auto;object-fit:contain}
+            .signature-signer{margin-top:10px;font-size:14px;font-weight:700}
+            .actions{margin-top:20px;display:flex;justify-content:flex-end;gap:12px}
+            button{padding:12px 16px;border-radius:14px;border:1px solid #cbd5e1;background:#fff;font-weight:700;cursor:pointer}
+            @media print {.actions{display:none}.sheet{padding:0}.card{border:none}}
+          </style>
+        </head>
+        <body>
+          <div class="sheet">
+            <div class="card">
+              <h1 class="title">${escapeHtml(title)}</h1>
+              <div class="body">${escapeHtml(text)}</div>
+              ${signatureBlock}
+              <div class="actions">
+                <button onclick="window.print()">PDF / ბეჭდვა</button>
+                <button onclick="window.close()">დახურვა</button>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      popup.document.close();
+    }
+
+    async function copyCurrentContract() {
+      const text = $('#contractPreview').textContent.trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        formMessage('ok', 'ტექსტი დაკოპირდა.');
+      } catch {
+        formMessage('err', 'კოპირება ვერ შესრულდა ამ ბრაუზერში.');
+      }
+    }
+
+    function applyQueryPrefill() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('case_id')) fields.caseId.value = params.get('case_id');
+      if (params.get('contact_id')) fields.contactId.value = params.get('contact_id');
+      if (params.get('invoice_id')) fields.invoiceId.value = params.get('invoice_id');
+      if (fields.caseId.value) syncFromCase();
+      if (fields.contactId.value) syncFromContact();
+      if (fields.invoiceId.value) syncFromInvoice();
+      if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+    }
+
+    function bindFieldReactions() {
+      Object.values(fields).forEach((element) => {
+        if (!element || ['id', 'caseId', 'contactId', 'invoiceId', 'templateKey'].includes(element.id.replace('contractId', 'id'))) return;
+        element.addEventListener('input', renderPreview);
+        element.addEventListener('change', renderPreview);
+      });
+
+      fields.templateKey.addEventListener('change', () => {
+        if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+        renderPreview();
+      });
+      fields.caseId.addEventListener('change', () => { syncFromCase(); renderPreview(); });
+      fields.contactId.addEventListener('change', () => { syncFromContact(); renderPreview(); });
+      fields.invoiceId.addEventListener('change', () => { syncFromInvoice(); syncFromCase(); renderPreview(); });
+    }
+
+    $('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
+    $('#goCases').onclick = () => window.location.href = 'cases.html';
+    $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
+    $('#goContacts').onclick = () => window.location.href = 'contacts.html';
+    $('#goFinances').onclick = () => window.location.href = 'finances.html';
+    $('#resetForm').onclick = () => { if (window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) resetForm(); };
+    $('#copyContract').onclick = () => copyCurrentContract();
+    $('#excelContract').onclick = () => exportContractExcel();
+    $('#printContract').onclick = () => printText(fields.contractTitle.value || 'ხელშეკრულება', $('#contractPreview').textContent.trim(), {
+      signatureDataUrl: signatureState?.dataUrl || '',
+      signer: currentSignerLabel()
+    });
+    $('#search').oninput = () => renderContractsList();
+    $('#signatureFile').onchange = async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        setSignatureState({
+          user_id: currentUser.id,
+          fileName: file.name,
+          dataUrl,
+          updated_at: new Date().toISOString()
+        });
+        formMessage('ok', 'ხელმოწერა შეინახა და შემდეგ ხელშეკრულებებზეც ავტომატურად დაედება.');
+      } catch (error) {
+        formMessage('err', error.message || 'ხელმოწერის ატვირთვა ვერ შესრულდა.');
+      } finally {
+        event.target.value = '';
+      }
+    };
+    $('#clearSignature').onclick = () => {
+      if (!signatureState) return;
+      if (window.confirm('დარწმუნებული ხარ, რომ ხელმოწერის წაშლა გინდა?')) {
+        setSignatureState(null);
+      }
+    };
+    $('#contractForm').onsubmit = async (event) => {
+      event.preventDefault();
+      clearMessage();
+      try { await saveContract(); } catch (error) { formMessage('err', error.message || 'ხელშეკრულების შენახვა ვერ შესრულდა.'); }
+    };
+    $('#templateCards').onclick = (event) => {
+      const button = event.target.closest('[data-template]');
+      if (!button) return;
+      fields.templateKey.value = button.dataset.template;
+      if (!fields.contractTitle.value.trim()) fields.contractTitle.value = suggestionTitle();
+      renderPreview();
+    };
+    $('#contractsList').onclick = (event) => {
+      const loadButton = event.target.closest('[data-load]');
+      if (loadButton) return loadContract(loadButton.dataset.load);
+      const printButton = event.target.closest('[data-print]');
+      if (printButton) {
+        const item = contracts.find((row) => row.id === printButton.dataset.print);
+        if (item) {
+          return printText(item.title || 'ხელშეკრულება', item.rendered_text || '', {
+            signatureDataUrl: signatureState?.dataUrl || '',
+            signer: currentSignerLabel(item.fields || {})
+          });
+        }
+      }
+      const excelButton = event.target.closest('[data-excel]');
+      if (excelButton) {
+        const item = contracts.find((row) => row.id === excelButton.dataset.excel);
+        if (item) return exportContractExcel(item);
+      }
+    };
+
+    (async function init() {
+      try {
+        currentUser = await getCurrentUser();
+        await loadCases();
+        await loadContacts();
+        await loadInvoices();
+        await loadContracts();
+        await loadContractHistory();
+        renderSelects();
+        loadSignature();
+        resetForm();
+        applyQueryPrefill();
+        bindFieldReactions();
+        renderContractsList();
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  </script>
+</body>
+</html>
