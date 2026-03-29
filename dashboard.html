@@ -27,7 +27,7 @@
       <button id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
       <button id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
-      <button class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
+      <button id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50">
       <div class="text-sm font-bold">მთავარი სივრცე</div>
@@ -103,11 +103,11 @@
               <div class="text-xl font-extrabold mt-2">დოკუმენტები</div>
               <div class="text-sm text-slate-500 mt-2">ფაილების და ატვირთვების ცალკე მოდული შემდეგ მარტივად მიემატება.</div>
             </article>
-            <article class="rounded-3xl border bg-slate-50 p-5">
+            <button id="cardFinances" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
               <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
               <div class="text-xl font-extrabold mt-2">ფინანსები</div>
-              <div class="text-sm text-slate-500 mt-2">როცა დაგვჭირდება, ამავე სტრუქტურით დამოუკიდებლად გამოვყოფთ.</div>
-            </article>
+              <div class="text-sm text-slate-500 mt-2">ინვოისები, ხარჯები, საათები და ავანსები უკვე ცალკე workspace-შია გამოტანილი.</div>
+            </button>
           </div>
         </article>
 
@@ -165,6 +165,13 @@
         month: 'short',
         day: 'numeric'
       }).format(parseKey(value));
+    }
+
+    function formatReminderBadge(value) {
+      const todayKey = formatKey(new Date());
+      if (value === todayKey) return 'დღეს';
+      if (value === addDays(todayKey, 1)) return 'ხვალ';
+      return formatShortDate(value);
     }
 
     function displayTime(value) {
@@ -304,7 +311,7 @@
       ]
         .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
         .sort((left, right) => {
-          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
+          if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
           if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
           if (!left.time) return 1;
           if (!right.time) return -1;
@@ -328,7 +335,7 @@
           <div class="flex flex-wrap items-center gap-2 mb-2">
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
-            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatShortDate(event.reminderDate))}</span>
+            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatReminderBadge(event.dateKey))}</span>
           </div>
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
@@ -401,15 +408,21 @@
       window.location.href = 'contacts.html';
     }
 
+    function goFinances() {
+      window.location.href = 'finances.html';
+    }
+
     document.querySelector('#goCases').onclick = () => goCases(false);
     document.querySelector('#goCalendar').onclick = () => goCalendar();
     document.querySelector('#goContacts').onclick = () => goContacts();
+    document.querySelector('#goFinances').onclick = () => goFinances();
     document.querySelector('#headerCases').onclick = () => goCases(false);
     document.querySelector('#headerNewCase').onclick = () => goCases(true);
     document.querySelector('#heroCases').onclick = () => goCases(false);
     document.querySelector('#heroNewCase').onclick = () => goCases(true);
     document.querySelector('#cardCases').onclick = () => goCases(false);
     document.querySelector('#cardCalendar').onclick = () => goCalendar();
+    document.querySelector('#cardFinances').onclick = () => goFinances();
     document.querySelector('#dashboardReminderCalendar').onclick = () => goCalendar();
     document.querySelector('#dashboardReminderList').onclick = (event) => {
       const caseButton = event.target.closest('[data-open-case]');

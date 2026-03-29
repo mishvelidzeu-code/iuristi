@@ -35,6 +35,7 @@
       <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
     </nav>
     <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
@@ -242,6 +243,13 @@
         month: 'short',
         day: 'numeric'
       }).format(parseKey(value));
+    }
+
+    function formatReminderBadge(value) {
+      const todayKey = formatKey(new Date());
+      if (value === todayKey) return 'დღეს';
+      if (value === addDays(todayKey, 1)) return 'ხვალ';
+      return formatShortDate(value);
     }
 
     function normalizeTimeValue(value) {
@@ -492,7 +500,7 @@
       return allEvents()
         .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
         .sort((left, right) => {
-          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
+          if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
           if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
           if (!left.time) return 1;
           if (!right.time) return -1;
@@ -544,7 +552,7 @@
           <div class="flex flex-wrap items-center gap-2 mb-2">
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
-            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatShortDate(event.reminderDate))}</span>
+            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatReminderBadge(event.dateKey))}</span>
           </div>
           <div class="text-base font-extrabold">${escapeHtml(event.title)}</div>
           <div class="text-xs text-slate-500 mt-1.5">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(displayTime(event.time))}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
@@ -802,6 +810,7 @@
     $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
     $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
     $('#goContacts').onclick = () => { window.location.href = 'contacts.html'; };
+    $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
     $('#jumpToday').onclick = () => {
       selectedDateKey = formatKey(new Date());
       monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
