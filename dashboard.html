@@ -111,21 +111,236 @@
           </div>
         </article>
 
-        <article class="rounded-[1.75rem] bg-white border p-6">
-          <div class="text-xs uppercase font-bold text-slate-400">შეჯამება</div>
-          <div class="text-2xl font-extrabold mt-1 mb-5">სტრუქტურა გამარტივდა</div>
-          <div class="space-y-4 text-sm text-slate-600 leading-7">
-            <div class="rounded-2xl bg-slate-50 px-4 py-4">`dashboard.html` ახლა მხოლოდ მთავარი დაფაა და აღარ იტვირთება საქმეების უზარმაზარი ლოგიკით.</div>
-            <div class="rounded-2xl bg-slate-50 px-4 py-4">`cases.html` უკვე ცალკე მოდულია თავისი სტილით და თავისი Supabase ლოგიკით.</div>
-            <div class="rounded-2xl bg-slate-50 px-4 py-4">ეს მოგვცემს საშუალებას შემდეგი ფუნქციები ბევრად სუფთად დავამატოთ.</div>
-          </div>
-        </article>
+        <div class="space-y-6">
+          <article class="rounded-[1.75rem] bg-white border p-6">
+            <div class="flex items-center justify-between gap-3 mb-5">
+              <div>
+                <div class="text-xs uppercase font-bold text-slate-400">Reminder</div>
+                <div class="text-2xl font-extrabold mt-1">მომდევნო 5 დღის შეხსენებები</div>
+              </div>
+              <button id="dashboardReminderCalendar" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">კალენდარი</button>
+            </div>
+            <div id="dashboardReminderNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">იტვირთება...</div>
+            <div id="dashboardReminderList" class="mt-4 space-y-3"></div>
+          </article>
+
+          <article class="rounded-[1.75rem] bg-white border p-6">
+            <div class="text-xs uppercase font-bold text-slate-400">შეჯამება</div>
+            <div class="text-2xl font-extrabold mt-1 mb-5">სტრუქტურა გამარტივდა</div>
+            <div class="space-y-4 text-sm text-slate-600 leading-7">
+              <div class="rounded-2xl bg-slate-50 px-4 py-4">`dashboard.html` ახლა მხოლოდ მთავარი დაფაა და აღარ იტვირთება საქმეების უზარმაზარი ლოგიკით.</div>
+              <div class="rounded-2xl bg-slate-50 px-4 py-4">`cases.html` უკვე ცალკე მოდულია თავისი სტილით და თავისი Supabase ლოგიკით.</div>
+              <div class="rounded-2xl bg-slate-50 px-4 py-4">ეს მოგვცემს საშუალებას შემდეგი ფუნქციები ბევრად სუფთად დავამატოთ.</div>
+            </div>
+          </article>
+        </div>
       </section>
     </div>
   </main>
 
   <script src="supabase-config.js"></script>
   <script>
+    const LOCAL_EVENTS_KEY = 'lexmanage-calendar-events';
+
+    function formatKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseKey(value) {
+      const [year, month, day] = String(value).split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function addDays(value, amount) {
+      const date = parseKey(value);
+      date.setDate(date.getDate() + amount);
+      return formatKey(date);
+    }
+
+    function formatShortDate(value) {
+      return new Intl.DateTimeFormat('ka-GE', {
+        month: 'short',
+        day: 'numeric'
+      }).format(parseKey(value));
+    }
+
+    function displayTime(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return '';
+      const match = raw.match(/^(\d{1,2}):(\d{2})/);
+      if (!match) return raw;
+      return `${String(Number(match[1])).padStart(2, '0')}:${match[2]}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function defaultReminderDate(eventDate) {
+      const todayKey = formatKey(new Date());
+      return parseKey(eventDate) <= parseKey(todayKey) ? eventDate : addDays(eventDate, -1);
+    }
+
+    function extractMeta(notes) {
+      if (!notes || !notes.includes('\n[[CASE_META]]\n')) {
+        return { cleanNotes: notes || '', meta: {} };
+      }
+
+      const parts = notes.split('\n[[CASE_META]]\n');
+      try {
+        return {
+          cleanNotes: (parts[0] || '').trim(),
+          meta: JSON.parse(parts[1]) || {}
+        };
+      } catch (error) {
+        return { cleanNotes: notes || '', meta: {} };
+      }
+    }
+
+    function mapCaseRow(row) {
+      const parsed = extractMeta(row.notes);
+      return {
+        id: row.id,
+        title: row.title,
+        code: row.code,
+        client_name: row.client_name,
+        deadline: row.deadline,
+        result: row.result,
+        notes: parsed.cleanNotes,
+        meta: parsed.meta
+      };
+    }
+
+    function caseEventsFromRow(row) {
+      const items = [];
+      const meta = row.meta || {};
+      const label = `${row.code} • ${row.client_name}`;
+
+      if (meta.hearing_date) {
+        items.push({
+          id: `case-hearing-${row.id}-${meta.hearing_date}`,
+          source: 'case',
+          kind: 'პროცესი',
+          title: row.title,
+          subtitle: label,
+          dateKey: meta.hearing_date,
+          time: meta.hearing_time || '',
+          location: meta.meeting_location || '',
+          note: meta.next_action || row.notes || '',
+          caseId: row.id,
+          reminderDate: meta.reminder_date || defaultReminderDate(meta.hearing_date)
+        });
+      }
+
+      if (row.deadline) {
+        items.push({
+          id: `case-deadline-${row.id}-${row.deadline}`,
+          source: 'case',
+          kind: 'ვადა',
+          title: row.title,
+          subtitle: label,
+          dateKey: row.deadline,
+          time: '',
+          location: '',
+          note: meta.next_action || row.notes || 'საქმის ვადა',
+          caseId: row.id,
+          reminderDate: defaultReminderDate(row.deadline)
+        });
+      }
+
+      return items;
+    }
+
+    function manualEventFromRow(row, cases) {
+      const relatedCase = cases.find((item) => item.id === row.related_case_id);
+      return {
+        id: row.id,
+        source: 'manual',
+        kind: row.category || 'პირადი',
+        title: row.title,
+        subtitle: relatedCase ? `${relatedCase.code} • ${relatedCase.client_name}` : '',
+        dateKey: row.event_date,
+        time: row.event_time || '',
+        location: row.location || '',
+        note: row.notes || '',
+        caseId: row.related_case_id || '',
+        reminderDate: row.reminder_date || defaultReminderDate(row.event_date)
+      };
+    }
+
+    function sourceBadge(event) {
+      return event.source === 'case'
+        ? 'bg-blue-50 text-blue-700 border-blue-100'
+        : 'bg-slate-100 text-slate-700 border-slate-200';
+    }
+
+    function kindBadge(event) {
+      if (event.kind === 'პროცესი') return 'bg-indigo-50 text-indigo-700 border-indigo-100';
+      if (event.kind === 'ვადა') return 'bg-amber-50 text-amber-700 border-amber-100';
+      if (event.kind === 'შეხსენება') return 'bg-rose-50 text-rose-700 border-rose-100';
+      return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+    }
+
+    function readLocalEntries(userId) {
+      const all = JSON.parse(localStorage.getItem(LOCAL_EVENTS_KEY) || '[]');
+      return all.filter((item) => item.user_id === userId);
+    }
+
+    function upcomingReminderEvents(cases, manualEntries, days = 5) {
+      const todayKey = formatKey(new Date());
+      const lastDayKey = addDays(todayKey, Math.max(days - 1, 0));
+
+      return [
+        ...cases.flatMap(caseEventsFromRow),
+        ...manualEntries.map((item) => manualEventFromRow(item, cases))
+      ]
+        .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
+        .sort((left, right) => {
+          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
+          if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
+          if (!left.time) return 1;
+          if (!right.time) return -1;
+          return left.time.localeCompare(right.time);
+        });
+    }
+
+    function renderDashboardReminders(events) {
+      const note = document.querySelector('#dashboardReminderNote');
+      const list = document.querySelector('#dashboardReminderList');
+
+      note.textContent = 'აქ ჩანს ის შეხსენებები, რომლებიც დღესიდან მომდევნო 5 დღეში უნდა შეგახსენდეს.';
+
+      if (!events.length) {
+        list.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">მომდევნო 5 დღეში შეხსენება არ გაქვს.</div>';
+        return;
+      }
+
+      list.innerHTML = events.map((event) => `
+        <article class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
+            <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
+            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatShortDate(event.reminderDate))}</span>
+          </div>
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="text-base font-extrabold">${escapeHtml(event.title)}</div>
+              <div class="text-xs text-slate-500 mt-1.5">${escapeHtml(event.subtitle || '')}${event.time ? `${event.subtitle ? ' • ' : ''}${escapeHtml(displayTime(event.time))}` : ''}${event.location ? `${event.subtitle || event.time ? ' • ' : ''}${escapeHtml(event.location)}` : ''}</div>
+            </div>
+            ${event.caseId ? `<button type="button" data-open-case="${event.caseId}" class="shrink-0 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-white">საქმე</button>` : `<button type="button" data-open-calendar="1" class="shrink-0 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-white">კალენდარი</button>`}
+          </div>
+        </article>
+      `).join('');
+    }
+
     async function loadOverview() {
       const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
       if (userError) throw userError;
@@ -136,12 +351,13 @@
 
       const { data, error } = await window.supabaseClient
         .from('cases')
-        .select('result')
-        .eq('user_id', userData.user.id);
+        .select('id,title,code,client_name,deadline,notes,result')
+        .eq('user_id', userData.user.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const rows = data || [];
+      const rows = (data || []).map(mapCaseRow);
       const active = rows.filter((item) => !['მოგებული', 'წაგებული', 'მორიგებით დასრულებული', 'შეწყვეტილი'].includes(item.result)).length;
       const done = rows.filter((item) => item.result === 'მოგებული').length;
       const stopped = rows.filter((item) => item.result === 'შეწყვეტილი').length;
@@ -150,10 +366,31 @@
       document.querySelector('#overviewDone').textContent = done;
       document.querySelector('#overviewStopped').textContent = stopped;
       document.querySelector('#overviewAll').textContent = rows.length;
+
+      let manualEntries = [];
+      try {
+        const { data: manualData, error: manualError } = await window.supabaseClient
+          .from('calendar_events')
+          .select('id,user_id,related_case_id,title,category,event_date,event_time,reminder_date,location,notes')
+          .eq('user_id', userData.user.id)
+          .order('event_date', { ascending: true })
+          .order('event_time', { ascending: true });
+
+        if (manualError) throw manualError;
+        manualEntries = manualData || [];
+      } catch (error) {
+        manualEntries = readLocalEntries(userData.user.id);
+      }
+
+      renderDashboardReminders(upcomingReminderEvents(rows, manualEntries, 5));
     }
 
     function goCases(newCase = false) {
       window.location.href = newCase ? 'cases.html?new=1' : 'cases.html';
+    }
+
+    function openCase(caseId) {
+      window.location.href = `cases.html?id=${caseId}`;
     }
 
     function goCalendar() {
@@ -173,6 +410,17 @@
     document.querySelector('#heroNewCase').onclick = () => goCases(true);
     document.querySelector('#cardCases').onclick = () => goCases(false);
     document.querySelector('#cardCalendar').onclick = () => goCalendar();
+    document.querySelector('#dashboardReminderCalendar').onclick = () => goCalendar();
+    document.querySelector('#dashboardReminderList').onclick = (event) => {
+      const caseButton = event.target.closest('[data-open-case]');
+      if (caseButton) {
+        openCase(caseButton.dataset.openCase);
+        return;
+      }
+
+      const calendarButton = event.target.closest('[data-open-calendar]');
+      if (calendarButton) goCalendar();
+    };
 
     loadOverview().catch((error) => {
       console.error(error);

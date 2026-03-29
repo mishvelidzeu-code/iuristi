@@ -84,7 +84,7 @@
           <div class="flex items-center justify-between gap-3">
             <div>
               <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Reminder</div>
-              <div class="text-lg font-extrabold mt-1">დღევანდელი შეხსენებები</div>
+              <div class="text-lg font-extrabold mt-1">მომდევნო 5 დღის შეხსენებები</div>
             </div>
             <button type="button" id="jumpToday" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">დღეს</button>
           </div>
@@ -486,6 +486,20 @@
       return allEvents().filter((event) => event.reminderDate === todayKey);
     }
 
+    function upcomingReminderEvents(days = 5) {
+      const todayKey = formatKey(new Date());
+      const lastDayKey = addDays(todayKey, Math.max(days - 1, 0));
+      return allEvents()
+        .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
+        .sort((left, right) => {
+          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
+          if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
+          if (!left.time) return 1;
+          if (!right.time) return -1;
+          return left.time.localeCompare(right.time);
+        });
+    }
+
     function calendarDates() {
       const firstDay = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1);
       const startOffset = (firstDay.getDay() + 6) % 7;
@@ -517,11 +531,11 @@
     }
 
     function renderReminderList() {
-      const reminders = reminderEventsForToday();
-      $('#notificationNote').textContent = 'Browser notification იმუშავებს მხოლოდ მაშინ, როცა ამ საიტს გახსნილი გაქვს და შეტყობინებების უფლება მინიჭებულია.';
+      const reminders = upcomingReminderEvents(5);
+      $('#notificationNote').textContent = 'აქ ჩანს ის შეხსენებები, რომლებიც დღესიდან მომდევნო 5 დღეში უნდა შეგახსენოს. Browser notification მაინც მხოლოდ მიმდინარე დღეზე იმუშავებს.';
 
       if (!reminders.length) {
-        $('#reminderList').innerHTML = '<div class="rounded-[1.2rem] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">დღეს დამატებითი შეხსენება არ გაქვს.</div>';
+        $('#reminderList').innerHTML = '<div class="rounded-[1.2rem] border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">მომდევნო 5 დღეში შეხსენება არ გაქვს.</div>';
         return;
       }
 
@@ -530,6 +544,7 @@
           <div class="flex flex-wrap items-center gap-2 mb-2">
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
             <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
+            <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatShortDate(event.reminderDate))}</span>
           </div>
           <div class="text-base font-extrabold">${escapeHtml(event.title)}</div>
           <div class="text-xs text-slate-500 mt-1.5">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(displayTime(event.time))}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
