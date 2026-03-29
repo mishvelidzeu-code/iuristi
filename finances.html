@@ -32,6 +32,7 @@
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goDocuments" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">დოკუმენტები</button>
       <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">ფინანსები</button>
     </nav>
@@ -131,7 +132,7 @@
       </section>
 
       <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-4">
-        <article class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
+        <article id="invoiceSection" class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
               <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისები</div>
@@ -371,7 +372,8 @@
       search: '',
       client: 'all',
       caseId: 'all',
-      period: 'all'
+      period: 'all',
+      invoiceStatus: 'all'
     };
 
     const invoiceModal = $('#invoiceModal');
@@ -489,8 +491,12 @@
       ]).includes(query);
     }
 
-    function filteredInvoices() {
+    function baseFilteredInvoices() {
       return invoices.filter((item) => filterByCommon(item, 'issue_date', [item.payment_model, invoiceStatus(item)]));
+    }
+
+    function filteredInvoices() {
+      return baseFilteredInvoices().filter((item) => filters.invoiceStatus === 'all' || invoiceStatus(item) === filters.invoiceStatus);
     }
 
     function filteredBillables() {
@@ -773,12 +779,13 @@
     }
 
     function renderOverview() {
+      const baseInvoices = baseFilteredInvoices();
       const fi = filteredInvoices();
       const fb = filteredBillables();
       const fr = filteredRetainers();
-      const revenue = currentMonthRevenue(fi);
-      const pending = receivables(fi);
-      const overdue = overdueAmount(fi);
+      const revenue = currentMonthRevenue(baseInvoices);
+      const pending = receivables(baseInvoices);
+      const overdue = overdueAmount(baseInvoices);
       const hours = openBillableHours(fb);
       const retainersBalance = fr.reduce((sum, item) => sum + retainerBalance(item), 0);
 
@@ -791,19 +798,31 @@
       $('#overviewHours').textContent = formatHours(hours);
 
       const counts = {
-        Paid: fi.filter((item) => invoiceStatus(item) === 'Paid').length,
-        Pending: fi.filter((item) => invoiceStatus(item) === 'Pending').length,
-        Overdue: fi.filter((item) => invoiceStatus(item) === 'Overdue').length,
-        'Partially Paid': fi.filter((item) => invoiceStatus(item) === 'Partially Paid').length
+        Paid: baseInvoices.filter((item) => invoiceStatus(item) === 'Paid').length,
+        Pending: baseInvoices.filter((item) => invoiceStatus(item) === 'Pending').length,
+        Overdue: baseInvoices.filter((item) => invoiceStatus(item) === 'Overdue').length,
+        'Partially Paid': baseInvoices.filter((item) => invoiceStatus(item) === 'Partially Paid').length
       };
 
-      $('#statusBoard').innerHTML = Object.entries(counts).map(([status, count]) => `
-        <div class="rounded-2xl border px-4 py-4 ${statusTone(status)}">
+      $('#statusBoard').innerHTML = [[
+        'all',
+        'ყველა',
+        baseInvoices.length,
+        filters.invoiceStatus === 'all'
+          ? 'bg-slate-900 text-white border-slate-900 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.75)]'
+          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300'
+      ], ...Object.entries(counts).map(([status, count]) => ([
+        status,
+        statusLabel(status),
+        count,
+        `${statusTone(status)} ${filters.invoiceStatus === status ? 'ring-2 ring-slate-900 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.3)]' : 'hover:-translate-y-0.5'}`
+      ]))].map(([status, label, count, tone]) => `
+        <button type="button" data-status-filter="${status}" class="w-full rounded-2xl border px-4 py-4 text-left transition ${tone}">
           <div class="flex items-center justify-between gap-3">
-            <div class="font-bold">${statusLabel(status)}</div>
+            <div class="font-bold">${label}</div>
             <div class="text-lg font-black">${count}</div>
           </div>
-        </div>
+        </button>
       `).join('') || `<div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-4 text-sm text-slate-500">ინვოისები ჯერ არ არის.</div>`;
 
       const models = {};
@@ -820,7 +839,8 @@
           `).join('')
         : `<div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-500">მოდელების განაწილება გამოჩნდება, როცა ინვოისები დაემატება.</div>`;
 
-      $('#filterMeta').textContent = `${fi.length} ინვოისი • ${fb.length} საათი • ${filteredExpenses().length} ხარჯი • ${fr.length} ავანსი`;
+      const statusNote = filters.invoiceStatus === 'all' ? '' : ` • სტატუსი: ${statusLabel(filters.invoiceStatus)}`;
+      $('#filterMeta').textContent = `${fi.length} ინვოისი • ${fb.length} საათი • ${filteredExpenses().length} ხარჯი • ${fr.length} ავანსი${statusNote}`;
     }
 
     function renderInvoices() {
@@ -1325,16 +1345,25 @@
       renderAmountPreviews();
     }
 
-    $('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
-    $('#goCases').onclick = () => window.location.href = 'cases.html';
-    $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
-    $('#goContacts').onclick = () => window.location.href = 'contacts.html';
-    $('#goContracts').onclick = () => window.location.href = 'contracts.html';
+$('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
+$('#goCases').onclick = () => window.location.href = 'cases.html';
+$('#goCalendar').onclick = () => window.location.href = 'calendar.html';
+$('#goContacts').onclick = () => window.location.href = 'contacts.html';
+$('#goDocuments').onclick = () => window.location.href = 'documents.html';
+$('#goContracts').onclick = () => window.location.href = 'contracts.html';
     $('#globalSearch').oninput = (event) => { filters.search = event.target.value; $('#search').value = event.target.value; render(); };
     $('#search').oninput = (event) => { filters.search = event.target.value; $('#globalSearch').value = event.target.value; render(); };
     $('#clientFilter').onchange = (event) => { filters.client = event.target.value; render(); };
     $('#caseFilter').onchange = (event) => { filters.caseId = event.target.value; render(); };
     $('#periodFilter').onchange = (event) => { filters.period = event.target.value; render(); };
+    $('#statusBoard').onclick = (event) => {
+      const button = event.target.closest('[data-status-filter]');
+      if (!button) return;
+      const nextStatus = button.dataset.statusFilter;
+      filters.invoiceStatus = nextStatus === 'all' ? 'all' : (filters.invoiceStatus === nextStatus ? 'all' : nextStatus);
+      render();
+      requestAnimationFrame(() => $('#invoiceSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    };
     $('#newInvoice').onclick = openInvoiceModal;
     $('#openInvoiceFromOverview').onclick = openInvoiceModal;
     $('#invoiceButtonInline').onclick = openInvoiceModal;

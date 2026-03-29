@@ -36,6 +36,7 @@
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goDocuments" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">დოკუმენტები</button>
       <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">ხელშეკრულებები</button>
     </nav>
@@ -250,7 +251,7 @@
             </div>
             <div id="formMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
             <div class="flex justify-end">
-              <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+              <button type="submit" class="px-5 py-3 rounded-2xl bg-emerald-500 text-white font-bold hover:bg-emerald-600">შენახვა</button>
             </div>
           </form>
         </article>
@@ -1486,6 +1487,7 @@
     $('#goCases').onclick = () => window.location.href = 'cases.html';
     $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
     $('#goContacts').onclick = () => window.location.href = 'contacts.html';
+    $('#goDocuments').onclick = () => window.location.href = 'documents.html';
     $('#goFinances').onclick = () => window.location.href = 'finances.html';
     $('#toggleGenerator').onclick = () => {
       sectionState.generatorCollapsed = !sectionState.generatorCollapsed;
