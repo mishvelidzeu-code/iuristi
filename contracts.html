@@ -24,13 +24,13 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
   <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex lg:flex-col">
-    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+    <button type="button" id="workspaceHome" class="h-16 px-5 border-b border-slate-100 flex items-center gap-3 text-left hover:bg-slate-50 transition">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
       <div>
         <div class="font-extrabold">LexManage</div>
         <div class="text-[11px] text-slate-400">ხელშეკრულებების სივრცე</div>
       </div>
-    </div>
+    </button>
     <nav class="flex-1 p-3 space-y-1">
       <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
@@ -1483,6 +1483,7 @@
       fields.invoiceId.addEventListener('change', () => { syncFromInvoice(); syncFromCase(); renderPreview(); });
     }
 
+    $('#workspaceHome').onclick = () => window.location.href = 'contracts.html';
     $('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
     $('#goCases').onclick = () => window.location.href = 'cases.html';
     $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
