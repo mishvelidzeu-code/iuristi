@@ -198,7 +198,7 @@
             <textarea id="billableDescription" rows="3" class="lg:col-span-2 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="რა სამუშაო შესრულდა ამ საათებში..."></textarea>
             <div class="lg:col-span-2 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div id="billableAmountPreview" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700">ღირებულება: ₾0</div>
-              <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">დამატება</button>
+              <button type="submit" class="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-bold hover:bg-emerald-700">დამატება</button>
             </div>
             <div id="billableFormMsg" class="off lg:col-span-2 rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           </form>
@@ -237,7 +237,7 @@
             <textarea id="expenseDescription" rows="3" class="lg:col-span-2 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="ხარჯის აღწერა, ქვითრის დეტალი ან განმარტება..."></textarea>
             <div class="lg:col-span-2 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div id="expenseAmountPreview" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700">ხარჯი: ₾0</div>
-              <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">დამატება</button>
+              <button type="submit" class="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-bold hover:bg-emerald-700">დამატება</button>
             </div>
             <div id="expenseFormMsg" class="off lg:col-span-2 rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           </form>
@@ -267,7 +267,7 @@
             <input id="retainerReference" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="რეფერენსი / საბანკო ჩანაწერი">
             <textarea id="retainerNotes" rows="3" class="lg:col-span-2 w-full px-4 py-3 rounded-2xl border border-slate-200 bg-white outline-none resize-none" placeholder="რა ეტაპისთვისაა ავანსი, დამატებითი პირობები..."></textarea>
             <div class="lg:col-span-2 flex justify-end">
-              <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">დამატება</button>
+              <button type="submit" class="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-bold hover:bg-emerald-700">დამატება</button>
             </div>
             <div id="retainerFormMsg" class="off lg:col-span-2 rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           </form>
@@ -296,8 +296,8 @@
       <div class="w-full max-w-4xl rounded-[1.8rem] bg-white border border-slate-200 overflow-hidden">
         <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
           <div>
-            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისის გენერატორი</div>
-            <div class="text-2xl font-extrabold mt-2">ახალი ინვოისის გენერაცია</div>
+            <div id="invoiceModalEyebrow" class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ინვოისის გენერატორი</div>
+            <div id="invoiceModalTitle" class="text-2xl font-extrabold mt-2">ახალი ინვოისის გენერაცია</div>
           </div>
           <div class="flex gap-3">
             <button type="button" id="resetInvoiceForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
@@ -338,7 +338,7 @@
           <div id="invoiceSourceMeta" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">აირჩიე საქმე ან კლიენტი, რომ სისტემამ საათები და ხარჯები დათვალოს.</div>
           <div id="invoiceFormMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
           <div class="flex justify-end">
-            <button type="submit" class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">ინვოისის გენერაცია</button>
+            <button id="invoiceSubmitButton" type="submit" class="px-6 py-4 rounded-2xl bg-emerald-600 text-white font-bold hover:bg-emerald-700">ინვოისის გენერაცია</button>
           </div>
         </form>
       </div>
@@ -377,6 +377,7 @@
     };
 
     const invoiceModal = $('#invoiceModal');
+    let editingInvoiceId = null;
 
     function num(value) {
       const parsed = Number(value);
@@ -875,6 +876,7 @@
               <div class="rounded-2xl bg-slate-50 px-4 py-3"><div class="text-xs text-slate-400 mb-1">ხარჯები</div><div class="font-bold">${linkedExpensesCount}</div></div>
             </div>
             <div class="flex flex-wrap gap-2 mt-4">
+              <button type="button" data-invoice-edit="${item.id}" class="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-sm font-bold text-emerald-700 hover:bg-emerald-100">რედაქტირება</button>
               <button type="button" data-invoice-pdf="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">PDF / ბეჭდვა</button>
               <button type="button" data-invoice-payment="${item.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">გადახდის ჩაწერა</button>
               ${item.case_id ? `<button type="button" data-open-case="${item.case_id}" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">საქმე</button>` : ''}
@@ -990,7 +992,8 @@
       const clientName = $('#invoiceClientName').value.trim() || getCase(caseId)?.client_name || '';
       const service = num($('#invoiceServiceAmount').value);
       const adjustments = num($('#invoiceAdjustments').value);
-      const { openBillables, openExpenses } = invoiceEligibleEntries(caseId, clientName);
+      const openBillables = editingInvoiceId ? relatedBillables(editingInvoiceId) : invoiceEligibleEntries(caseId, clientName).openBillables;
+      const openExpenses = editingInvoiceId ? relatedExpenses(editingInvoiceId) : invoiceEligibleEntries(caseId, clientName).openExpenses;
       const subtotalHours = openBillables.reduce((sum, item) => sum + num(item.amount), 0);
       const subtotalExpenses = openExpenses.reduce((sum, item) => sum + num(item.amount), 0);
       const total = Math.max(0, service + subtotalHours + subtotalExpenses + adjustments);
@@ -1000,7 +1003,9 @@
       $('#invoicePreviewService').textContent = formatMoney(service);
       $('#invoicePreviewAdjustment').textContent = formatMoney(adjustments);
       $('#invoicePreviewTotal').textContent = formatMoney(total);
-      $('#invoiceSourceMeta').textContent = `ღია ჩანაწერები: ${openBillables.length} საათობრივი • ${openExpenses.length} ხარჯი`;
+      $('#invoiceSourceMeta').textContent = editingInvoiceId
+        ? `მიბმული ჩანაწერები: ${openBillables.length} საათობრივი • ${openExpenses.length} ხარჯი`
+        : `ღია ჩანაწერები: ${openBillables.length} საათობრივი • ${openExpenses.length} ხარჯი`;
     }
 
     function message(target, type, text) {
@@ -1019,7 +1024,15 @@
       if (item && $(inputId)) $(inputId).value = item.client_name || '';
     }
 
+    function syncInvoiceModalCopy() {
+      const isEditing = Boolean(editingInvoiceId);
+      $('#invoiceModalEyebrow').textContent = isEditing ? 'ინვოისის რედაქტორი' : 'ინვოისის გენერატორი';
+      $('#invoiceModalTitle').textContent = isEditing ? 'ინვოისის რედაქტირება' : 'ახალი ინვოისის გენერაცია';
+      $('#invoiceSubmitButton').textContent = isEditing ? 'ცვლილებების შენახვა' : 'ინვოისის გენერაცია';
+    }
+
     function resetInvoiceForm() {
+      editingInvoiceId = null;
       $('#invoiceCaseId').value = '';
       $('#invoiceClientName').value = '';
       $('#invoicePaymentModel').value = 'Hourly';
@@ -1028,12 +1041,33 @@
       $('#invoiceDueDate').value = todayKey();
       $('#invoiceAdjustments').value = '';
       $('#invoiceNotes').value = '';
+      syncInvoiceModalCopy();
       clearMessage('#invoiceFormMsg');
       renderInvoicePreview();
     }
 
     function openInvoiceModal() {
       resetInvoiceForm();
+      invoiceModal.classList.remove('off');
+      document.body.classList.add('overflow-hidden');
+      $('#invoiceClientName').focus();
+    }
+
+    function openInvoiceEditor(invoiceId) {
+      const item = invoices.find((entry) => entry.id === invoiceId);
+      if (!item) return;
+      editingInvoiceId = invoiceId;
+      $('#invoiceCaseId').value = item.case_id || '';
+      $('#invoiceClientName').value = item.client_name || '';
+      $('#invoicePaymentModel').value = item.payment_model || 'Hourly';
+      $('#invoiceServiceAmount').value = num(item.service_amount || 0) ? String(num(item.service_amount || 0)) : '';
+      $('#invoiceIssueDate').value = item.issue_date || todayKey();
+      $('#invoiceDueDate').value = item.due_date || $('#invoiceIssueDate').value;
+      $('#invoiceAdjustments').value = num(item.adjustments || 0) ? String(num(item.adjustments || 0)) : '';
+      $('#invoiceNotes').value = item.notes || '';
+      syncInvoiceModalCopy();
+      clearMessage('#invoiceFormMsg');
+      renderInvoicePreview();
       invoiceModal.classList.remove('off');
       document.body.classList.add('overflow-hidden');
       $('#invoiceClientName').focus();
@@ -1050,7 +1084,7 @@
       return `INV-${seed}-${String(count).padStart(3, '0')}`;
     }
 
-    async function createInvoice() {
+    async function saveInvoice() {
       const caseId = $('#invoiceCaseId').value || null;
       const clientName = $('#invoiceClientName').value.trim() || getCase(caseId)?.client_name || '';
       const paymentModel = $('#invoicePaymentModel').value;
@@ -1065,13 +1099,52 @@
         return;
       }
 
-      const { openBillables, openExpenses } = invoiceEligibleEntries(caseId, clientName);
+      const openBillables = editingInvoiceId ? relatedBillables(editingInvoiceId) : invoiceEligibleEntries(caseId, clientName).openBillables;
+      const openExpenses = editingInvoiceId ? relatedExpenses(editingInvoiceId) : invoiceEligibleEntries(caseId, clientName).openExpenses;
       const subtotalHours = openBillables.reduce((sum, item) => sum + num(item.amount), 0);
       const subtotalExpenses = openExpenses.reduce((sum, item) => sum + num(item.amount), 0);
       const total = Math.max(0, service + subtotalHours + subtotalExpenses + adjustments);
 
       if (total <= 0) {
         message('#invoiceFormMsg', 'err', 'ინვოისის თანხა ნულზე მეტი უნდა იყოს.');
+        return;
+      }
+
+      if (editingInvoiceId) {
+        const currentInvoice = invoices.find((entry) => entry.id === editingInvoiceId);
+        if (!currentInvoice) {
+          message('#invoiceFormMsg', 'err', 'ინვოისი ვერ მოიძებნა.');
+          return;
+        }
+
+        const paidAmount = Math.min(num(currentInvoice.paid_amount), total);
+        const balance = Math.max(0, total - paidAmount);
+        const status = balance <= 0
+          ? 'Paid'
+          : paidAmount > 0
+            ? 'Partially Paid'
+            : (dueDate && dueDate < todayKey() ? 'Overdue' : 'Pending');
+
+        await updateRecord('invoices', editingInvoiceId, {
+          case_id: caseId,
+          client_name: clientName || getCase(caseId)?.client_name || '',
+          payment_model: paymentModel,
+          issue_date: issueDate,
+          due_date: dueDate,
+          service_amount: service,
+          subtotal_hours: subtotalHours,
+          subtotal_expenses: subtotalExpenses,
+          adjustments,
+          total_amount: total,
+          paid_amount: paidAmount,
+          balance_amount: balance,
+          notes,
+          status
+        });
+
+        message('#invoiceFormMsg', 'ok', 'ინვოისი განახლდა.');
+        await reload();
+        setTimeout(closeInvoiceModal, 700);
         return;
       }
 
@@ -1378,7 +1451,7 @@ $('#goContracts').onclick = () => window.location.href = 'contracts.html';
     $('#invoiceForm').onsubmit = async (event) => {
       event.preventDefault();
       clearMessage('#invoiceFormMsg');
-      try { await createInvoice(); } catch (error) { message('#invoiceFormMsg', 'err', error.message || 'ინვოისის გენერაცია ვერ შესრულდა.'); }
+      try { await saveInvoice(); } catch (error) { message('#invoiceFormMsg', 'err', error.message || 'ინვოისის შენახვა ვერ შესრულდა.'); }
     };
     $('#billableTarget').onchange = (event) => { $('#billableRetainerWrap').classList.toggle('off', event.target.value !== 'retainer'); };
     $('#expenseTarget').onchange = (event) => { $('#expenseRetainerWrap').classList.toggle('off', event.target.value !== 'retainer'); };
@@ -1402,6 +1475,8 @@ $('#goContracts').onclick = () => window.location.href = 'contracts.html';
     };
     $('#retainerCaseId').onchange = () => setCaseLinkedClient('#retainerCaseId', '#retainerClient');
     $('#invoiceList').onclick = async (event) => {
+      const editButton = event.target.closest('[data-invoice-edit]');
+      if (editButton) return openInvoiceEditor(editButton.dataset.invoiceEdit);
       const pdfButton = event.target.closest('[data-invoice-pdf]');
       if (pdfButton) return printInvoice(pdfButton.dataset.invoicePdf);
       const paymentButton = event.target.closest('[data-invoice-payment]');

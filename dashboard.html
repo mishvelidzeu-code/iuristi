@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ka">
 <head>
   <meta charset="UTF-8">
@@ -18,13 +18,13 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
   <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
-    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+    <button type="button" id="dashboardHome" class="h-16 px-5 border-b border-slate-100 flex items-center gap-3 text-left hover:bg-slate-50 transition">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
       <div>
         <div class="font-extrabold">LexManage</div>
         <div class="text-[11px] text-slate-400">Legal Workspace</div>
       </div>
-    </div>
+    </button>
     <nav class="flex-1 p-3 space-y-1">
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">მთავარი დაფა</button>
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
@@ -49,6 +49,7 @@
       <div class="flex items-center gap-3">
         <button type="button" id="headerCases" class="px-4 py-2 rounded-xl border border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50">საქმეები</button>
         <button type="button" id="headerNewCase" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold hover:bg-blue-600">ახალი საქმე</button>
+        <button type="button" id="headerLogout" class="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 font-bold text-rose-700 hover:bg-rose-100">გამოსვლა</button>
       </div>
     </header>
 
@@ -65,25 +66,6 @@
         </div>
       </section>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <article class="rounded-3xl bg-white border p-5">
-          <div class="text-xs text-slate-400 uppercase font-bold">მიმდინარე საქმეები</div>
-          <div id="overviewActive" class="mt-2 text-3xl font-black">0</div>
-        </article>
-        <article class="rounded-3xl bg-white border p-5">
-          <div class="text-xs text-slate-400 uppercase font-bold">მოგებული საქმეები</div>
-          <div id="overviewDone" class="mt-2 text-3xl font-black">0</div>
-        </article>
-        <article class="rounded-3xl bg-white border p-5">
-          <div class="text-xs text-slate-400 uppercase font-bold">შეწყვეტილი საქმეები</div>
-          <div id="overviewStopped" class="mt-2 text-3xl font-black">0</div>
-        </article>
-        <article class="rounded-3xl bg-white border p-5">
-          <div class="text-xs text-slate-400 uppercase font-bold">სულ საქმეები</div>
-          <div id="overviewAll" class="mt-2 text-3xl font-black">0</div>
-        </article>
-      </section>
-
       <section class="grid grid-cols-1 xl:grid-cols-[1.1fr_0.9fr] gap-6">
         <article class="rounded-[1.75rem] bg-white border p-6">
           <div class="flex items-center justify-between mb-5">
@@ -92,53 +74,73 @@
               <div class="text-2xl font-extrabold mt-1">სწრაფი გადასვლები</div>
             </div>
           </div>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             <button type="button" id="cardCases" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
               <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
               <div class="text-xl font-extrabold mt-2">საქმეები</div>
               <div class="text-sm text-slate-500 mt-2">ფილტრები, ძებნა, დამატება, რედაქტირება და დეტალები.</div>
             </button>
             <button type="button" id="cardCalendar" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
-              <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
+              <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
               <div class="text-xl font-extrabold mt-2">კალენდარი</div>
-              <div class="text-sm text-slate-500 mt-2">შემდეგ ეტაპზე იგივე პრინციპით ცალკე გვერდად დაემატება.</div>
+              <div class="text-sm text-slate-500 mt-2">პროცესები, ვადები, პირადი ჩანაწერები და შეხსენებები ერთ კალენდარში.</div>
+            </button>
+            <button type="button" id="cardContacts" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
+              <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
+              <div class="text-xl font-extrabold mt-2">კონტაქტები</div>
+              <div class="text-sm text-slate-500 mt-2">კლიენტები, ტელეფონები, მისამართები და საქმეებთან მიბმული კონტაქტები.</div>
             </button>
             <button type="button" id="cardDocuments" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
-              <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
+              <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
               <div class="text-xl font-extrabold mt-2">დოკუმენტები</div>
-              <div class="text-sm text-slate-500 mt-2">ფაილების და ატვირთვების ცალკე მოდული შემდეგ მარტივად მიემატება.</div>
+              <div class="text-sm text-slate-500 mt-2">ატვირთვა, ძებნა, გადმოწერა და სურვილის მიხედვით საქმეზე მიბმა.</div>
             </button>
             <button type="button" id="cardFinances" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
-              <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
+              <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
               <div class="text-xl font-extrabold mt-2">ფინანსები</div>
               <div class="text-sm text-slate-500 mt-2">ინვოისები, ხარჯები, საათები და ავანსები უკვე ცალკე workspace-შია გამოტანილი.</div>
             </button>
+            <button type="button" id="cardContracts" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
+              <div class="text-xs uppercase text-slate-400 font-bold">Module</div>
+              <div class="text-xl font-extrabold mt-2">ხელშეკრულებები</div>
+              <div class="text-sm text-slate-500 mt-2">შაბლონები, ცოცხალი პრევიუ, ისტორია და PDF/Excel გატანა.</div>
+            </button>
+          </div>
+          <div class="mt-6">
+            <div class="text-xs uppercase font-bold text-slate-400">საქმეების სტატუსი</div>
+            <div class="text-2xl font-extrabold mt-1">სწრაფი შეჯამება</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+              <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-5">
+                <div class="text-xs text-blue-700 uppercase font-bold">მიმდინარე საქმეები</div>
+                <div id="overviewActive" class="mt-2 text-3xl font-black text-blue-950">0</div>
+              </article>
+              <article class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-lime-50 p-5">
+                <div class="text-xs text-emerald-700 uppercase font-bold">მოგებული საქმეები</div>
+                <div id="overviewDone" class="mt-2 text-3xl font-black text-emerald-950">0</div>
+              </article>
+              <article class="rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-5">
+                <div class="text-xs text-amber-700 uppercase font-bold">შეწყვეტილი საქმეები</div>
+                <div id="overviewStopped" class="mt-2 text-3xl font-black text-amber-950">0</div>
+              </article>
+              <article class="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-50 to-indigo-50 p-5">
+                <div class="text-xs text-violet-700 uppercase font-bold">სულ საქმეები</div>
+                <div id="overviewAll" class="mt-2 text-3xl font-black text-violet-950">0</div>
+              </article>
+            </div>
           </div>
         </article>
 
-        <div class="space-y-6">
-          <article class="rounded-[1.75rem] bg-white border p-6">
-            <div class="flex items-center justify-between gap-3 mb-5">
-              <div>
-                <div class="text-xs uppercase font-bold text-slate-400">Reminder</div>
-                <div class="text-2xl font-extrabold mt-1">მომდევნო 5 დღის შეხსენებები</div>
-              </div>
-              <button type="button" id="dashboardReminderCalendar" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">კალენდარი</button>
+        <article class="rounded-[1.75rem] bg-white border p-6">
+          <div class="flex items-center justify-between gap-3 mb-5">
+            <div>
+              <div class="text-xs uppercase font-bold text-slate-400">Reminder</div>
+              <div class="text-2xl font-extrabold mt-1">მომდევნო 5 დღის შეხსენებები</div>
             </div>
-            <div id="dashboardReminderNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">იტვირთება...</div>
-            <div id="dashboardReminderList" class="mt-4 space-y-3"></div>
-          </article>
-
-          <article class="rounded-[1.75rem] bg-white border p-6">
-            <div class="text-xs uppercase font-bold text-slate-400">შეჯამება</div>
-            <div class="text-2xl font-extrabold mt-1 mb-5">სტრუქტურა გამარტივდა</div>
-            <div class="space-y-4 text-sm text-slate-600 leading-7">
-              <div class="rounded-2xl bg-slate-50 px-4 py-4">`dashboard.html` ახლა მხოლოდ მთავარი დაფაა და აღარ იტვირთება საქმეების უზარმაზარი ლოგიკით.</div>
-              <div class="rounded-2xl bg-slate-50 px-4 py-4">`cases.html` უკვე ცალკე მოდულია თავისი სტილით და თავისი Supabase ლოგიკით.</div>
-              <div class="rounded-2xl bg-slate-50 px-4 py-4">ეს მოგვცემს საშუალებას შემდეგი ფუნქციები ბევრად სუფთად დავამატოთ.</div>
-            </div>
-          </article>
-        </div>
+            <button type="button" id="dashboardReminderCalendar" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">კალენდარი</button>
+          </div>
+          <div id="dashboardReminderNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600">იტვირთება...</div>
+          <div id="dashboardReminderList" class="mt-4 space-y-3"></div>
+        </article>
       </section>
     </div>
   </main>
@@ -425,6 +427,20 @@
       window.location.href = 'contracts.html';
     }
 
+    function goDashboardHome() {
+      window.location.href = 'dashboard.html';
+    }
+
+    async function signOut() {
+      try {
+        await window.supabaseClient.auth.signOut();
+      } catch (error) {
+        console.error(error);
+      }
+      window.location.href = 'login.html';
+    }
+
+    document.querySelector('#dashboardHome').onclick = () => goDashboardHome();
     document.querySelector('#goCases').onclick = () => goCases(false);
     document.querySelector('#goCalendar').onclick = () => goCalendar();
     document.querySelector('#goContacts').onclick = () => goContacts();
@@ -433,12 +449,15 @@
     document.querySelector('#goContracts').onclick = () => goContracts();
     document.querySelector('#headerCases').onclick = () => goCases(false);
     document.querySelector('#headerNewCase').onclick = () => goCases(true);
+    document.querySelector('#headerLogout').onclick = () => signOut();
     document.querySelector('#heroCases').onclick = () => goCases(false);
     document.querySelector('#heroNewCase').onclick = () => goCases(true);
     document.querySelector('#cardCases').onclick = () => goCases(false);
     document.querySelector('#cardCalendar').onclick = () => goCalendar();
+    document.querySelector('#cardContacts').onclick = () => goContacts();
     document.querySelector('#cardDocuments').onclick = () => goDocuments();
     document.querySelector('#cardFinances').onclick = () => goFinances();
+    document.querySelector('#cardContracts').onclick = () => goContracts();
     document.querySelector('#dashboardReminderCalendar').onclick = () => goCalendar();
     document.querySelector('#dashboardReminderList').onclick = (event) => {
       const caseButton = event.target.closest('[data-open-case]');
@@ -457,3 +476,4 @@
   </script>
 </body>
 </html>
+
