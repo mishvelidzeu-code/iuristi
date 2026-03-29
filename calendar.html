@@ -38,6 +38,7 @@
       <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goDocuments" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">დოკუმენტები</button>
       <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
       <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
       <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">კალენდარი</button>
@@ -64,8 +65,8 @@
     </header>
 
     <div class="flex-1 overflow-y-auto p-3 md:p-4 space-y-3">
-      <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-3">
-        <article class="rounded-[1.35rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-5">
+      <section class="grid xl:grid-cols-[1.15fr_0.85fr] gap-3 items-start">
+        <article class="self-start h-fit rounded-[1.35rem] bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 text-white p-5">
           <div class="inline-flex px-3 py-1 rounded-full bg-white/10 text-xs font-bold uppercase tracking-[0.2em] mb-4">Schedule Center</div>
           <h1 class="text-xl md:text-2xl font-extrabold leading-tight mb-3">საქმის პროცესები, ვადები და პირადი ჩანაწერები ახლა ერთ კალენდარზეა გაერთიანებული.</h1>
           <p class="text-slate-300 leading-6 text-sm max-w-3xl">თუ საქმეში ჩაწერილი გაქვს სხდომის თარიღი, reminder ან ვადა, ეს დღე ავტომატურად გამოჩნდება კალენდარში. დამატებით, შეგიძლია შენი ჩანაწერებიც შეინახო და კონკრეტულ დღეზე სრული agenda ქვემოთ ნახო.</p>
@@ -85,7 +86,7 @@
           </div>
         </article>
 
-        <article class="rounded-[1.35rem] bg-white border p-4 space-y-3">
+        <article class="self-start max-h-[24rem] overflow-hidden rounded-[1.35rem] bg-white border p-4 space-y-3">
           <div class="flex items-center justify-between gap-3">
             <div>
               <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Reminder</div>
@@ -94,11 +95,11 @@
             <button type="button" id="jumpToday" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">დღეს</button>
           </div>
           <div id="notificationNote" class="rounded-2xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 text-xs text-slate-600"></div>
-          <div id="reminderList" class="space-y-2.5"></div>
+          <div id="reminderList" class="space-y-2.5 max-h-[16.5rem] overflow-y-auto pr-1"></div>
         </article>
       </section>
 
-      <section class="rounded-[1.35rem] bg-white border p-3 space-y-3">
+      <section id="agendaSection" class="rounded-[1.35rem] bg-white border p-3 space-y-3">
         <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
           <div class="flex items-center gap-3">
             <button type="button" id="prevMonth" class="w-9 h-9 rounded-xl border border-slate-200 bg-white text-base font-bold hover:bg-slate-50">&larr;</button>
@@ -216,6 +217,35 @@
     function parseKey(value) {
       const [year, month, day] = value.split('-').map(Number);
       return new Date(year, month - 1, day);
+    }
+
+    function selectDate(value, options = {}) {
+      if (!value) return;
+
+      const { openComposer = false, scrollToAgenda = false } = options;
+      selectedDateKey = value;
+      const selectedDate = parseKey(value);
+
+      if (selectedDate.getMonth() !== monthCursor.getMonth() || selectedDate.getFullYear() !== monthCursor.getFullYear()) {
+        monthCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      }
+
+      render();
+
+      if (scrollToAgenda) {
+        requestAnimationFrame(() => {
+          $('#agendaSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+          if (openComposer) {
+            window.setTimeout(() => openEventModal(null, value), 180);
+          }
+        });
+        return;
+      }
+
+      if (openComposer) {
+        requestAnimationFrame(() => openEventModal(null, value));
+      }
     }
 
     function addDays(value, amount) {
@@ -580,17 +610,17 @@
         const isSelected = dateKey === selectedDateKey;
 
         return `
-          <button type="button" data-date="${dateKey}" class="calendar-cell rounded-[1rem] border p-2 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50 shadow-[0_18px_45px_-35px_rgba(37,99,235,0.55)]' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'} ${isCurrentMonth ? '' : 'opacity-55'}">
+          <article data-date="${dateKey}" role="button" tabindex="0" class="calendar-cell cursor-pointer rounded-[1rem] border p-2 text-left transition ${isSelected ? 'border-blue-300 bg-blue-50 shadow-[0_18px_45px_-35px_rgba(37,99,235,0.55)]' : 'border-slate-200 bg-white hover:border-slate-300 hover:-translate-y-0.5'} ${isCurrentMonth ? '' : 'opacity-55'}">
             <div class="flex items-center justify-between gap-2 mb-2">
               <div class="text-sm font-extrabold">${date.getDate()}</div>
               ${isToday ? '<span class="inline-flex items-center rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-white">დღეს</span>' : ''}
             </div>
             <div class="space-y-1">
-              ${items.slice(0, 2).map((event) => `<div class="event-chip rounded-xl px-2 py-1 text-[10px] font-bold ${event.source === 'case' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${escapeHtml(event.time ? `${displayTime(event.time)} • ${event.title}` : event.title)}</div>`).join('')}
+              ${items.slice(0, 2).map((event) => `<button type="button" data-quick-add="${dateKey}" class="event-chip w-full rounded-xl px-2 py-1 text-left text-[10px] font-bold transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-200 ${event.source === 'case' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-700'}">${escapeHtml(event.time ? `${displayTime(event.time)} • ${event.title}` : event.title)}</button>`).join('')}
               ${items.length > 2 ? `<div class="text-[10px] font-bold text-slate-400">+${items.length - 2} დამატებით</div>` : ''}
               ${items.length === 0 ? '<div class="text-[10px] text-slate-300 pt-1">ცარიელი დღე</div>' : ''}
             </div>
-          </button>
+          </article>
         `;
       }).join('');
     }
@@ -811,10 +841,11 @@
       triggerNotifications();
     }
 
-    $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
-    $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
-    $('#goContacts').onclick = () => { window.location.href = 'contacts.html'; };
-    $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
+$('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
+$('#goCases').onclick = () => { window.location.href = 'cases.html'; };
+$('#goContacts').onclick = () => { window.location.href = 'contacts.html'; };
+$('#goDocuments').onclick = () => { window.location.href = 'documents.html'; };
+$('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
     $('#goContracts').onclick = () => { window.location.href = 'contracts.html'; };
     $('#jumpToday').onclick = () => {
       selectedDateKey = formatKey(new Date());
@@ -849,14 +880,15 @@
     });
 
     $('#calendarGrid').onclick = (event) => {
+      const quickAdd = event.target.closest('[data-quick-add]');
+      if (quickAdd) {
+        selectDate(quickAdd.dataset.quickAdd, { openComposer: true, scrollToAgenda: true });
+        return;
+      }
+
       const cell = event.target.closest('[data-date]');
       if (!cell) return;
-      selectedDateKey = cell.dataset.date;
-      const selectedDate = parseKey(selectedDateKey);
-      if (selectedDate.getMonth() !== monthCursor.getMonth() || selectedDate.getFullYear() !== monthCursor.getFullYear()) {
-        monthCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-      }
-      render();
+      selectDate(cell.dataset.date, { scrollToAgenda: true });
     };
 
     $('#sourceFilters').onclick = (event) => {
