@@ -30,6 +30,7 @@
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
       <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
       <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" id="goDocuments" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">დოკუმენტები</button>
       <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
       <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
     </nav>
@@ -102,11 +103,11 @@
               <div class="text-xl font-extrabold mt-2">კალენდარი</div>
               <div class="text-sm text-slate-500 mt-2">შემდეგ ეტაპზე იგივე პრინციპით ცალკე გვერდად დაემატება.</div>
             </button>
-            <article class="rounded-3xl border bg-slate-50 p-5">
+            <button type="button" id="cardDocuments" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
               <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
               <div class="text-xl font-extrabold mt-2">დოკუმენტები</div>
               <div class="text-sm text-slate-500 mt-2">ფაილების და ატვირთვების ცალკე მოდული შემდეგ მარტივად მიემატება.</div>
-            </article>
+            </button>
             <button type="button" id="cardFinances" class="rounded-3xl border bg-slate-50 p-5 text-left hover:bg-blue-50 hover:border-blue-200 transition">
               <div class="text-xs uppercase text-slate-400 font-bold">Next</div>
               <div class="text-xl font-extrabold mt-2">ფინანსები</div>
@@ -412,6 +413,10 @@
       window.location.href = 'contacts.html';
     }
 
+    function goDocuments() {
+      window.location.href = 'documents.html';
+    }
+
     function goFinances() {
       window.location.href = 'finances.html';
     }
@@ -423,6 +428,7 @@
     document.querySelector('#goCases').onclick = () => goCases(false);
     document.querySelector('#goCalendar').onclick = () => goCalendar();
     document.querySelector('#goContacts').onclick = () => goContacts();
+    document.querySelector('#goDocuments').onclick = () => goDocuments();
     document.querySelector('#goFinances').onclick = () => goFinances();
     document.querySelector('#goContracts').onclick = () => goContracts();
     document.querySelector('#headerCases').onclick = () => goCases(false);
@@ -431,6 +437,7 @@
     document.querySelector('#heroNewCase').onclick = () => goCases(true);
     document.querySelector('#cardCases').onclick = () => goCases(false);
     document.querySelector('#cardCalendar').onclick = () => goCalendar();
+    document.querySelector('#cardDocuments').onclick = () => goDocuments();
     document.querySelector('#cardFinances').onclick = () => goFinances();
     document.querySelector('#dashboardReminderCalendar').onclick = () => goCalendar();
     document.querySelector('#dashboardReminderList').onclick = (event) => {

@@ -1,0 +1,805 @@
+﻿<!doctype html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LexManage - დოკუმენტები</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans Georgian', sans-serif; }
+    .off { display: none; }
+    @media (min-width: 1280px) {
+      html { font-size: 75%; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex lg:flex-col">
+    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
+      <div>
+        <div class="font-extrabold">LexManage</div>
+        <div class="text-[11px] text-slate-400">Documents Workspace</div>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
+      <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
+      <button type="button" id="goCalendar" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კალენდარი</button>
+      <button type="button" id="goContacts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">კონტაქტები</button>
+      <button type="button" class="w-full text-left px-3 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold">დოკუმენტები</button>
+      <button type="button" id="goFinances" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ფინანსები</button>
+      <button type="button" id="goContracts" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">ხელშეკრულებები</button>
+    </nav>
+    <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+      <div>
+        <div class="text-sm font-bold">ატვირთვები და ფაილები</div>
+        <div class="text-xs text-slate-500 mt-1">დოკუმენტი შეგიძლია დატოვო ცალკე ან სურვილის მიხედვით მიაბა კონკრეტულ საქმეს.</div>
+      </div>
+      <div id="storageBadge" class="rounded-2xl bg-white border border-slate-200 px-4 py-3 text-xs text-slate-500"></div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <header class="h-16 px-4 md:px-8 bg-white border-b border-slate-200 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 font-bold">Documents</div>
+        <div class="text-xl font-extrabold">დოკუმენტები</div>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="globalSearch" class="w-64 max-w-[40vw] px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა დოკუმენტებში...">
+        <button type="button" id="newDocument" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-blue-600">ახალი დოკუმენტი</button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-3 md:p-5 space-y-4">
+      <section class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <article class="rounded-[1.6rem] bg-white border p-5">
+          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სულ დოკუმენტები</div>
+          <div id="documentsCount" class="text-2xl font-black mt-2">0</div>
+        </article>
+        <article class="rounded-[1.6rem] bg-white border p-5">
+          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საქმეზე მიბმული</div>
+          <div id="linkedCount" class="text-2xl font-black mt-2">0</div>
+        </article>
+        <article class="rounded-[1.6rem] bg-white border p-5">
+          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ცალკე დოკუმენტები</div>
+          <div id="standaloneCount" class="text-2xl font-black mt-2">0</div>
+        </article>
+        <article class="rounded-[1.6rem] bg-white border p-5">
+          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">საერთო მოცულობა</div>
+          <div id="storageCount" class="text-2xl font-black mt-2">0 MB</div>
+        </article>
+      </section>
+
+      <section class="grid xl:grid-cols-[0.95fr_1.05fr] gap-4">
+        <article class="rounded-[1.6rem] bg-white border p-4 space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">სია</div>
+              <div class="text-xl font-extrabold mt-1">ყველა დოკუმენტი</div>
+            </div>
+            <div id="listMeta" class="text-sm text-slate-500"></div>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold mb-2">ტიპი</div>
+            <div id="sourceFilters" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold mb-2">ფაილის სახეობა</div>
+            <div id="kindFilters" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <input id="search" class="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 outline-none text-sm" placeholder="ძებნა სათაურით, საქმით, ფაილის სახელით ან შენიშვნით...">
+          <div id="empty" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+            <div class="text-lg font-bold">დოკუმენტები ვერ მოიძებნა</div>
+            <div class="text-slate-500 mt-2">შეგიძლია ატვირთო ახალი ფაილი და სურვილის შემთხვევაში საქმეს მიაბა.</div>
+          </div>
+          <div id="documentsList" class="space-y-3"></div>
+        </article>
+
+        <article class="rounded-[1.6rem] bg-white border p-4 space-y-4">
+          <div id="detailEmpty" class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+            <div class="text-lg font-bold">აირჩიე დოკუმენტი</div>
+            <div class="text-slate-500 mt-2">მარცხენა სიიდან დაკლიკების შემდეგ აქ გამოჩნდება დოკუმენტის სრული ინფორმაცია და მოქმედებები.</div>
+          </div>
+          <div id="detailPanel" class="off space-y-4">
+            <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+              <div>
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Document Detail</div>
+                <div id="detailTitle" class="text-2xl font-extrabold mt-1"></div>
+                <div id="detailSubtitle" class="text-sm text-slate-500 mt-2"></div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" id="openDocument" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">გახსნა</button>
+                <button type="button" id="downloadDocument" class="px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:bg-slate-50">გადმოწერა</button>
+                <button type="button" id="openCase" class="off px-4 py-2 rounded-xl border border-blue-200 bg-blue-50 text-sm font-bold text-blue-700 hover:bg-blue-100">საქმეზე გადასვლა</button>
+                <button type="button" id="deleteDocument" class="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm font-bold text-rose-700 hover:bg-rose-100">წაშლა</button>
+              </div>
+            </div>
+            <div id="detailBadges" class="flex flex-wrap gap-2"></div>
+            <div id="detailGrid" class="grid md:grid-cols-2 gap-3"></div>
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+              <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">შენიშვნები</div>
+              <div id="detailNotes" class="mt-3 text-sm leading-7 whitespace-pre-line text-slate-700"></div>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <section id="documentModal" class="off fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="min-h-full flex items-start justify-center">
+      <div class="w-full max-w-4xl rounded-[2rem] bg-white border border-slate-200 overflow-hidden">
+        <div class="px-6 py-6 border-b border-slate-100 flex items-start justify-between gap-4">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">Documents</div>
+            <div class="text-2xl font-extrabold mt-2">ახალი დოკუმენტი</div>
+          </div>
+          <div class="flex gap-3">
+            <button type="button" id="resetDocumentForm" class="px-4 py-2 rounded-xl border border-slate-200 font-bold text-slate-700">გასუფთავება</button>
+            <button type="button" id="closeDocumentModal" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">დახურვა</button>
+          </div>
+        </div>
+        <form id="documentForm" class="p-6 space-y-6">
+          <div class="grid lg:grid-cols-2 gap-6">
+            <section class="space-y-4">
+              <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-5">
+                <div class="text-sm font-bold mb-3">ფაილის არჩევა</div>
+                <label class="block cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">
+                  <input id="documentFiles" type="file" class="hidden" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.webp,.txt,.rtf,.zip,.rar">
+                  PDF, Word, Excel, სურათები და სხვა
+                </label>
+                <div id="selectedFiles" class="mt-3 text-xs text-slate-500">ფაილი ჯერ არ არის არჩეული.</div>
+              </div>
+              <input id="documentTitle" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none" placeholder="სათაური (თუ ერთი ფაილია, შეგიძლია ჩაწერო უკეთესი დასახელება)">
+              <div class="grid md:grid-cols-2 gap-4">
+                <select id="documentCategory" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+                  <option value="სხვა">სხვა</option>
+                  <option value="ხელშეკრულება">ხელშეკრულება</option>
+                  <option value="მტკიცებულება">მტკიცებულება</option>
+                  <option value="სასამართლო დოკუმენტი">სასამართლო დოკუმენტი</option>
+                  <option value="იდენტიფიკაცია">იდენტიფიკაცია</option>
+                  <option value="ფინანსური დოკუმენტი">ფინანსური დოკუმენტი</option>
+                </select>
+                <select id="documentCaseId" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none">
+                  <option value="">საქმის გარეშე</option>
+                </select>
+              </div>
+            </section>
+
+            <section class="space-y-4">
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4">
+                <div class="text-sm font-bold">საქმეზე მიბმა</div>
+                <div class="text-sm text-slate-500 mt-2">თუ საქმეს აირჩევ, დოკუმენტი ავტომატურად გამოჩნდება `საქმეები` გვერდის იმ ჩანაწერშიც.</div>
+              </div>
+              <textarea id="documentNotes" rows="9" class="w-full px-4 py-4 rounded-2xl border bg-white outline-none resize-none" placeholder="შენიშვნები, აღწერა ან რისთვის არის ეს დოკუმენტი..."></textarea>
+              <div class="rounded-3xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-600 leading-7">
+                თუ `documents` ცხრილი ჯერ არ გაქვს გაშვებული Supabase-ში, საქმეების გარეშე ატვირთული ფაილები დროებით ამ ბრაუზერში დაიმახსოვრება. საქმისთვის მიბმული ფაილები მაინც იმუშავებს.
+              </div>
+            </section>
+          </div>
+          <div id="documentMessage" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
+          <button type="submit" class="px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+        </form>
+      </div>
+    </div>
+  </section>
+  <script src="supabase-config.js"></script>
+  <script>
+    const SOURCE_FILTERS = ['ყველა', 'საქმეზე მიბმული', 'ცალკე'];
+    const KIND_FILTERS = ['ყველა', 'PDF', 'Word', 'Excel', 'სურათი', 'არქივი', 'სხვა'];
+    const CATEGORY_COLORS = {
+      'ხელშეკრულება': 'bg-violet-50 text-violet-700 border-violet-200',
+      'მტკიცებულება': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      'სასამართლო დოკუმენტი': 'bg-blue-50 text-blue-700 border-blue-200',
+      'იდენტიფიკაცია': 'bg-amber-50 text-amber-700 border-amber-200',
+      'ფინანსური დოკუმენტი': 'bg-rose-50 text-rose-700 border-rose-200',
+      'სხვა': 'bg-slate-50 text-slate-700 border-slate-200',
+      'საქმის ფაილი': 'bg-cyan-50 text-cyan-700 border-cyan-200'
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const modal = $('#documentModal');
+    const fields = {
+      files: $('#documentFiles'),
+      title: $('#documentTitle'),
+      category: $('#documentCategory'),
+      caseId: $('#documentCaseId'),
+      notes: $('#documentNotes')
+    };
+
+    let currentUser = null;
+    let cases = [];
+    let documents = [];
+    let selectedDocumentId = null;
+    let sourceFilter = 'ყველა';
+    let kindFilter = 'ყველა';
+    let searchTerm = '';
+    let documentsTableAvailable = false;
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function localDocumentsKey(userId) {
+      return `lexmanage-documents-${userId}`;
+    }
+
+    function readLocalDocuments(userId) {
+      try {
+        return JSON.parse(localStorage.getItem(localDocumentsKey(userId)) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function writeLocalDocuments(userId, rows) {
+      localStorage.setItem(localDocumentsKey(userId), JSON.stringify(rows));
+    }
+
+    function safeName(name) {
+      return String(name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+    }
+
+    function inferKind(fileName, fileType) {
+      const lowerName = String(fileName || '').toLowerCase();
+      const lowerType = String(fileType || '').toLowerCase();
+      if (lowerName.endsWith('.pdf') || lowerType.includes('pdf')) return 'PDF';
+      if (/\.(doc|docx)$/i.test(lowerName) || lowerType.includes('word')) return 'Word';
+      if (/\.(xls|xlsx|csv)$/i.test(lowerName) || lowerType.includes('excel') || lowerType.includes('csv')) return 'Excel';
+      if (/\.(png|jpg|jpeg|webp|gif|svg)$/i.test(lowerName) || lowerType.startsWith('image/')) return 'სურათი';
+      if (/\.(zip|rar|7z)$/i.test(lowerName) || lowerType.includes('zip') || lowerType.includes('compressed')) return 'არქივი';
+      return 'სხვა';
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString('ka-GE', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function formatDateTime(value) {
+      if (!value) return '-';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleString('ka-GE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }
+
+    function formatSizeKb(kb) {
+      const size = Number(kb || 0);
+      if (!size) return '0 KB';
+      if (size >= 1024) return `${(size / 1024).toFixed(size >= 10240 ? 0 : 1)} MB`;
+      return `${size} KB`;
+    }
+
+    function getCase(caseId) {
+      return cases.find((item) => item.id === caseId) || null;
+    }
+
+    function caseLabel(caseId) {
+      const item = getCase(caseId);
+      if (!item) return 'საქმის გარეშე';
+      return `${item.code || 'CASE'} • ${item.title}`;
+    }
+
+    function message(type, text) {
+      const element = $('#documentMessage');
+      element.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${type === 'ok'
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        : 'border-rose-200 bg-rose-50 text-rose-700'}`;
+      element.textContent = text;
+      element.classList.remove('off');
+    }
+
+    function closeModal() {
+      modal.classList.add('off');
+      document.body.classList.remove('overflow-hidden');
+      $('#documentMessage').classList.add('off');
+    }
+
+    function openModal() {
+      modal.classList.remove('off');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function resetForm() {
+      fields.files.value = '';
+      fields.title.value = '';
+      fields.category.value = 'სხვა';
+      fields.caseId.value = '';
+      fields.notes.value = '';
+      $('#selectedFiles').textContent = 'ფაილი ჯერ არ არის არჩეული.';
+      $('#documentMessage').classList.add('off');
+    }
+
+    function renderFileSelection() {
+      const files = Array.from(fields.files.files || []);
+      if (!files.length) {
+        $('#selectedFiles').textContent = 'ფაილი ჯერ არ არის არჩეული.';
+        return;
+      }
+      $('#selectedFiles').textContent = files.map((file) => `${file.name} • ${formatSizeKb(Math.max(1, Math.round(file.size / 1024)))}`).join(' | ');
+    }
+
+    function populateCaseSelect(selected = '') {
+      fields.caseId.innerHTML = `<option value="">საქმის გარეშე</option>${cases.map((item) => `<option value="${item.id}">${escapeHtml(`${item.code || 'CASE'} • ${item.title}`)}</option>`).join('')}`;
+      fields.caseId.value = selected || '';
+    }
+
+    function renderStorageBadge() {
+      $('#storageBadge').textContent = documentsTableAvailable
+        ? 'ძირითადი დოკუმენტები Supabase-ზე ინახება, ხოლო ძველი საქმის ფაილები ერთიანად ჩანს აქ.'
+        : 'საქმეზე მიბმული ფაილები Supabase-ზეა. ცალკე დოკუმენტები დროებით ამ ბრაუზერში ინახება.';
+    }
+
+    function chipClass(current, value) {
+      return value === current
+        ? 'bg-slate-900 text-white'
+        : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100';
+    }
+
+    function renderFilterChips() {
+      $('#sourceFilters').innerHTML = SOURCE_FILTERS.map((value) => `<button type="button" data-filter="source" data-value="${value}" class="${chipClass(sourceFilter, value)} px-3 py-2 rounded-full text-sm font-bold">${value}</button>`).join('');
+      $('#kindFilters').innerHTML = KIND_FILTERS.map((value) => `<button type="button" data-filter="kind" data-value="${value}" class="${chipClass(kindFilter, value)} px-3 py-2 rounded-full text-sm font-bold">${value}</button>`).join('');
+    }
+
+    function toDocumentCard(row, source) {
+      const linked = source === 'legacy' ? true : !!row.case_id;
+      return {
+        uid: `${source}:${row.id}`,
+        id: row.id,
+        source,
+        linked,
+        case_id: source === 'legacy' ? row.case_id : row.case_id || null,
+        case_label: caseLabel(source === 'legacy' ? row.case_id : row.case_id),
+        title: row.title || row.file_name,
+        file_name: row.file_name,
+        file_type: row.file_type || 'ფაილი',
+        file_size_kb: Number(row.file_size_kb || 0),
+        file_path: row.file_path || null,
+        category: row.category || (linked ? 'საქმის ფაილი' : 'სხვა'),
+        notes: row.notes || '',
+        created_at: row.created_at || new Date().toISOString(),
+        updated_at: row.updated_at || row.created_at || null,
+        kind: inferKind(row.file_name, row.file_type)
+      };
+    }
+
+    async function getCurrentUser() {
+      if (currentUser) return currentUser;
+      const { data, error } = await window.supabaseClient.auth.getUser();
+      if (error) throw error;
+      if (!data.user) {
+        window.location.href = 'login.html';
+        throw new Error('ავტორიზაცია საჭიროა.');
+      }
+      currentUser = data.user;
+      return currentUser;
+    }
+
+    async function loadCases() {
+      const user = await getCurrentUser();
+      const { data, error } = await window.supabaseClient
+        .from('cases')
+        .select('id,title,code,client_name')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      cases = data || [];
+      populateCaseSelect(new URLSearchParams(window.location.search).get('case') || '');
+    }
+
+    async function loadDocumentsTable() {
+      const user = await getCurrentUser();
+      const { data, error } = await window.supabaseClient
+        .from('documents')
+        .select('id,case_id,title,file_name,file_type,file_size_kb,file_path,category,notes,created_at,updated_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        documentsTableAvailable = false;
+        return [];
+      }
+      documentsTableAvailable = true;
+      return (data || []).map((row) => toDocumentCard(row, 'documents'));
+    }
+
+    async function loadLegacyCaseFiles() {
+      const user = await getCurrentUser();
+      const { data, error } = await window.supabaseClient
+        .from('case_files')
+        .select('id,case_id,file_name,file_type,file_size_kb,file_path,created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((row) => toDocumentCard(row, 'legacy'));
+    }
+
+    async function loadLocalStandalone() {
+      const user = await getCurrentUser();
+      return readLocalDocuments(user.id).map((row) => toDocumentCard(row, 'local'));
+    }
+
+    function sortDocuments(rows) {
+      return [...rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+
+    async function loadAllDocuments() {
+      const [tableRows, legacyRows, localRows] = await Promise.all([
+        loadDocumentsTable(),
+        loadLegacyCaseFiles(),
+        loadLocalStandalone()
+      ]);
+      documents = sortDocuments([...tableRows, ...legacyRows, ...localRows]);
+      renderStorageBadge();
+      render();
+    }
+
+    function filteredDocuments() {
+      return documents.filter((item) => {
+        if (sourceFilter === 'საქმეზე მიბმული' && !item.linked) return false;
+        if (sourceFilter === 'ცალკე' && item.linked) return false;
+        if (kindFilter !== 'ყველა' && item.kind !== kindFilter) return false;
+        const query = searchTerm.trim().toLowerCase();
+        if (!query) return true;
+        return [
+          item.title,
+          item.file_name,
+          item.category,
+          item.notes,
+          item.kind,
+          item.case_label,
+          getCase(item.case_id)?.client_name
+        ].join(' ').toLowerCase().includes(query);
+      });
+    }
+
+    function renderStats() {
+      const linked = documents.filter((item) => item.linked).length;
+      const standalone = documents.length - linked;
+      const totalKb = documents.reduce((sum, item) => sum + Number(item.file_size_kb || 0), 0);
+      $('#documentsCount').textContent = String(documents.length);
+      $('#linkedCount').textContent = String(linked);
+      $('#standaloneCount').textContent = String(standalone);
+      $('#storageCount').textContent = formatSizeKb(totalKb);
+    }
+
+    function categoryClass(category) {
+      return CATEGORY_COLORS[category] || CATEGORY_COLORS['სხვა'];
+    }
+
+    function sourceClass(linked) {
+      return linked
+        ? 'bg-blue-50 text-blue-700 border-blue-200'
+        : 'bg-slate-50 text-slate-700 border-slate-200';
+    }
+
+    function renderList() {
+      renderFilterChips();
+      renderStats();
+      const rows = filteredDocuments();
+      $('#listMeta').textContent = `${rows.length} შედეგი`;
+      $('#empty').classList.toggle('off', rows.length !== 0);
+      $('#documentsList').innerHTML = rows.map((item) => `
+        <article data-open="${item.uid}" class="rounded-3xl bg-white border p-4 cursor-pointer hover:border-blue-200 hover:bg-blue-50/40 transition">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceClass(item.linked)}">${item.linked ? 'საქმეზე მიბმული' : 'ცალკე'}</span>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${categoryClass(item.category)}">${escapeHtml(item.category)}</span>
+                <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold bg-slate-50 text-slate-600 border-slate-200">${item.kind}</span>
+              </div>
+              <div class="font-extrabold text-lg leading-6 break-words">${escapeHtml(item.title)}</div>
+              <div class="text-sm text-slate-500 mt-1 break-all">${escapeHtml(item.file_name)}</div>
+            </div>
+            <div class="flex gap-2 shrink-0">
+              <button type="button" data-act="open" data-id="${item.uid}" class="px-3 py-2 rounded-xl border text-sm font-bold text-slate-700 hover:bg-slate-50">გახსნა</button>
+              <button type="button" data-act="delete" data-id="${item.uid}" class="px-3 py-2 rounded-xl border border-rose-200 text-sm font-bold text-rose-700 hover:bg-rose-50">წაშლა</button>
+            </div>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3 mt-4 text-sm">
+            <div class="rounded-2xl bg-slate-50 px-4 py-3">
+              <div class="text-xs text-slate-400 mb-1">საქმე</div>
+              <div class="font-bold">${escapeHtml(item.case_label)}</div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 px-4 py-3">
+              <div class="text-xs text-slate-400 mb-1">ატვირთვა</div>
+              <div class="font-bold">${escapeHtml(formatDate(item.created_at))}</div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderDetail() {
+      const item = documents.find((row) => row.uid === selectedDocumentId);
+      const hasSelection = !!item;
+      $('#detailEmpty').classList.toggle('off', hasSelection);
+      $('#detailPanel').classList.toggle('off', !hasSelection);
+      if (!item) return;
+
+      $('#detailTitle').textContent = item.title;
+      $('#detailSubtitle').textContent = `${item.file_name} • ${item.kind}`;
+      $('#detailBadges').innerHTML = `
+        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${sourceClass(item.linked)}">${item.linked ? 'საქმეზე მიბმული' : 'ცალკე დოკუმენტი'}</span>
+        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${categoryClass(item.category)}">${item.category}</span>
+        <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold bg-slate-50 text-slate-600 border-slate-200">${item.kind}</span>
+      `;
+
+      $('#detailGrid').innerHTML = [
+        ['დაკავშირებული საქმე', item.case_label],
+        ['ფაილის ზომა', formatSizeKb(item.file_size_kb)],
+        ['ატვირთვის თარიღი', formatDateTime(item.created_at)],
+        ['განახლება', formatDateTime(item.updated_at || item.created_at)]
+      ].map(([label, value]) => `
+        <div class="rounded-3xl bg-slate-50 border border-slate-200 px-4 py-4">
+          <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">${escapeHtml(label)}</div>
+          <div class="text-sm font-bold mt-2 break-words">${escapeHtml(value || '-')}</div>
+        </div>
+      `).join('');
+
+      $('#detailNotes').textContent = item.notes || 'შენიშვნები არ არის დამატებული.';
+      $('#openCase').classList.toggle('off', !item.case_id);
+    }
+
+    function render() {
+      renderList();
+      renderDetail();
+    }
+
+    async function signedUrl(filePath) {
+      if (!filePath) throw new Error('ფაილის მისამართი ვერ მოიძებნა.');
+      const { data, error } = await window.supabaseClient.storage.from('case-files').createSignedUrl(filePath, 3600);
+      if (error) throw error;
+      return data.signedUrl;
+    }
+
+    async function openOrDownload(item, downloadMode) {
+      const url = await signedUrl(item.file_path);
+      const link = document.createElement('a');
+      link.href = url;
+      link.rel = 'noopener noreferrer';
+      if (downloadMode) {
+        link.download = item.file_name;
+      } else {
+        link.target = '_blank';
+      }
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    async function uploadToStorage(userId, caseId, file) {
+      const folder = caseId || 'general';
+      const filePath = `${userId}/documents/${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName(file.name)}`;
+      const { error } = await window.supabaseClient.storage.from('case-files').upload(filePath, file, { upsert: false });
+      if (error) throw error;
+      return filePath;
+    }
+
+    async function saveDocumentRows(userId, files, selectedCaseId) {
+      const uploaded = [];
+      try {
+        for (const file of files) {
+          const filePath = await uploadToStorage(userId, selectedCaseId, file);
+          uploaded.push({ file, filePath });
+        }
+
+        if (documentsTableAvailable) {
+          const rows = uploaded.map(({ file, filePath }, index) => ({
+            user_id: userId,
+            case_id: selectedCaseId || null,
+            title: files.length === 1 && fields.title.value.trim() ? fields.title.value.trim() : file.name,
+            file_name: file.name,
+            file_type: file.type || 'ფაილი',
+            file_size_kb: Math.max(1, Math.round(file.size / 1024)),
+            file_path: filePath,
+            category: fields.category.value || 'სხვა',
+            notes: index === 0 ? fields.notes.value.trim() : ''
+          }));
+          const { error } = await window.supabaseClient.from('documents').insert(rows);
+          if (error) throw error;
+          message('ok', selectedCaseId ? 'დოკუმენტი დაემატა და საქმეს მიება.' : 'დოკუმენტი დაემატა.');
+          return;
+        }
+
+        if (selectedCaseId) {
+          const rows = uploaded.map(({ file, filePath }) => ({
+            case_id: selectedCaseId,
+            user_id: userId,
+            file_name: file.name,
+            file_type: file.type || 'ფაილი',
+            file_size_kb: Math.max(1, Math.round(file.size / 1024)),
+            file_path: filePath
+          }));
+          const { error } = await window.supabaseClient.from('case_files').insert(rows);
+          if (error) throw error;
+          message('ok', 'ფაილი დაემატა საქმეს. ცალკე დოკუმენტების სრული ბაზისთვის SQL-ის გაშვება დაგჭირდება.');
+          return;
+        }
+
+        const localRows = readLocalDocuments(userId);
+        const createdAt = new Date().toISOString();
+        const newRows = uploaded.map(({ file, filePath }) => ({
+          id: crypto.randomUUID(),
+          case_id: null,
+          title: files.length === 1 && fields.title.value.trim() ? fields.title.value.trim() : file.name,
+          file_name: file.name,
+          file_type: file.type || 'ფაილი',
+          file_size_kb: Math.max(1, Math.round(file.size / 1024)),
+          file_path: filePath,
+          category: fields.category.value || 'სხვა',
+          notes: fields.notes.value.trim(),
+          created_at: createdAt,
+          updated_at: createdAt
+        }));
+        writeLocalDocuments(userId, [...newRows, ...localRows]);
+        message('ok', 'დოკუმენტი დაემატა. სანამ SQL არ არის გაშვებული, ეს ჩანაწერი ამ ბრაუზერში ინახება.');
+      } catch (error) {
+        if (uploaded.length) {
+          await window.supabaseClient.storage.from('case-files').remove(uploaded.map((item) => item.filePath));
+        }
+        throw error;
+      }
+    }
+
+    async function deleteDocumentRow(item) {
+      if (!window.confirm('დარწმუნებული ხარ, რომ ამ დოკუმენტის წაშლა გინდა?')) return;
+      if (item.source === 'documents') {
+        const { error } = await window.supabaseClient.from('documents').delete().eq('id', item.id);
+        if (error) throw error;
+      } else if (item.source === 'legacy') {
+        const { error } = await window.supabaseClient.from('case_files').delete().eq('id', item.id);
+        if (error) throw error;
+      } else {
+        const user = await getCurrentUser();
+        const rows = readLocalDocuments(user.id).filter((row) => row.id !== item.id);
+        writeLocalDocuments(user.id, rows);
+      }
+      if (item.file_path) {
+        await window.supabaseClient.storage.from('case-files').remove([item.file_path]);
+      }
+    }
+
+    function selectedDocument() {
+      return documents.find((item) => item.uid === selectedDocumentId) || null;
+    }
+
+    $('#goDashboard').onclick = () => { window.location.href = 'dashboard.html'; };
+    $('#goCases').onclick = () => { window.location.href = 'cases.html'; };
+    $('#goCalendar').onclick = () => { window.location.href = 'calendar.html'; };
+    $('#goContacts').onclick = () => { window.location.href = 'contacts.html'; };
+    $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
+    $('#goContracts').onclick = () => { window.location.href = 'contracts.html'; };
+    $('#newDocument').onclick = () => { resetForm(); openModal(); fields.title.focus(); };
+    $('#closeDocumentModal').onclick = closeModal;
+    $('#resetDocumentForm').onclick = () => { if (window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) resetForm(); };
+    modal.onclick = (event) => { if (event.target === modal) closeModal(); };
+    fields.files.addEventListener('change', renderFileSelection);
+
+    $('#globalSearch').oninput = (event) => { searchTerm = event.target.value; $('#search').value = event.target.value; render(); };
+    $('#search').oninput = (event) => { searchTerm = event.target.value; $('#globalSearch').value = event.target.value; render(); };
+    $('#sourceFilters').onclick = (event) => {
+      const button = event.target.closest('button[data-filter="source"]');
+      if (!button) return;
+      sourceFilter = button.dataset.value;
+      render();
+    };
+    $('#kindFilters').onclick = (event) => {
+      const button = event.target.closest('button[data-filter="kind"]');
+      if (!button) return;
+      kindFilter = button.dataset.value;
+      render();
+    };
+
+    $('#documentsList').onclick = async (event) => {
+      const actionButton = event.target.closest('button[data-act]');
+      if (actionButton) {
+        const item = documents.find((row) => row.uid === actionButton.dataset.id);
+        if (!item) return;
+        try {
+          if (actionButton.dataset.act === 'open') {
+            await openOrDownload(item, false);
+          } else if (actionButton.dataset.act === 'delete') {
+            await deleteDocumentRow(item);
+            if (selectedDocumentId === item.uid) selectedDocumentId = null;
+            await loadAllDocuments();
+          }
+        } catch (error) {
+          window.alert(error.message || 'მოქმედება ვერ შესრულდა.');
+        }
+        return;
+      }
+
+      const card = event.target.closest('[data-open]');
+      if (!card) return;
+      selectedDocumentId = card.dataset.open;
+      render();
+    };
+
+    $('#openDocument').onclick = async () => {
+      const item = selectedDocument();
+      if (!item) return;
+      try { await openOrDownload(item, false); } catch (error) { window.alert(error.message || 'ფაილი ვერ გაიხსნა.'); }
+    };
+    $('#downloadDocument').onclick = async () => {
+      const item = selectedDocument();
+      if (!item) return;
+      try { await openOrDownload(item, true); } catch (error) { window.alert(error.message || 'ფაილი ვერ გადმოიწერა.'); }
+    };
+    $('#openCase').onclick = () => {
+      const item = selectedDocument();
+      if (item?.case_id) window.location.href = `cases.html?id=${item.case_id}`;
+    };
+    $('#deleteDocument').onclick = async () => {
+      const item = selectedDocument();
+      if (!item) return;
+      try {
+        await deleteDocumentRow(item);
+        selectedDocumentId = null;
+        await loadAllDocuments();
+      } catch (error) {
+        window.alert(error.message || 'წაშლა ვერ შესრულდა.');
+      }
+    };
+
+    $('#documentForm').onsubmit = async (event) => {
+      event.preventDefault();
+      const files = Array.from(fields.files.files || []);
+      if (!files.length) {
+        message('err', 'აირჩიე მინიმუმ ერთი ფაილი.');
+        return;
+      }
+      try {
+        const user = await getCurrentUser();
+        await saveDocumentRows(user.id, files, fields.caseId.value || null);
+        await loadAllDocuments();
+        if (documents.length && !selectedDocumentId) selectedDocumentId = documents[0].uid;
+        setTimeout(() => {
+          closeModal();
+          resetForm();
+        }, 700);
+      } catch (error) {
+        message('err', error.message || 'დოკუმენტის შენახვა ვერ შესრულდა.');
+      }
+    };
+
+    (async function init() {
+      try {
+        await loadCases();
+        await loadAllDocuments();
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('new') === '1') openModal();
+        if (!selectedDocumentId && documents.length) {
+          selectedDocumentId = documents[0].uid;
+          render();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  </script>
+</body>
+</html>
+
