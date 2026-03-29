@@ -20,13 +20,13 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex h-screen overflow-hidden">
   <aside class="w-64 bg-white border-r border-slate-200 hidden lg:flex lg:flex-col">
-    <div class="h-16 px-5 border-b border-slate-100 flex items-center gap-3">
+    <button type="button" id="financeHome" class="h-16 px-5 border-b border-slate-100 flex items-center gap-3 text-left hover:bg-slate-50 transition">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center">L</div>
       <div>
         <div class="font-extrabold">LexManage</div>
         <div class="text-[11px] text-slate-400">ფინანსების სივრცე</div>
       </div>
-    </div>
+    </button>
     <nav class="flex-1 p-3 space-y-1">
       <button type="button" id="goDashboard" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">მთავარი დაფა</button>
       <button type="button" id="goCases" class="w-full text-left px-3 py-3 rounded-xl text-slate-500 hover:bg-slate-50">საქმეები</button>
@@ -322,6 +322,12 @@
                 <input id="invoiceIssueDate" type="date" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none">
                 <input id="invoiceDueDate" type="date" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none">
               </div>
+              <select id="invoiceStatus" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none">
+                <option value="Pending">გადასახდელი</option>
+                <option value="Paid">გადახდილი</option>
+                <option value="Overdue">ვადაგადაცილებული</option>
+                <option value="Partially Paid">ნაწილობრივ გადახდილი</option>
+              </select>
             </section>
             <section class="space-y-4">
               <input id="invoiceAdjustments" type="number" step="0.01" class="w-full px-4 py-4 rounded-2xl border border-slate-200 bg-white outline-none" placeholder="დამატება / ფასდაკლება (+ / -)">
@@ -528,6 +534,7 @@
     }
 
     function invoiceStatus(item) {
+      if (item.status && item.status !== 'Pending') return item.status;
       const balance = invoiceBalance(item);
       const paid = num(item.paid_amount);
       if (balance <= 0 && num(item.total_amount) > 0) return 'Paid';
@@ -1036,6 +1043,7 @@
       $('#invoiceCaseId').value = '';
       $('#invoiceClientName').value = '';
       $('#invoicePaymentModel').value = 'Hourly';
+      $('#invoiceStatus').value = 'Pending';
       $('#invoiceServiceAmount').value = '';
       $('#invoiceIssueDate').value = todayKey();
       $('#invoiceDueDate').value = todayKey();
@@ -1060,6 +1068,7 @@
       $('#invoiceCaseId').value = item.case_id || '';
       $('#invoiceClientName').value = item.client_name || '';
       $('#invoicePaymentModel').value = item.payment_model || 'Hourly';
+      $('#invoiceStatus').value = invoiceStatus(item);
       $('#invoiceServiceAmount').value = num(item.service_amount || 0) ? String(num(item.service_amount || 0)) : '';
       $('#invoiceIssueDate').value = item.issue_date || todayKey();
       $('#invoiceDueDate').value = item.due_date || $('#invoiceIssueDate').value;
@@ -1088,6 +1097,7 @@
       const caseId = $('#invoiceCaseId').value || null;
       const clientName = $('#invoiceClientName').value.trim() || getCase(caseId)?.client_name || '';
       const paymentModel = $('#invoicePaymentModel').value;
+      const selectedStatus = $('#invoiceStatus').value || 'Pending';
       const service = num($('#invoiceServiceAmount').value);
       const issueDate = $('#invoiceIssueDate').value || todayKey();
       const dueDate = $('#invoiceDueDate').value || issueDate;
@@ -1117,13 +1127,11 @@
           return;
         }
 
-        const paidAmount = Math.min(num(currentInvoice.paid_amount), total);
+        let paidAmount = Math.min(num(currentInvoice.paid_amount), total);
+        if (selectedStatus === 'Paid') paidAmount = total;
+        if (selectedStatus === 'Pending') paidAmount = 0;
         const balance = Math.max(0, total - paidAmount);
-        const status = balance <= 0
-          ? 'Paid'
-          : paidAmount > 0
-            ? 'Partially Paid'
-            : (dueDate && dueDate < todayKey() ? 'Overdue' : 'Pending');
+        const status = selectedStatus;
 
         await updateRecord('invoices', editingInvoiceId, {
           case_id: caseId,
@@ -1153,7 +1161,7 @@
         case_id: caseId,
         client_name: clientName || getCase(caseId)?.client_name || '',
         invoice_number: buildInvoiceNumber(),
-        status: 'Pending',
+        status: selectedStatus,
         payment_model: paymentModel,
         issue_date: issueDate,
         due_date: dueDate,
@@ -1163,8 +1171,8 @@
         subtotal_expenses: subtotalExpenses,
         adjustments,
         total_amount: total,
-        paid_amount: 0,
-        balance_amount: total,
+        paid_amount: selectedStatus === 'Paid' ? total : 0,
+        balance_amount: selectedStatus === 'Paid' ? 0 : total,
         notes
       });
 
@@ -1418,6 +1426,7 @@
       renderAmountPreviews();
     }
 
+$('#financeHome').onclick = () => window.location.href = 'finances.html';
 $('#goDashboard').onclick = () => window.location.href = 'dashboard.html';
 $('#goCases').onclick = () => window.location.href = 'cases.html';
 $('#goCalendar').onclick = () => window.location.href = 'calendar.html';
@@ -1446,6 +1455,7 @@ $('#goContracts').onclick = () => window.location.href = 'contracts.html';
     $('#invoiceCaseId').onchange = () => { const item = getCase($('#invoiceCaseId').value); if (item) $('#invoiceClientName').value = item.client_name || ''; renderInvoicePreview(); };
     $('#invoiceClientName').oninput = renderInvoicePreview;
     $('#invoicePaymentModel').onchange = renderInvoicePreview;
+    $('#invoiceStatus').onchange = renderInvoicePreview;
     $('#invoiceServiceAmount').oninput = renderInvoicePreview;
     $('#invoiceAdjustments').oninput = renderInvoicePreview;
     $('#invoiceForm').onsubmit = async (event) => {
