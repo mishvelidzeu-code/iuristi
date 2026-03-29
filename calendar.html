@@ -8,14 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --desktop-ui-scale: 0.7; }
     body { font-family: 'Noto Sans Georgian', sans-serif; }
     .off { display: none; }
+    @media (min-width: 1280px) {
+      html { font-size: 75%; }
+    }
     .calendar-cell { min-height: 4.6rem; }
     .event-chip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.15; }
-    @media (min-width: 1280px) {
-      html { zoom: var(--desktop-ui-scale); }
-    }
     @media (min-width: 1280px) {
       .calendar-cell { min-height: 5.1rem; }
     }
