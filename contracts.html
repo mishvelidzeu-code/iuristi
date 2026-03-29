@@ -128,6 +128,26 @@
             </button>
             <button type="button" id="resetForm" class="px-3 py-2 rounded-xl border border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50">გასუფთავება</button>
           </div>
+          <button type="button" id="toggleGeneratorCollapsedView" class="w-full text-left rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100 transition-colors">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">მოკლე მონახაზი</div>
+                <div id="generatorSummaryTitle" class="text-lg font-extrabold mt-1">ხელშეკრულების მონაცემები</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">სრულად გახსნა</span>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3 mt-4">
+              <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <div class="text-xs text-slate-400 mb-1">შაბლონი და სტატუსი</div>
+                <div id="generatorSummaryTemplate" class="font-bold">სტანდარტული შაბლონი</div>
+                <div id="generatorSummaryStatus" class="text-sm text-slate-500 mt-1">დრაფტი</div>
+              </div>
+              <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <div class="text-xs text-slate-400 mb-1">კავშირები</div>
+                <div id="generatorSummaryLinks" class="font-bold">საქმე, კონტაქტი და ინვოისი არჩეული არ არის</div>
+              </div>
+            </div>
+          </button>
           <form id="contractForm" class="off space-y-5">
             <input id="contractId" type="hidden">
             <div class="grid md:grid-cols-2 gap-4">
@@ -246,6 +266,25 @@
             </div>
             <div id="previewMeta" class="text-sm text-slate-500">შაბლონის შევსება მიმდინარეობს</div>
           </button>
+          <button type="button" id="togglePreviewCollapsedView" class="w-full text-left rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100 transition-colors">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ცოცხალი პრევიუს მონახაზი</div>
+                <div id="previewSummaryTitle" class="text-lg font-extrabold mt-1">სტანდარტული ტექსტი</div>
+              </div>
+              <span class="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">სრულად გახსნა</span>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3 mt-4">
+              <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <div class="text-xs text-slate-400 mb-1">მონიშნული ჩანაწერები</div>
+                <div id="previewSummaryLinks" class="font-bold">საქმე, კონტაქტი და ინვოისი არჩეული არ არის</div>
+              </div>
+              <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                <div class="text-xs text-slate-400 mb-1">ტექსტის მონაკვეთი</div>
+                <div id="previewSummaryExcerpt" class="text-sm leading-6 text-slate-600">სრულად გასახსნელად დააჭირე ბლოკს.</div>
+              </div>
+            </div>
+          </button>
           <div id="previewBody" class="off space-y-4">
             <div class="grid md:grid-cols-3 gap-3">
               <div class="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3">
@@ -276,19 +315,18 @@
 
       <section class="rounded-[1.6rem] bg-white border p-4 panel-shadow space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-          <button type="button" id="toggleArchive" class="flex items-center gap-3 text-left">
-            <span id="archiveChevron" class="accordion-chevron text-slate-400 text-sm">▾</span>
+          <div class="flex items-center gap-3 text-left">
             <span>
               <span class="block text-xs uppercase tracking-[0.18em] text-slate-400 font-bold">ისტორია და არქივი</span>
               <span class="block text-xl font-extrabold mt-1">შენახული ხელშეკრულებები და ცვლილებები</span>
             </span>
-          </button>
+          </div>
           <div class="flex flex-col md:flex-row md:items-center gap-3">
             <input id="archiveSearch" class="w-full md:w-72 px-4 py-2 rounded-full border border-slate-200 bg-white outline-none text-sm" placeholder="ძებნა არქივსა და ისტორიაში...">
             <div id="listMeta" class="text-sm text-slate-500">0 ჩანაწერი</div>
           </div>
         </div>
-        <div id="archiveBody" class="off space-y-4">
+        <div id="archiveBody" class="space-y-4">
           <div id="emptyContracts" class="off rounded-3xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
             <div class="text-lg font-bold">ხელშეკრულებები ჯერ არ არის შენახული</div>
             <div class="text-slate-500 mt-2">აირჩიე შაბლონი, შეავსე მონაცემები და შექმენი პირველი ხელშეკრულება.</div>
@@ -493,8 +531,7 @@
     let contractHistory = [];
     let signatureState = null;
     const sectionState = {
-      generatorCollapsed: true,
-      archiveCollapsed: true
+      generatorCollapsed: true
     };
 
     function todayKey() {
@@ -518,6 +555,13 @@
         hour: '2-digit',
         minute: '2-digit'
       }).format(date);
+    }
+
+    function truncateText(value, maxLength = 180) {
+      const normalized = String(value || '').replace(/\s+/g, ' ').trim();
+      if (!normalized) return 'სრულად გასახსნელად დააჭირე ბლოკს.';
+      if (normalized.length <= maxLength) return normalized;
+      return `${normalized.slice(0, maxLength).trim()}...`;
     }
 
     function formatMoney(value) {
@@ -771,11 +815,11 @@
 
     function renderSectionState() {
       $('#contractForm').classList.toggle('off', sectionState.generatorCollapsed);
+      $('#toggleGeneratorCollapsedView').classList.toggle('off', !sectionState.generatorCollapsed);
       $('#previewBody').classList.toggle('off', sectionState.generatorCollapsed);
-      $('#archiveBody').classList.toggle('off', sectionState.archiveCollapsed);
+      $('#togglePreviewCollapsedView').classList.toggle('off', !sectionState.generatorCollapsed);
       $('#generatorChevron').classList.toggle('collapsed', sectionState.generatorCollapsed);
       $('#previewChevron').classList.toggle('collapsed', sectionState.generatorCollapsed);
-      $('#archiveChevron').classList.toggle('collapsed', sectionState.archiveCollapsed);
     }
 
     function currentSearchQuery() {
@@ -934,6 +978,12 @@
     function renderPreview() {
       const { template, rendered, caseItem } = buildPreviewText();
       const sourceLabel = fields.customTemplateBody.value.trim() ? (currentTemplateName() || 'ატვირთული შაბლონი') : template.label;
+      const summaryLinks = [
+        caseItem ? `საქმე: ${caseItem.code}` : '',
+        fields.contactName.value.trim() ? `კონტაქტი: ${fields.contactName.value.trim()}` : '',
+        fields.invoiceNumber.value.trim() ? `ინვოისი: ${fields.invoiceNumber.value.trim()}` : ''
+      ].filter(Boolean).join(' • ') || 'საქმე, კონტაქტი და ინვოისი არჩეული არ არის';
+
       $('#previewMeta').textContent = `${sourceLabel} • ${fields.contractStatus.value}`;
       $('#previewCase').textContent = caseItem ? `${caseItem.code} • ${caseItem.title}` : 'არჩეული არ არის';
       $('#previewContact').textContent = fields.contactName.value.trim() || 'არჩეული არ არის';
@@ -944,6 +994,13 @@
         fields.invoiceNumber.value.trim() ? `ინვოისი: ${fields.invoiceNumber.value.trim()}` : '',
         signatureState?.dataUrl ? 'ხელმოწერა: ავტომატურად დაემატება' : ''
       ].filter(Boolean).join(' • ') || 'აირჩიე დაკავშირებული ჩანაწერები და გენერატორი ავტომატურად შეავსებს ველებს.';
+      $('#generatorSummaryTitle').textContent = fields.contractTitle.value.trim() || suggestionTitle() || 'ხელშეკრულების მონაცემები';
+      $('#generatorSummaryTemplate').textContent = sourceLabel;
+      $('#generatorSummaryStatus').textContent = fields.contractStatus.value;
+      $('#generatorSummaryLinks').textContent = summaryLinks;
+      $('#previewSummaryTitle').textContent = fields.contractTitle.value.trim() || sourceLabel;
+      $('#previewSummaryLinks').textContent = summaryLinks;
+      $('#previewSummaryExcerpt').textContent = truncateText(rendered, 220);
       $('#contractPreview').textContent = rendered;
       if (signatureState?.dataUrl) {
         $('#signaturePreviewMeta').textContent = [fields.lawyerName.value.trim() || fields.lawFirmName.value.trim(), fields.lawyerRole.value.trim()].filter(Boolean).join(' • ');
@@ -1434,12 +1491,16 @@
       sectionState.generatorCollapsed = !sectionState.generatorCollapsed;
       renderSectionState();
     };
+    $('#toggleGeneratorCollapsedView').onclick = () => {
+      sectionState.generatorCollapsed = false;
+      renderSectionState();
+    };
     $('#togglePreview').onclick = () => {
       sectionState.generatorCollapsed = !sectionState.generatorCollapsed;
       renderSectionState();
     };
-    $('#toggleArchive').onclick = () => {
-      sectionState.archiveCollapsed = !sectionState.archiveCollapsed;
+    $('#togglePreviewCollapsedView').onclick = () => {
+      sectionState.generatorCollapsed = false;
       renderSectionState();
     };
     $('#resetForm').onclick = () => { if (window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) resetForm(); };
