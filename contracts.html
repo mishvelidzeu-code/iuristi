@@ -250,7 +250,7 @@
             </div>
             <div id="formMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
             <div class="flex justify-end">
-              <button class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
+              <button type="submit" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-bold">შენახვა</button>
             </div>
           </form>
         </article>
@@ -1432,8 +1432,8 @@
               <div class="body">${escapeHtml(text)}</div>
               ${signatureBlock}
               <div class="actions">
-                <button onclick="window.print()">PDF / ბეჭდვა</button>
-                <button onclick="window.close()">დახურვა</button>
+                <button type="button" onclick="window.print()">PDF / ბეჭდვა</button>
+                <button type="button" onclick="window.close()">დახურვა</button>
               </div>
             </div>
           </div>
