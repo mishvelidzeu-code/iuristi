@@ -69,7 +69,7 @@
           </div>
           <div class="grid md:grid-cols-2 gap-3">
             <input id="caseScheduleDate" type="date" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
-            <input id="caseScheduleTime" type="time" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
+            <input id="caseScheduleTime" type="text" inputmode="numeric" placeholder="15:30" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none text-sm">
           </div>
           <textarea id="caseScheduleNotes" rows="3" class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-white outline-none resize-none text-sm" placeholder="დეტალური მითითება ამ დღისთვის..."></textarea>
           <div id="caseScheduleMsg" class="off rounded-2xl border px-4 py-3 text-sm font-medium"></div>
@@ -155,6 +155,68 @@
     if (category === 'შეხსენება') return 'bg-rose-50 text-rose-700 border-rose-100';
     if (category === 'პროცესი') return 'bg-blue-50 text-blue-700 border-blue-100';
     return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+  }
+
+  function normalizeTimeValue(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+
+    const cleaned = raw.replace(/\./g, ':');
+    let match = cleaned.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+
+    if (!match) {
+      const digitsOnly = raw.replace(/[^\d]/g, '');
+      if (/^\d{3,4}$/.test(digitsOnly)) {
+        const hourPart = digitsOnly.length === 3 ? digitsOnly.slice(0, 1) : digitsOnly.slice(0, 2);
+        const minutePart = digitsOnly.slice(-2);
+        match = [raw, hourPart, minutePart];
+      }
+    }
+
+    if (!match) return null;
+
+    const hour = Number(match[1]);
+    const minute = Number(match[2]);
+    if (!Number.isInteger(hour) || !Number.isInteger(minute) || hour > 23 || minute > 59) return null;
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  }
+
+  function displayTime(value) {
+    const normalized = normalizeTimeValue(value);
+    return normalized === null ? String(value || '').trim() : normalized;
+  }
+
+  function setupTwentyFourHourInput(input) {
+    if (!input) return;
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.placeholder = '15:30';
+    input.autocomplete = 'off';
+    input.pattern = '([01][0-9]|2[0-3]):[0-5][0-9]';
+    input.maxLength = 5;
+
+    const initialValue = normalizeTimeValue(input.value);
+    input.value = initialValue && initialValue !== null ? initialValue : '';
+
+    input.addEventListener('input', () => input.setCustomValidity(''));
+    input.addEventListener('blur', () => {
+      const raw = input.value.trim();
+      if (!raw) {
+        input.value = '';
+        input.setCustomValidity('');
+        return;
+      }
+
+      const normalized = normalizeTimeValue(raw);
+      if (normalized === null) {
+        input.setCustomValidity('დრო ჩაწერე ფორმატით 15:30');
+        input.reportValidity();
+        return;
+      }
+
+      input.value = normalized;
+      input.setCustomValidity('');
+    });
   }
 
   function showScheduleMessage(type, text) {
@@ -279,7 +341,7 @@
       title: 'ძირითადი თარიღი',
       category: 'პროცესი',
       event_date: hearingDateInput.value,
-      event_time: hearingTimeInput.value || '',
+      event_time: displayTime(hearingTimeInput.value || ''),
       notes: nextActionInput.value.trim() || 'საქმის ძირითადი თარიღი',
       locked: true
     };
@@ -326,7 +388,7 @@
       els.title.value = entry.title || '';
       els.category.value = entry.category || 'ვადა';
       els.date.value = entry.event_date || state.selectedDateKey;
-      els.time.value = entry.event_time || '';
+      els.time.value = displayTime(entry.event_time || '');
       els.notes.value = entry.notes || '';
     }
     els.title.focus();
@@ -354,7 +416,7 @@
               <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${badgeClass(entry.category)}">${entry.category}</span>
             </div>
             <div class="font-extrabold text-slate-800">${entry.title}</div>
-            <div class="text-xs text-slate-500 mt-1">${entry.event_time || 'დრო არ არის მითითებული'}</div>
+            <div class="text-xs text-slate-500 mt-1">${displayTime(entry.event_time) || 'დრო არ არის მითითებული'}</div>
             <div class="text-sm text-slate-500 mt-2">${entry.notes || 'დეტალური ჩანაწერი არ არის.'}</div>
           </div>
           ${entry.locked ? '' : `<div class="flex flex-col gap-2"><button type="button" data-schedule-edit="${entry.id}" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700">რედაქტირება</button><button type="button" data-schedule-delete="${entry.id}" class="px-3 py-2 rounded-xl border border-rose-200 text-xs font-bold text-rose-600">წაშლა</button></div>`}
@@ -403,17 +465,23 @@
   }
 
   async function saveEditorEntry() {
+    const normalizedEditorTime = normalizeTimeValue(els.time.value);
     const payload = {
       id: els.eventId.value || null,
       title: els.title.value.trim(),
       category: els.category.value,
       event_date: els.date.value,
-      event_time: els.time.value,
+      event_time: normalizedEditorTime,
       notes: els.notes.value.trim()
     };
 
     if (!payload.title || !payload.event_date) {
       showScheduleMessage('err', 'შეავსე მინიმუმ სათაური და თარიღი.');
+      return;
+    }
+
+    if (els.time.value.trim() && normalizedEditorTime === null) {
+      showScheduleMessage('err', 'დრო ჩაწერე ფორმატით 15:30.');
       return;
     }
 
@@ -473,6 +541,7 @@
   if (originalFill) {
     fill = function (item) {
       originalFill(item);
+      hearingTimeInput.value = displayTime(hearingTimeInput.value);
       Promise.resolve(loadForCase(item.id)).catch((error) => console.error(error));
     };
   }
@@ -480,6 +549,14 @@
   const originalSaveCaseToDb = typeof saveCaseToDb === 'function' ? saveCaseToDb : null;
   if (originalSaveCaseToDb) {
     saveCaseToDb = async function (payload) {
+      const rawHearingTime = payload?.meta?.hearing_time || '';
+      const normalizedHearingTime = normalizeTimeValue(rawHearingTime);
+      if (String(rawHearingTime).trim() && normalizedHearingTime === null) {
+        throw new Error('დრო ჩაწერე ფორმატით 15:30.');
+      }
+      if (payload?.meta) payload.meta.hearing_time = normalizedHearingTime;
+      hearingTimeInput.value = normalizedHearingTime || '';
+
       const savedId = await originalSaveCaseToDb(payload);
       if (!payload.id && state.draftEntries.length) {
         await syncDraftEntries(savedId);
@@ -494,9 +571,17 @@
     state.selectedDateKey = hearingDateInput.value || state.selectedDateKey || formatKey(new Date());
     renderSchedule();
   });
-  hearingTimeInput.addEventListener('change', renderSchedule);
+  hearingTimeInput.addEventListener('change', () => {
+    const normalized = normalizeTimeValue(hearingTimeInput.value);
+    if (hearingTimeInput.value.trim() && normalized === null) return;
+    hearingTimeInput.value = normalized || '';
+    renderSchedule();
+  });
   if (meetingLocationInput) meetingLocationInput.addEventListener('input', renderSchedule);
   if (nextActionInput) nextActionInput.addEventListener('input', renderSchedule);
+
+  setupTwentyFourHourInput(hearingTimeInput);
+  setupTwentyFourHourInput(els.time);
 
   document.querySelector('#newCase')?.addEventListener('click', () => setTimeout(prepareNewCase, 0));
   document.querySelector('#primary')?.addEventListener('click', () => setTimeout(prepareNewCase, 0));
