@@ -316,6 +316,7 @@
       ]
         .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
         .sort((left, right) => {
+          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
           if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
           if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
           if (!left.time) return 1;
@@ -324,11 +325,31 @@
         });
     }
 
-    function renderDashboardReminders(events) {
+    function closestReminderEvents(cases, manualEntries, limit = 3) {
+      const todayKey = formatKey(new Date());
+      return [
+        ...cases.flatMap(caseEventsFromRow),
+        ...manualEntries.map((item) => manualEventFromRow(item, cases))
+      ]
+        .filter((event) => event.reminderDate && event.reminderDate >= todayKey)
+        .sort((left, right) => {
+          if (left.reminderDate !== right.reminderDate) return left.reminderDate.localeCompare(right.reminderDate);
+          if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
+          if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
+          if (!left.time) return 1;
+          if (!right.time) return -1;
+          return left.time.localeCompare(right.time);
+        })
+        .slice(0, limit);
+    }
+
+    function renderDashboardReminders(events, useFallback = false) {
       const note = document.querySelector('#dashboardReminderNote');
       const list = document.querySelector('#dashboardReminderList');
 
-      note.textContent = 'აქ ჩანს ის შეხსენებები, რომლებიც დღესიდან მომდევნო 5 დღეში უნდა შეგახსენდეს.';
+      note.textContent = useFallback
+        ? 'მომდევნო 5 დღეში ჩანაწერი არ არის, ამიტომ ქვემოთ ნაჩვენებია ყველაზე ახლო 3 შეხსენება.'
+        : 'აქ ჩანს ის შეხსენებები, რომლებიც დღესიდან მომდევნო 5 დღეში უნდა შეგახსენდეს.';
 
       if (!events.length) {
         list.innerHTML = '<div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">მომდევნო 5 დღეში შეხსენება არ გაქვს.</div>';
@@ -394,7 +415,9 @@
         manualEntries = readLocalEntries(userData.user.id);
       }
 
-      renderDashboardReminders(upcomingReminderEvents(rows, manualEntries, 5));
+      const reminders = upcomingReminderEvents(rows, manualEntries, 5);
+      const fallbackReminders = !reminders.length ? closestReminderEvents(rows, manualEntries, 3) : [];
+      renderDashboardReminders(reminders.length ? reminders : fallbackReminders, !reminders.length && fallbackReminders.length > 0);
     }
 
     function goCases(newCase = false) {

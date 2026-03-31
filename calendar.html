@@ -133,7 +133,10 @@
             <div id="selectedDateLabel" class="text-xl font-extrabold mt-1"></div>
             <div id="selectedDateMeta" class="text-xs text-slate-500 mt-2"></div>
           </div>
-          <button type="button" id="dayAddEvent" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-blue-600">ამ დღეზე ჩანაწერის დამატება</button>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="clearSelectedDay" class="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100">დღის გასუფთავება</button>
+            <button type="button" id="dayAddEvent" class="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-blue-600">ამ დღეზე ჩანაწერის დამატება</button>
+          </div>
         </div>
         <div id="agendaEmpty" class="off rounded-[1.2rem] border border-dashed border-slate-300 bg-slate-50 px-5 py-6 text-center">
           <div class="text-base font-bold">ამ დღეზე ჩანაწერი არ არის</div>
@@ -174,6 +177,10 @@
             <input id="eventTime" type="text" inputmode="numeric" placeholder="15:30" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
             <input id="eventReminderDate" type="date" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
           </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <div class="text-xs text-slate-500">თუ reminder არ გინდა, გააუქმე და ისე შეინახე.</div>
+            <button type="button" id="clearReminderDate" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100">რემაინდერის გაუქმება</button>
+          </div>
           <div class="grid md:grid-cols-2 gap-4">
             <input id="eventLocation" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none" placeholder="ლოკაცია / მისამართი">
             <select id="eventRelatedCase" class="w-full px-4 py-3 rounded-2xl border bg-white outline-none">
@@ -198,6 +205,7 @@
     ];
     const LOCAL_EVENTS_KEY = 'lexmanage-calendar-events';
     const LOCAL_NOTIFICATIONS_KEY = 'lexmanage-calendar-notified';
+    const LOCAL_CALENDAR_STATE_KEY = 'lexmanage-calendar-state';
 
     let currentUser = null;
     let monthCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -206,6 +214,7 @@
     let cases = [];
     let manualEntries = [];
     let calendarMode = 'local';
+    let calendarState = { hiddenEventIds: [], mutedReminderIds: [] };
 
     function formatKey(date) {
       const year = date.getFullYear();
@@ -217,6 +226,48 @@
     function parseKey(value) {
       const [year, month, day] = value.split('-').map(Number);
       return new Date(year, month - 1, day);
+    }
+
+    function loadCalendarState() {
+      if (!currentUser?.id) {
+        calendarState = { hiddenEventIds: [], mutedReminderIds: [] };
+        return;
+      }
+
+      const all = JSON.parse(localStorage.getItem(LOCAL_CALENDAR_STATE_KEY) || '{}');
+      const nextState = all[currentUser.id] || {};
+      calendarState = {
+        hiddenEventIds: Array.isArray(nextState.hiddenEventIds) ? nextState.hiddenEventIds : [],
+        mutedReminderIds: Array.isArray(nextState.mutedReminderIds) ? nextState.mutedReminderIds : []
+      };
+    }
+
+    function persistCalendarState() {
+      if (!currentUser?.id) return;
+      const all = JSON.parse(localStorage.getItem(LOCAL_CALENDAR_STATE_KEY) || '{}');
+      all[currentUser.id] = {
+        hiddenEventIds: [...new Set(calendarState.hiddenEventIds)],
+        mutedReminderIds: [...new Set(calendarState.mutedReminderIds)]
+      };
+      localStorage.setItem(LOCAL_CALENDAR_STATE_KEY, JSON.stringify(all));
+    }
+
+    function isHiddenEvent(eventId) {
+      return calendarState.hiddenEventIds.includes(eventId);
+    }
+
+    function isReminderMuted(eventId) {
+      return calendarState.mutedReminderIds.includes(eventId);
+    }
+
+    function hideEvents(eventIds) {
+      calendarState.hiddenEventIds = [...new Set([...calendarState.hiddenEventIds, ...eventIds])];
+      persistCalendarState();
+    }
+
+    function muteReminder(eventId) {
+      calendarState.mutedReminderIds = [...new Set([...calendarState.mutedReminderIds, eventId])];
+      persistCalendarState();
     }
 
     function selectDate(value, options = {}) {
@@ -407,7 +458,7 @@
       $('#eventCategory').value = entry?.category || 'პირადი';
       $('#eventDate').value = entry?.event_date || dateKey;
       $('#eventTime').value = displayTime(entry?.event_time || '');
-      $('#eventReminderDate').value = entry?.reminder_date || defaultReminderDate(entry?.event_date || dateKey);
+      $('#eventReminderDate').value = entry ? (entry?.reminder_date || '') : defaultReminderDate(dateKey);
       $('#eventLocation').value = entry?.location || '';
       $('#eventRelatedCase').value = entry?.related_case_id || '';
       $('#eventNotes').value = entry?.notes || '';
@@ -496,7 +547,7 @@
         location: row.location || '',
         note: row.notes || '',
         relatedCaseId: row.related_case_id || '',
-        reminderDate: row.reminder_date || defaultReminderDate(row.event_date),
+        reminderDate: row.reminder_date || '',
         raw: row
       };
     }
@@ -505,7 +556,7 @@
       return [
         ...cases.flatMap(caseEventsFromRow),
         ...manualEntries.map(manualEventFromRow)
-      ];
+      ].filter((event) => !isHiddenEvent(event.id));
     }
 
     function filteredEvents() {
@@ -525,21 +576,35 @@
 
     function reminderEventsForToday() {
       const todayKey = formatKey(new Date());
-      return allEvents().filter((event) => event.reminderDate === todayKey);
+      return allEvents().filter((event) => event.reminderDate === todayKey && !isReminderMuted(event.id));
+    }
+
+    function sortReminderEvents(events) {
+      return [...events].sort((left, right) => {
+        const leftReminderKey = left.reminderDate || left.dateKey;
+        const rightReminderKey = right.reminderDate || right.dateKey;
+        if (leftReminderKey !== rightReminderKey) return leftReminderKey.localeCompare(rightReminderKey);
+        if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
+        if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
+        if (!left.time) return 1;
+        if (!right.time) return -1;
+        return left.time.localeCompare(right.time);
+      });
     }
 
     function upcomingReminderEvents(days = 5) {
       const todayKey = formatKey(new Date());
       const lastDayKey = addDays(todayKey, Math.max(days - 1, 0));
-      return allEvents()
-        .filter((event) => event.reminderDate && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
-        .sort((left, right) => {
-          if (left.dateKey !== right.dateKey) return left.dateKey.localeCompare(right.dateKey);
-          if (!left.time && !right.time) return left.title.localeCompare(right.title, 'ka');
-          if (!left.time) return 1;
-          if (!right.time) return -1;
-          return left.time.localeCompare(right.time);
-        });
+      return sortReminderEvents(
+        allEvents().filter((event) => event.reminderDate && !isReminderMuted(event.id) && event.reminderDate >= todayKey && event.reminderDate <= lastDayKey)
+      );
+    }
+
+    function closestReminderEvents(limit = 3) {
+      const todayKey = formatKey(new Date());
+      return sortReminderEvents(
+        allEvents().filter((event) => event.reminderDate && !isReminderMuted(event.id) && event.reminderDate >= todayKey)
+      ).slice(0, limit);
     }
 
     function calendarDates() {
@@ -574,6 +639,23 @@
 
     function renderReminderList() {
       const reminders = upcomingReminderEvents(5);
+      const fallbackReminders = !reminders.length ? closestReminderEvents(3) : [];
+
+      if (fallbackReminders.length) {
+        $('#notificationNote').textContent = 'მომდევნო 5 დღეში ჩანაწერი არ არის, ამიტომ ქვემოთ ნაჩვენებია ყველაზე ახლო 3 შეხსენება.';
+        $('#reminderList').innerHTML = fallbackReminders.map((event) => `
+          <article class="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-3">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${sourceBadge(event)}">${event.source === 'case' ? 'საქმე' : 'ჩემი ჩანაწერი'}</span>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${kindBadge(event)}">${event.kind}</span>
+              <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600">${escapeHtml(formatReminderBadge(event.dateKey))}</span>
+            </div>
+            <div class="text-base font-extrabold">${escapeHtml(event.title)}</div>
+            <div class="text-xs text-slate-500 mt-1.5">${escapeHtml(formatShortDate(event.dateKey))}${event.time ? ` • ${escapeHtml(displayTime(event.time))}` : ''}${event.location ? ` • ${escapeHtml(event.location)}` : ''}</div>
+          </article>
+        `).join('');
+        return;
+      }
       $('#notificationNote').textContent = 'აქ ჩანს ის შეხსენებები, რომლებიც დღესიდან მომდევნო 5 დღეში უნდა შეგახსენოს. Browser notification მაინც მხოლოდ მიმდინარე დღეზე იმუშავებს.';
 
       if (!reminders.length) {
@@ -630,6 +712,9 @@
       $('#selectedDateLabel').textContent = formatLongDate(selectedDateKey);
       $('#selectedDateMeta').textContent = items.length ? `${items.length} ჩანაწერი ამ დღეზე` : 'ჩანაწერები ამ დღეზე ჯერ არ არის';
       $('#agendaEmpty').classList.toggle('off', items.length !== 0);
+      $('#clearSelectedDay').disabled = items.length === 0;
+      $('#clearSelectedDay').classList.toggle('opacity-50', items.length === 0);
+      $('#clearSelectedDay').classList.toggle('cursor-not-allowed', items.length === 0);
 
       $('#agendaList').innerHTML = items.map((event) => `
         <article class="rounded-[1.2rem] border border-slate-200 bg-slate-50 px-4 py-3">
@@ -647,6 +732,7 @@
             </div>
             <div class="flex flex-wrap gap-2">
               ${event.source === 'case' ? `<button type="button" data-open-case="${event.caseId}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-white">საქმის გახსნა</button>` : ''}
+              ${event.reminderDate && !isReminderMuted(event.id) ? `<button type="button" data-mute-reminder="${event.id}" class="px-3 py-1.5 rounded-xl border border-amber-200 text-xs font-bold text-amber-700 hover:bg-amber-50">რემაინდერის გაუქმება</button>` : ''}
               ${event.source === 'manual' ? `<button type="button" data-edit-event="${event.id}" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-white">რედაქტირება</button>` : ''}
               ${event.source === 'manual' ? `<button type="button" data-delete-event="${event.id}" class="px-3 py-1.5 rounded-xl border border-rose-200 text-xs font-bold text-rose-600 hover:bg-rose-50">წაშლა</button>` : ''}
             </div>
@@ -783,6 +869,50 @@
       writeLocalEntries(readLocalEntries().filter((item) => item.id !== id));
     }
 
+    async function deleteManualEntriesForDate(dateKey) {
+      if (calendarMode === 'supabase') {
+        const { error } = await window.supabaseClient
+          .from('calendar_events')
+          .delete()
+          .eq('user_id', currentUser.id)
+          .eq('event_date', dateKey);
+        if (error) throw error;
+        return;
+      }
+
+      writeLocalEntries(readLocalEntries().filter((item) => item.event_date !== dateKey));
+    }
+
+    async function disableReminderForEvent(eventItem) {
+      if (eventItem.source === 'manual') {
+        await saveManualEntry({
+          id: eventItem.raw.id,
+          title: eventItem.raw.title,
+          category: eventItem.raw.category || eventItem.kind || 'პირადი',
+          event_date: eventItem.raw.event_date,
+          event_time: eventItem.raw.event_time || '',
+          reminder_date: null,
+          location: eventItem.raw.location || '',
+          related_case_id: eventItem.raw.related_case_id || null,
+          notes: eventItem.raw.notes || ''
+        });
+        return;
+      }
+
+      muteReminder(eventItem.id);
+    }
+
+    async function clearSelectedDay() {
+      const dayItems = eventsForDate(selectedDateKey);
+      if (!dayItems.length) return;
+      if (!window.confirm('დარწმუნებული ხარ, რომ ამ დღის ჩანაწერების გასუფთავება გინდა?')) return;
+
+      const caseEventIds = dayItems.filter((item) => item.source === 'case').map((item) => item.id);
+
+      await deleteManualEntriesForDate(selectedDateKey);
+      if (caseEventIds.length) hideEvents(caseEventIds);
+    }
+
     function updateNotificationButton() {
       const button = $('#enableNotifications');
       if (!('Notification' in window)) {
@@ -867,11 +997,23 @@ $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
     };
     $('#newEvent').onclick = () => openEventModal(null, selectedDateKey);
     $('#dayAddEvent').onclick = () => openEventModal(null, selectedDateKey);
+    $('#clearSelectedDay').onclick = async () => {
+      try {
+        await clearSelectedDay();
+        await refreshCalendar();
+      } catch (error) {
+        console.error(error);
+      }
+    };
     $('#closeEventModal').onclick = closeEventModal;
     $('#resetEventForm').onclick = () => {
       if (window.confirm('დარწმუნებული ხარ, რომ ფორმის გასუფთავება გინდა?')) {
         resetEventForm(null, $('#eventDate').value || selectedDateKey);
       }
+    };
+    $('#clearReminderDate').onclick = () => {
+      $('#eventReminderDate').value = '';
+      showEventFormMessage('ok', 'რემაინდერი გაითიშება, თუ ასე შეინახავ.');
     };
     $('#eventModal').onclick = (event) => {
       if (event.target === $('#eventModal')) closeEventModal();
@@ -912,6 +1054,20 @@ $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
         if (!window.confirm('დარწმუნებული ხარ, რომ ამ ჩანაწერის წაშლა გინდა?')) return;
         try {
           await deleteManualEntry(deleteButton.dataset.deleteEvent);
+          await refreshCalendar();
+        } catch (error) {
+          console.error(error);
+        }
+        return;
+      }
+
+      const muteButton = event.target.closest('[data-mute-reminder]');
+      if (muteButton) {
+        const item = allEvents().find((entry) => entry.id === muteButton.dataset.muteReminder);
+        if (!item) return;
+        if (!window.confirm('დარწმუნებული ხარ, რომ ამ ჩანაწერის რემაინდერის გაუქმება გინდა?')) return;
+        try {
+          await disableReminderForEvent(item);
           await refreshCalendar();
         } catch (error) {
           console.error(error);
@@ -974,6 +1130,7 @@ $('#goFinances').onclick = () => { window.location.href = 'finances.html'; };
     (async function init() {
       try {
         currentUser = await getCurrentUser();
+        loadCalendarState();
         await refreshCalendar();
         updateNotificationButton();
         setInterval(triggerNotifications, 60000);
